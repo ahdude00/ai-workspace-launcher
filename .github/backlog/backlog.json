@@ -1,0 +1,749 @@
+{
+  "source": "docs/AWL_Teknik_Tasarim_ve_SRS.html",
+  "labels": [
+    { "name": "tür: özellik",        "color": "1d76db", "description": "Kullanıcıya görünen yeni davranış" },
+    { "name": "tür: altyapı",        "color": "5319e7", "description": "Mimari, ortak kod, CI/CD, paketleme" },
+    { "name": "tür: test",           "color": "0e8a16", "description": "Test ve kabul çalışmaları" },
+    { "name": "tür: doğrulama",      "color": "fbca04", "description": "Kodlamadan önce geliştirici ortamında yapılan Faz 0 doğrulaması" },
+    { "name": "tür: doküman",        "color": "0075ca", "description": "Karar günlüğü, SRS, ADR güncellemeleri" },
+    { "name": "tür: hata",           "color": "d73a4a", "description": "Beklenmeyen davranış" },
+    { "name": "alan: mimari",        "color": "c5def5", "description": "Çözüm yapısı, ortak çekirdek, kalıcılık" },
+    { "name": "alan: kurulum",       "color": "c5def5", "description": "İlk kurulum, onarım, kaldırma" },
+    { "name": "alan: oturum",        "color": "c5def5", "description": "Oturum ve kategori yönetimi" },
+    { "name": "alan: claude",        "color": "c5def5", "description": "Claude Code CLI entegrasyonu" },
+    { "name": "alan: terminal",      "color": "c5def5", "description": "Terminal başlatma, gömülü terminal" },
+    { "name": "alan: python",        "color": "c5def5", "description": "uv, venv, Python araçları" },
+    { "name": "alan: belge",         "color": "c5def5", "description": "Belgeler, UDF, dosya bırakma" },
+    { "name": "alan: windows",       "color": "c5def5", "description": "Sağ tık, kayıt defteri, tek örnek" },
+    { "name": "alan: arayüz",        "color": "c5def5", "description": "WPF ekranları" },
+    { "name": "alan: tanılama",      "color": "c5def5", "description": "Günlük, tanılama paketi" },
+    { "name": "alan: ci-cd",         "color": "c5def5", "description": "GitHub Actions, sürüm yayınlama" },
+    { "name": "alan: araçlar",       "color": "c5def5", "description": "Araçlar sekmesi" },
+    { "name": "öncelik: zorunlu",    "color": "b60205", "description": "Olmadan sürüm kabul edilmez" },
+    { "name": "öncelik: önemli",     "color": "d93f0b", "description": "Olmalı, gerekçeyle ertelenebilir" },
+    { "name": "öncelik: isteğe bağlı", "color": "c2e0c6", "description": "Zaman kalırsa" }
+  ],
+  "milestones": [
+    { "key": "F0", "title": "Faz 0 – Doğrulama",        "description": "AWL'nin otomatik yapacağı işlerin kodlamadan önce geliştiricinin kendi ortamında (kendi bilgisayarı veya Windows 10 sanal makinesi, standart kullanıcı hesabı) denenmesi. Son kullanıcının bilgisayarında hiçbir şey yapılmaz." },
+    { "key": "F1", "title": "Faz 1 – MVP",              "description": "Çalışan ilk sürüm (v1): kurulum, oturumlar, sağ tık, gerçek terminal" },
+    { "key": "F2", "title": "Faz 2 – Gömülü terminal",  "description": "WebView2 + xterm.js + ConPTY, arama, tema" },
+    { "key": "F3", "title": "Faz 3 – Araçlar",          "description": "Araçlar sekmesi ve web araçları" }
+  ],
+  "tasks": [
+    {
+      "key": "F0-01", "slug": "cli-manual-install", "milestone": "F0",
+      "title": "Otomatik kurulumun ön testi: Claude Code CLI'nin kullanıcı bazlı kurulumu",
+      "type": "doğrulama", "areas": ["claude", "kurulum"], "priority": "zorunlu",
+      "summary": "AWL ilk açılışta Claude Code'u kullanıcıya hiçbir şey yaptırmadan kuracak (KUR-06). Bu görevde geliştirici, aynı kurulum adımlarını kodlamaya başlamadan önce kendi ortamında (kendi bilgisayarı veya Windows 10 sanal makinesi, standart kullanıcı hesabı) elle dener ve yolun çalıştığını görür. Son kullanıcının bilgisayarında hiçbir şey yapılmaz.",
+      "todo": [
+        "Windows sürümünü ve build numarasını not et (winver)",
+        "PowerShell'de `irm https://claude.ai/install.ps1 | iex` çalıştır, çıktıyı kaydet",
+        "`claude --version` çıktısını kaydet",
+        "Boş bir klasörde `claude` ile giriş yap; giriş akışı sorunsuz mu?",
+        "Küçük, kişisel veri içermeyen bir PDF/DOCX ile deneme konuşması yap",
+        "Alt+V ile ekran görüntüsü yapıştırmayı dene"
+      ],
+      "requirements": "KUR-04, KUR-06, UYM-01 · D01, D03",
+      "acceptance": ["Sonuçlar (çalıştı / çalışmadı + hata metni) bu issue'ya yorum olarak yazıldı"],
+      "dependsOn": []
+    },
+    {
+      "key": "F0-02", "slug": "cli-behaviour", "milestone": "F0",
+      "title": "Claude Code CLI davranışlarını doğrula (oturum kimliği, ayarlar, dosya konumları)",
+      "type": "doğrulama", "areas": ["claude"], "priority": "zorunlu",
+      "summary": "Tasarımın dayandığı CLI özelliklerinin beklendiği gibi çalıştığını teyit etmek. Geliştirici makinesinde yapılabilir.",
+      "todo": [
+        "`claude --session-id <uuid>` ile başlat, kapat; farklı bir günde `claude --resume <uuid>` ile aç",
+        "`--settings` dosyasındaki `env` değişkenleri Claude'un PowerShell aracına ulaşıyor mu? (TA-01)",
+        "`--append-system-prompt-file` ile verilen talimatlar uygulanıyor mu?",
+        "`cleanupPeriodDays` ayarı kabul ediliyor mu?",
+        "Bir oturumdan sonra Claude veri klasöründe oturum kimliğini içeren tüm dosya ve klasörleri listele (D18 silme listesi)"
+      ],
+      "requirements": "OTR-02, OTR-03, OTR-04, OTR-11, TRM-05 · D14, D15, D18, TA-01",
+      "acceptance": ["Her madde için sonuç issue'ya yazıldı", "D18 silme listesi kesinleşti"],
+      "dependsOn": []
+    },
+    {
+      "key": "F0-03", "slug": "portable-terminal", "milestone": "F0",
+      "title": "Taşınabilir Windows Terminal'i Windows 10'da dene",
+      "type": "doğrulama", "areas": ["terminal"], "priority": "önemli",
+      "summary": "D17'deki tercih edilen terminal yolunun Windows 10'da standart kullanıcı hesabıyla çalıştığını geliştirici ortamında görmek.",
+      "todo": [
+        "Windows Terminal ZIP sürümünü kullanıcı klasörüne aç, yanına `.portable` dosyası ekle",
+        "Standart kullanıcı hesabıyla açılıyor mu?",
+        "`wt -w new new-tab -d <klasör> claude` ile Claude açılıyor mu?",
+        "Yeni sekmede, wt'yi başlatan süreçte tanımlanan bir ortam değişkeni görünüyor mu? (TA-01)",
+        "Windows 10 sürümü 2004'ten eskiyse Windows konsolu yolunu dene"
+      ],
+      "requirements": "TRM-02, KUR-13 · D17",
+      "acceptance": ["Sonuçlar issue'ya yazıldı"],
+      "dependsOn": ["F0-01"]
+    },
+    {
+      "key": "F0-04", "slug": "udf-repack", "milestone": "F0",
+      "title": "UDF yeniden paketleme ön testi",
+      "type": "doğrulama", "areas": ["belge"], "priority": "zorunlu",
+      "summary": "Python ile yeniden paketlenen bir UDF'nin UYAP Editör'de sorunsuz açıldığını görmek (D23).",
+      "todo": [
+        "Kişisel veri içermeyen bir UDF örneğini ZIP olarak aç ve girdilerini listele",
+        "İçerik XML'inde küçük bir metin değişikliği yap",
+        "Aynı girdi sırası ve sıkıştırma türüyle yeniden paketle",
+        "Geliştirici makinesine kurulu UYAP Editör'de açılıp açılmadığını kontrol et",
+        "Testlerde kullanılmak üzere anonim bir örnek UDF hazırla"
+      ],
+      "requirements": "BLG-04 · D23",
+      "acceptance": ["Sonuç issue'ya yazıldı", "Anonim örnek UDF hazır"],
+      "dependsOn": []
+    },
+    {
+      "key": "F0-05", "slug": "document-skills", "milestone": "F0",
+      "title": "Belge skill'lerinin kurulumu ve yüklenmesini araştır",
+      "type": "doğrulama", "areas": ["claude", "belge"], "priority": "önemli",
+      "summary": "D20'deki “önce skill” yolunun nasıl kurulacağını ve hangi koşullarda çalıştığını belirlemek.",
+      "todo": [
+        "Anthropic belge skill'lerinin Claude Code'a resmi plugin mekanizmasıyla nasıl kurulduğunu belirle",
+        "Oturuma özel yükleme mümkün mü, yoksa kullanıcı düzeyinde mi kurulmalı?",
+        "Node.js, LibreOffice, pandoc olmadan hangi işlemler çalışıyor?",
+        "Lisans koşullarını not et (pakete gömülemez)"
+      ],
+      "requirements": "KUR-12, LIS-01 · D20",
+      "acceptance": ["Kurulum yöntemi ve sınırlar issue'ya yazıldı"],
+      "dependsOn": []
+    },
+    {
+      "key": "F0-06", "slug": "record-phase0", "milestone": "F0",
+      "title": "Faz 0 sonuçlarını karar günlüğüne ve SRS'e işle",
+      "type": "doküman", "areas": ["mimari"], "priority": "zorunlu",
+      "summary": "Doğrulama sonuçlarını belgelere taşımak; değişen kararlar ve gereksinimler için iz bırakmak.",
+      "todo": [
+        "Her doğrulamanın sonucunu ilgili karara yaz",
+        "SRS'teki açık konular listesini güncelle",
+        "Değişen gereksinimleri SRS'te güncelle; gerekirse yeni issue aç"
+      ],
+      "requirements": "D13–D23 · SRS §16",
+      "acceptance": ["Açık konular listesinde Faz 0'a bağlı madde kalmadı"],
+      "dependsOn": ["F0-01", "F0-02", "F0-03", "F0-04", "F0-05"]
+    },
+
+    {
+      "key": "F1-01", "slug": "solution-skeleton", "milestone": "F1",
+      "title": "Çözüm iskeleti: projeler, ortak derleme ayarları, boş ana pencere",
+      "type": "altyapı", "areas": ["mimari"], "priority": "zorunlu",
+      "summary": "Tüm sonraki görevlerin üzerine kurulacağı üç projeli yapıyı ve derleyici kurallarını oluşturmak.",
+      "todo": [
+        "`AWL.sln`; `src/AWL.Core` (net10.0), `src/AWL.Infrastructure` (net10.0-windows), `src/AWL.Desktop` (WPF, net10.0-windows)",
+        "`tests/AWL.Core.Tests`, `tests/AWL.Infrastructure.Tests`, `tests/AWL.Architecture.Tests` (xUnit, NSubstitute, Shouldly)",
+        "`Directory.Build.props` (nullable, uyarılar = hata, AnalysisLevel), `Directory.Packages.props`, `.editorconfig`",
+        "Generic Host + DI bileşim kökü; Türkçe başlıklı boş ana pencere; `Strings.resx` (tr-TR)",
+        "Self-contained single-file `dotnet publish` komutunun çalıştığını doğrula"
+      ],
+      "requirements": "BAK-01, BAK-02, UYM-02 · Teknik §01–§02",
+      "acceptance": ["`dotnet build` uyarısız", "`dotnet test` geçiyor", "Yayımlanan tek EXE açılıyor"],
+      "dependsOn": []
+    },
+    {
+      "key": "F1-02", "slug": "ci-pipeline", "milestone": "F1",
+      "title": "CI hattı (GitHub Actions) ve main koruması",
+      "type": "altyapı", "areas": ["ci-cd"], "priority": "zorunlu",
+      "summary": "Her push ve PR'da derleme ve testlerin otomatik çalışması; kırmızı CI ile main'e merge edilememesi.",
+      "todo": [
+        "`.github/workflows/ci.yml`: push + pull_request tetikleyicileri",
+        "`build-test` işi (windows-latest): .NET 10, restore, build, test, kapsam raporu artifact",
+        "`python-tests` işi (ubuntu-latest): `tests/python` için pytest (klasör yoksa başarılı geçer)",
+        "CodeQL (C#) taraması",
+        "`.github/dependabot.yml`: nuget ve github-actions, haftalık",
+        "README'ye CI rozeti",
+        "main için ruleset: PR zorunlu, `build-test` ve `python-tests` zorunlu, force push ve silme yasak"
+      ],
+      "requirements": "BAK-02, BAK-03 · Geliştirme Süreci §4",
+      "acceptance": ["Kırmızı CI'lı bir PR merge edilemiyor", "Yeşil PR squash merge edilebiliyor"],
+      "dependsOn": ["F1-01"]
+    },
+    {
+      "key": "F1-03", "slug": "architecture-tests", "milestone": "F1",
+      "title": "Mimari kuralları test et (NetArchTest)",
+      "type": "test", "areas": ["mimari"], "priority": "önemli",
+      "summary": "Bağımlılık yönünün zamanla bozulmasını otomatik olarak yakalamak.",
+      "todo": [
+        "Core; `Microsoft.Win32`, `System.Windows`, `System.Management` isim alanlarına bağımlı değil",
+        "ViewModel'ler `System.Windows` tiplerine bağımlı değil",
+        "Infrastructure, Desktop'a bağımlı değil"
+      ],
+      "requirements": "BAK-01",
+      "acceptance": ["Kuralı bozan örnek bir değişiklik testi kırıyor"],
+      "dependsOn": ["F1-01"]
+    },
+    {
+      "key": "F1-04", "slug": "core-common", "milestone": "F1",
+      "title": "Ortak çekirdek: Result, AppError, IClock, AwlPaths",
+      "type": "altyapı", "areas": ["mimari"], "priority": "zorunlu",
+      "summary": "Tüm modüllerin kullanacağı hata, zaman ve yol soyutlamalarını tek yerde tanımlamak.",
+      "todo": [
+        "`Result` / `Result<T>` ve `AppError` (Code, UserMessageKey, Detail)",
+        "`IClock` ve sistem uygulaması",
+        "`AwlPaths`: bilinen klasörler `Environment.GetFolderPath` ile; `CLAUDE_CONFIG_DIR` desteği",
+        "Options sınıfları ve birim testleri"
+      ],
+      "requirements": "BAK-04, UYM-01",
+      "acceptance": ["Kodda sabit sürücü harfi veya kullanıcı adı yok", "Birim testleri geçiyor"],
+      "dependsOn": ["F1-01"]
+    },
+    {
+      "key": "F1-05", "slug": "logging-errors", "milestone": "F1",
+      "title": "Günlükleme ve global hata yakalama",
+      "type": "altyapı", "areas": ["tanılama"], "priority": "zorunlu",
+      "summary": "Sorunların hassas veri sızdırmadan teşhis edilebilmesi ve uygulamanın beklenmeyen hatada kontrollü davranması.",
+      "todo": [
+        "Serilog dosya günlüğü (5 MB × 10 dosya) `AWL_HOME/logs` altında",
+        "Günlük kuralları: belge/sohbet içeriği, oturum başlığı, kimlik bilgisi yok; yollar yalnızca Debug seviyesinde",
+        "Dispatcher, TaskScheduler ve AppDomain yakalayıcıları",
+        "Türkçe, sade hata penceresi",
+        "Açılışta AWL sürümünü günlüğe yaz"
+      ],
+      "requirements": "TAN-01, TAN-02, TAN-05",
+      "acceptance": ["Bilinçli atılan bir istisna uygulamayı çökertmeden günlüğe düşüyor"],
+      "dependsOn": ["F1-04"]
+    },
+    {
+      "key": "F1-06", "slug": "sqlite-persistence", "milestone": "F1",
+      "title": "SQLite kalıcılık katmanı ve şema v1",
+      "type": "altyapı", "areas": ["mimari", "oturum"], "priority": "zorunlu",
+      "summary": "Oturum ve kategorilerin güvenli, çökmeye dayanıklı biçimde saklanması.",
+      "todo": [
+        "Microsoft.Data.Sqlite + Dapper, WAL modu",
+        "İleri yönlü migration çalıştırıcı (`schema_version`)",
+        "Şema v1: `categories`, `sessions` (SRS §15.4)",
+        "`ISessionRepository` ve `ICategoryRepository` uygulamaları",
+        "Geçici veritabanıyla entegrasyon testleri"
+      ],
+      "requirements": "GVL-01 · SRS §15.4",
+      "acceptance": ["Migration iki kez çalıştırıldığında hata vermiyor", "Entegrasyon testleri geçiyor"],
+      "dependsOn": ["F1-04"]
+    },
+    {
+      "key": "F1-07", "slug": "awl-settings", "milestone": "F1",
+      "title": "AWL ayarları (settings.json)",
+      "type": "altyapı", "areas": ["mimari"], "priority": "zorunlu",
+      "summary": "Saklama süresi, terminal tercihi ve kurulum durumlarının kalıcı tutulması.",
+      "todo": [
+        "`AwlSettings`: saklama süresi (varsayılan 3650 gün), terminal tercihi, kurulum adım durumları",
+        "Atomik kaydetme (geçici dosya + yeniden adlandırma)",
+        "Bozuk dosyada varsayılanlara dön ve günlüğe yaz",
+        "Birim testleri"
+      ],
+      "requirements": "AYR-01, AYR-02",
+      "acceptance": ["Bozuk bir settings.json uygulamayı durdurmuyor"],
+      "dependsOn": ["F1-04"]
+    },
+    {
+      "key": "F1-08", "slug": "command-builder", "milestone": "F1",
+      "title": "Claude komut satırı oluşturucu",
+      "type": "özellik", "areas": ["claude"], "priority": "zorunlu",
+      "summary": "Her oturumun Claude'u doğru kimlik ve AWL dosyalarıyla başlatmasını tek, test edilebilir bir yerde toplamak.",
+      "todo": [
+        "`ClaudeCli` sabitleri (bayrak adları tek yerde)",
+        "`ClaudeLaunchSpec`",
+        "`ClaudeCommandBuilder`: yeni oturumda `--session-id`, devamda `--resume`; her zaman `--settings` ve `--append-system-prompt-file`",
+        "Birim testleri: boşluklu ve Türkçe karakterli yollar dahil"
+      ],
+      "requirements": "OTR-02, OTR-03, OTR-04, BAK-04 · D14, D15",
+      "acceptance": ["Birim testleri geçiyor"],
+      "dependsOn": ["F1-04"]
+    },
+    {
+      "key": "F1-09", "slug": "claude-config-files", "milestone": "F1",
+      "title": "Claude ayar dosyası ve bağlam dosyasının (awl-context.md) üretimi",
+      "type": "özellik", "areas": ["claude", "belge"], "priority": "zorunlu",
+      "summary": "Claude'a ortam bilgisini ve AWL kurallarını (kopya kuralı, skill → Python, UDF, çıktı klasörü) ulaştırmak.",
+      "todo": [
+        "`ClaudeSettingsWriter`: `permissions.defaultMode = default`, `cleanupPeriodDays`, `env` (AWL_HOME, VIRTUAL_ENV)",
+        "`ContextFileWriter`: Türkçe yanıt, Python tam yolu, kopya kuralı (D16), skill → Python (D20), udf_tool (D23), AWL_Ciktilar",
+        "Ayarlar değişince dosyaları yeniden yaz",
+        "Şablon ve JSON çıktısı için birim testleri",
+        "F0-02 sonucuna göre `env` yaklaşımını teyit et"
+      ],
+      "requirements": "KUR-10, BLG-01, BLG-02, BLG-03, TRM-05 · D04, D15, D16, D20, D23",
+      "acceptance": ["Üretilen dosyalar Teknik §05'teki örneklerle uyumlu", "Birim testleri geçiyor"],
+      "dependsOn": ["F1-07", "F0-02"]
+    },
+    {
+      "key": "F1-10", "slug": "claude-installation", "milestone": "F1",
+      "title": "Claude Code'un bulunması, sürümü ve kurulumu",
+      "type": "özellik", "areas": ["claude", "kurulum"], "priority": "zorunlu",
+      "summary": "Claude Code'u ilk açılışta, kullanıcıya hiçbir şey yaptırmadan, kullanıcı klasörüne ve resmi kaynaktan kurmak; varsa yeniden kurmamak.",
+      "todo": [
+        "`IClaudeInstallation`: önce kullanıcı `.local/bin` konumu, sonra PATH",
+        "`claude --version` çıktısını ayrıştır",
+        "PowerShell ile resmi kurulum betiği; ExecutionPolicy değiştirilmez; çıktı günlüğe",
+        "Constrained Language Mode tespiti ve Türkçe açıklama",
+        "Açılışta Claude sürümünü günlüğe yaz"
+      ],
+      "requirements": "KUR-05, KUR-06, KUR-19, TAN-04, GUV-07 · D01, D03, D21",
+      "acceptance": ["Kurulu makinede yeniden kurulum yapılmıyor", "Kurulu olmayan makinede UAC istemi çıkmadan kuruluyor"],
+      "dependsOn": ["F1-05", "F0-01"]
+    },
+    {
+      "key": "F1-11", "slug": "python-environment", "milestone": "F1",
+      "title": "Python ortamı: uv, venv ve kilitli paketler",
+      "type": "özellik", "areas": ["python", "kurulum"], "priority": "zorunlu",
+      "summary": "Sistem Python'una dokunmadan, tekrar üretilebilir bir belge işleme ortamı kurmak.",
+      "todo": [
+        "`requirements.in` (python-docx, pypdf, pdfplumber, openpyxl, pandas, reportlab, lxml) ve hash'li `requirements.lock`",
+        "uv ile Python 3.13 kurulumu (UV_PYTHON_INSTALL_DIR, UV_CACHE_DIR, UV_NATIVE_TLS)",
+        "`uv venv --seed` ve `uv pip install --require-hashes`",
+        "CheckAsync: venv ve paketler mevcut mu?",
+        "PATH ve sistem Python'u değiştirilmez"
+      ],
+      "requirements": "KUR-08, KUR-09, GUV-08 · D04",
+      "acceptance": ["Temiz kullanıcı hesabında ortam kuruluyor", "İkinci çalıştırmada adım atlanıyor"],
+      "dependsOn": ["F1-05"]
+    },
+    {
+      "key": "F1-12", "slug": "udf-tool", "milestone": "F1",
+      "title": "udf_tool.py: UDF okuma ve yeniden paketleme aracı",
+      "type": "özellik", "areas": ["python", "belge"], "priority": "zorunlu",
+      "summary": "Claude'un UDF dosyalarını güvenle okuyup düzenlenmiş kopyalarını üretebilmesi (D23).",
+      "todo": [
+        "`info`, `text`, `unpack`, `pack` komutları; yalnızca standart kütüphane",
+        "`pack`: manifest sırası ve özgün sıkıştırma; değişmeyen girdiler bayt düzeyinde aynı",
+        "Kaynak dosyanın üzerine yazmayı reddet; geçici dosya + yeniden adlandırma",
+        "Türkçe, tek satırlık hata mesajları ve sıfırdan farklı çıkış kodları",
+        "pytest: aç → paketle → karşılaştır (F0-04'teki anonim örnekle)"
+      ],
+      "requirements": "BLG-04, BLG-05, KUR-11 · D23",
+      "acceptance": ["pytest geçiyor", "Üretilen UDF UYAP Editör'de açılıyor"],
+      "dependsOn": ["F0-04"]
+    },
+    {
+      "key": "F1-13", "slug": "setup-pipeline", "milestone": "F1",
+      "title": "Kurulum hattı ve ön kontroller",
+      "type": "özellik", "areas": ["kurulum"], "priority": "zorunlu",
+      "summary": "Tüm kurulum adımlarını tekrar çalıştırılabilir, açıklanabilir tek bir hatta toplamak.",
+      "todo": [
+        "`ISetupStep` sözleşmesi ve `SetupPipeline` (Check → atla / Run)",
+        "Adım durumlarının settings.json'a kaydı",
+        "Ön kontroller: Windows sürümü ve mimarisi, yazma izni, ağ erişimi, PowerShell dil modu",
+        "Kurulacağı bilgisayar önceden test edilemeyeceği için her kısıt tespit edilir, kullanıcıya sade dille açıklanır ve tanılama paketine yazılır (D22)",
+        "Adımlar: Claude, Python, yapılandırma dosyaları, udf_tool kopyalama",
+        "Destek için paylaşılabilecek teknik özet metninin üretimi",
+        "Birim testleri"
+      ],
+      "requirements": "KUR-03, KUR-04, KUR-11, KUR-14, KUR-15, KUR-19",
+      "acceptance": ["Yarıda kalan kurulum tekrar çalıştırıldığında kaldığı yerden devam ediyor"],
+      "dependsOn": ["F1-09", "F1-10", "F1-11", "F1-12"]
+    },
+    {
+      "key": "F1-14", "slug": "setup-wizard-ui", "milestone": "F1",
+      "title": "Kurulum sihirbazı arayüzü",
+      "type": "özellik", "areas": ["arayüz", "kurulum"], "priority": "zorunlu",
+      "summary": "Claude Code, Python ve kütüphanelerin ilk açılışta kendiliğinden kurulması; kullanıcı yalnızca ilerlemeyi izler ve Claude girişini yapar.",
+      "todo": [
+        "İlk açılışta otomatik başlar; kullanıcıdan komut veya elle kurulum istenmez",
+        "Adım listesi, durum ve ilerleme",
+        "Hata: ne oldu / ne yapmalı + Tekrar dene",
+        "Teknik özeti panoya kopyalama",
+        "Giriş adımı: Claude'u terminalde açıp kullanıcının kendi akışıyla giriş yapması (AWL kimlik bilgisi görmez)"
+      ],
+      "requirements": "KUR-03, KUR-15, KUR-16, KUR-19, KUL-01, KUL-02",
+      "acceptance": ["Temiz makinede kurulum yalnızca sihirbazla tamamlanıyor"],
+      "dependsOn": ["F1-13", "F1-15"]
+    },
+    {
+      "key": "F1-15", "slug": "terminal-launchers", "milestone": "F1",
+      "title": "Terminal başlatıcıları (Windows Terminal ve Windows konsolu)",
+      "type": "özellik", "areas": ["terminal"], "priority": "zorunlu",
+      "summary": "Claude Code'u eksiksiz çalışacağı gerçek bir terminal penceresinde açmak (D17).",
+      "todo": [
+        "`ITerminalLauncher`",
+        "`WindowsTerminalLauncher`: `-w new new-tab --title -d`, `;` kaçırma, `ArgumentList`",
+        "`ConsoleLauncher`",
+        "`TerminalLauncherSelector`: ayar + kullanılabilirlik",
+        "Windows 10 2004+ ise taşınabilir Windows Terminal kurulum adımı",
+        "Argüman oluşturma testleri"
+      ],
+      "requirements": "TRM-01, TRM-02, TRM-03, TRM-04, KUR-13, GUV-05 · D17",
+      "acceptance": ["Boşluklu, Türkçe ve `;` içeren klasörde Claude doğru klasörde açılıyor"],
+      "dependsOn": ["F1-07", "F1-08", "F0-03"]
+    },
+    {
+      "key": "F1-16", "slug": "process-monitor", "milestone": "F1",
+      "title": "Claude süreç izleyici (WMI)",
+      "type": "özellik", "areas": ["claude"], "priority": "zorunlu",
+      "summary": "Hangi oturumun açık olduğunu, AWL yeniden açılsa bile güvenilir biçimde bilmek.",
+      "todo": [
+        "2 sn aralıkla `Win32_Process` sorgusu",
+        "Komut satırından UUID çıkarma (`--session-id` / `--resume`)",
+        "`RunningSessionIds` ve `Changed` olayı",
+        "Süreç ağacını sonlandırma yardımcısı",
+        "CPU kullanımı ölçümü ve entegrasyon testi"
+      ],
+      "requirements": "OTR-07, PRF-04, GVL-02",
+      "acceptance": ["Durum en geç 3 sn içinde güncelleniyor", "Boşta CPU < %1"],
+      "dependsOn": ["F1-04"]
+    },
+    {
+      "key": "F1-17", "slug": "history-store", "milestone": "F1",
+      "title": "Claude geçmiş deposu: bulma ve silme",
+      "type": "özellik", "areas": ["claude"], "priority": "zorunlu",
+      "summary": "Oturumun Claude tarafındaki geçmişini bulmak ve D18'e göre eksiksiz silebilmek.",
+      "todo": [
+        "`projects` altında `<uuid>.jsonl` arama + kısa önbellek",
+        "`HistoryInfo` (var mı, son değişiklik zamanı)",
+        "Silme: jsonl, aynı adlı klasör, `debug/<uuid>.txt`, `ExtraSessionPaths` (F0-02 sonucu)",
+        "`DeleteReport` ile kısmi başarısızlığın raporlanması",
+        "Geçici klasörle testler"
+      ],
+      "requirements": "OTR-11, OTR-14, OTR-15 · D18",
+      "acceptance": ["Silme sonrası oturum kimliğini içeren dosya kalmıyor"],
+      "dependsOn": ["F1-04", "F0-02"]
+    },
+    {
+      "key": "F1-18", "slug": "session-service", "milestone": "F1",
+      "title": "Oturum servisi ve durum hesaplama",
+      "type": "özellik", "areas": ["oturum"], "priority": "zorunlu",
+      "summary": "Oturum yaşam döngüsünün iş kurallarını arayüzden bağımsız ve test edilebilir biçimde uygulamak.",
+      "todo": [
+        "`SessionStateResolver` (saf fonksiyon)",
+        "`SessionService`: oluştur (UUID), aç, devam et",
+        "Açık oturum tekrar açılmak istenirse: ikinci süreç yok, bilgi + öne getirmeyi dene",
+        "Çalışma klasörü yoksa yeni klasör seçimi; geçmiş yoksa yeni oturum önerisi",
+        "Claude sürümünü ve son etkinliği kaydet; açılış uzlaştırması",
+        "Birim testleri"
+      ],
+      "requirements": "OTR-01–04, OTR-06–09, OTR-15, OTR-17, OTR-18, OTR-20 · D12, D14",
+      "acceptance": ["Tüm durum geçişleri birim testleriyle kapsanıyor"],
+      "dependsOn": ["F1-06", "F1-08", "F1-15", "F1-16", "F1-17"]
+    },
+    {
+      "key": "F1-19", "slug": "main-window", "milestone": "F1",
+      "title": "Ana pencere ve oturum listesi",
+      "type": "özellik", "areas": ["arayüz", "oturum"], "priority": "zorunlu",
+      "summary": "Kullanıcının oturumlarını görüp tek tıkla açabildiği ana ekran.",
+      "todo": [
+        "Sol panel: Sohbet / Araçlar, Yeni oturum, kategoriye göre gruplu sanallaştırılmış liste, durum göstergeleri",
+        "Sağ panel: başlık, klasör, durum; Aç / Devam et, Klasörü aç, Çıktılar, Sil",
+        "Durum güncellemeleri `IMessenger` ile",
+        "%100–%200 ölçekleme kontrolü"
+      ],
+      "requirements": "OTR-05, OTR-06, OTR-19, PRF-03, KUL-01, KUL-04 · D06",
+      "acceptance": ["1.000 oturumla liste akıcı", "Tüm eylemler klavyeyle erişilebilir"],
+      "dependsOn": ["F1-18"]
+    },
+    {
+      "key": "F1-20", "slug": "session-dialogs", "milestone": "F1",
+      "title": "Yeni oturum penceresi ve oturum düzenleme",
+      "type": "özellik", "areas": ["arayüz", "oturum"], "priority": "zorunlu",
+      "summary": "Oturum oluşturma ve düzenlemenin sade bir pencereden yapılması.",
+      "todo": [
+        "Başlık, klasör seçici, kategori; doğrulama mesajları",
+        "Yeniden adlandır, kategori değiştir, arşivle / arşivden çıkar"
+      ],
+      "requirements": "OTR-01, OTR-10",
+      "acceptance": ["Geçersiz klasörle oturum oluşturulamıyor"],
+      "dependsOn": ["F1-19"]
+    },
+    {
+      "key": "F1-21", "slug": "categories", "milestone": "F1",
+      "title": "Kategori yönetimi",
+      "type": "özellik", "areas": ["oturum", "arayüz"], "priority": "zorunlu",
+      "summary": "Oturumların konu veya proje bazında düzenlenmesi.",
+      "todo": [
+        "Oluştur, yeniden adlandır, sırala, sil",
+        "Silinen kategorinin oturumları “Kategorisiz” grubuna geçer"
+      ],
+      "requirements": "KAT-01, KAT-02 · D06",
+      "acceptance": ["Kategori silindiğinde hiçbir oturum kaybolmuyor"],
+      "dependsOn": ["F1-19"]
+    },
+    {
+      "key": "F1-22", "slug": "deletion-retention", "milestone": "F1",
+      "title": "Oturum silme ve saklama süresi",
+      "type": "özellik", "areas": ["oturum", "claude"], "priority": "zorunlu",
+      "summary": "Bir oturumun AWL'den ve Claude'dan birlikte, sahipsiz dosya bırakmadan silinmesi (D18).",
+      "todo": [
+        "`SessionDeletionService`: onay metni (silinecekler + geri alınamaz)",
+        "Açık oturum için kapatma onayı ve süreç sonlandırma",
+        "Önce Claude dosyaları, sonra AWL kaydı; kısmi hatada “Hata” durumu + Tekrar dene",
+        "`RetentionPolicy` ve açılışta saklama süresi temizliği",
+        "Saklama süresi değişince `claude-settings.json` yeniden yazılır"
+      ],
+      "requirements": "OTR-11–14, OTR-16, AYR-01, KUL-05 · D18",
+      "acceptance": ["Silme sonrası AWL'de ve Claude veri klasöründe iz kalmıyor", "Kullanıcı belgeleri yerinde"],
+      "dependsOn": ["F1-17", "F1-18", "F1-19"]
+    },
+    {
+      "key": "F1-23", "slug": "single-instance", "milestone": "F1",
+      "title": "Tek örnek, IPC ve komut satırı ayrıştırma",
+      "type": "özellik", "areas": ["windows"], "priority": "zorunlu",
+      "summary": "Sağ tık isteklerinin güvenle tek bir AWL penceresinde toplanması.",
+      "todo": [
+        "`LaunchArgumentParser` (saf): `--folder` / `--file`, mutlak ve var olan yol, aygıt yollarını reddet",
+        "Mutex `Local\\AWL-<SID>`",
+        "Named pipe (yalnızca mevcut kullanıcı) ile isteği çalışan örneğe iletme",
+        "Gelen verinin yeniden doğrulanması; testler"
+      ],
+      "requirements": "SAG-04, SAG-05, GUV-09",
+      "acceptance": ["AWL açıkken sağ tık ikinci pencere açmıyor"],
+      "dependsOn": ["F1-04"]
+    },
+    {
+      "key": "F1-24", "slug": "context-menu", "milestone": "F1",
+      "title": "Sağ tık menüsü (HKCU)",
+      "type": "özellik", "areas": ["windows", "kurulum"], "priority": "zorunlu",
+      "summary": "Gezgin'den klasör veya dosya ile doğrudan oturum başlatabilmek (D09).",
+      "todo": [
+        "Directory, Directory/Background ve SystemFileAssociations (.pdf .docx .xlsx .udf .png .jpg) anahtarları",
+        "MUIVerb “AWL ile aç”, simge, tırnaklı komutlar",
+        "Kayıt ve kaldırma (yalnızca AWL anahtarları); kurulum adımına bağlama",
+        "`--file`: dosyanın klasöründe yeni oturum + yolu panoya",
+        "Boşluk, Türkçe karakter ve `;` içeren yol testleri"
+      ],
+      "requirements": "SAG-01, SAG-02, SAG-03, SAG-06, SAG-07, GUV-06 · D09",
+      "acceptance": ["Üç sağ tık türü de doğru klasörle yeni oturum penceresini açıyor"],
+      "dependsOn": ["F1-13", "F1-20", "F1-23"]
+    },
+    {
+      "key": "F1-25", "slug": "drop-to-clipboard", "milestone": "F1",
+      "title": "Dosya bırakma: tırnaklı yolu panoya kopyala",
+      "type": "özellik", "areas": ["belge", "arayüz"], "priority": "önemli",
+      "summary": "Gömülü terminal olmadan da dosyaları Claude'a kolayca gösterebilmek (D08).",
+      "todo": [
+        "Sağ panelde bırakma alanı",
+        "Tırnak içindeki tam yol(lar) panoya",
+        "“Claude penceresine yapıştırın” bilgisi"
+      ],
+      "requirements": "BLG-07 · D08",
+      "acceptance": ["Birden çok dosya bırakıldığında tüm yollar panoda"],
+      "dependsOn": ["F1-19"]
+    },
+    {
+      "key": "F1-26", "slug": "skills-setup-step", "milestone": "F1",
+      "title": "Belge skill'lerinin kurulum adımı",
+      "type": "özellik", "areas": ["kurulum", "claude"], "priority": "önemli",
+      "summary": "D20'deki “önce skill” yolunu kurulumla birlikte hazır etmek.",
+      "todo": [
+        "F0-05 sonucuna göre skill kurulum adımı",
+        "Başarısızlık kurulumu durdurmaz; kullanıcı bilgilendirilir",
+        "Skill'ler AWL paketine gömülmez"
+      ],
+      "requirements": "KUR-12, LIS-01 · D20",
+      "acceptance": ["Skill kurulamadığında kurulum yine tamamlanıyor"],
+      "dependsOn": ["F0-05", "F1-13"]
+    },
+    {
+      "key": "F1-27", "slug": "diagnostics-about", "milestone": "F1",
+      "title": "Tanılama paketi ve Hakkında ekranı",
+      "type": "özellik", "areas": ["tanılama"], "priority": "zorunlu",
+      "summary": "Destek için gerekli bilgiyi tek dosyada, kişisel veri olmadan toplamak.",
+      "todo": [
+        "ZIP: günlükler, AWL / Claude / Python / Windows sürümleri, ön kontrol sonuçları",
+        "Veritabanı ve belgeler pakete girmez; kaydetme yeri kullanıcıya sorulur",
+        "Hakkında: sürümler ve üçüncü taraf lisansları"
+      ],
+      "requirements": "TAN-03, AYR-04",
+      "acceptance": ["Paket içinde oturum başlığı veya belge içeriği yok"],
+      "dependsOn": ["F1-05", "F1-10", "F1-11"]
+    },
+    {
+      "key": "F1-28", "slug": "settings-screen", "milestone": "F1",
+      "title": "Ayarlar ekranı",
+      "type": "özellik", "areas": ["arayüz"], "priority": "zorunlu",
+      "summary": "Kullanıcının değiştirebileceği az sayıdaki ayarı ve onarım/destek komutlarını tek yerde sunmak.",
+      "todo": [
+        "Saklama süresi, terminal tercihi",
+        "Onar, Tanılama paketini kaydet, Hakkında",
+        "Tüm metinler `Strings.resx` içinde"
+      ],
+      "requirements": "AYR-01, AYR-02, AYR-03, KUR-17",
+      "acceptance": ["Onar, eksik bir bileşeni yeniden kuruyor"],
+      "dependsOn": ["F1-07", "F1-13", "F1-22", "F1-27"]
+    },
+    {
+      "key": "F1-29", "slug": "installer", "milestone": "F1",
+      "title": "Kurulum paketi (Inno Setup) ve üçüncü taraf bileşenler",
+      "type": "altyapı", "areas": ["ci-cd", "kurulum"], "priority": "zorunlu",
+      "summary": "Tek dosyalık, kullanıcı bazlı (UAC istemi çıkarmayan), temiz kaldırılabilen bir kurulum paketi.",
+      "todo": [
+        "`third_party/versions.json` (uv, Windows Terminal: sürüm, URL, SHA256) ve indirme / doğrulama betiği",
+        "`installer/AWL.iss`: PrivilegesRequired=lowest, kullanıcı Programs klasörü, Türkçe, Başlat menüsü kısayolu",
+        "Kaldırıcı: `AWL.exe --uninstall-cleanup` (HKCU temizliği); Claude Code ve geçmişin kaldırılması ayrıca sorulur",
+        "Yükseltme kurulumunda kullanıcı verisi korunur"
+      ],
+      "requirements": "KUR-01, KUR-02, KUR-18, TAS-01, TAS-02, GUV-07, SAG-07, LIS-01 · D03, D21",
+      "acceptance": ["Standart kullanıcıda UAC istemi olmadan kurulup kaldırılabiliyor"],
+      "dependsOn": ["F1-01"]
+    },
+    {
+      "key": "F1-30", "slug": "release-pipeline", "milestone": "F1",
+      "title": "Release hattı (CD): etiketle kurulum paketi üret",
+      "type": "altyapı", "areas": ["ci-cd"], "priority": "zorunlu",
+      "summary": "Bir sürüm etiketiyle kurulum dosyasının otomatik üretilip taslak Release'e konması.",
+      "todo": [
+        "`.github/workflows/release.yml`: `v*` etiketiyle tetiklenir",
+        "Sürüm numarası etiketten alınır",
+        "Self-contained single-file publish; third_party indirme + SHA256 doğrulama",
+        "Inno Setup derlemesi",
+        "`AWL-Setup-x.y.z.exe` ve SHA256 dosyasıyla taslak Release; sürüm notu şablonu"
+      ],
+      "requirements": "TAS-01, TAS-02 · D21 · Geliştirme Süreci §5",
+      "acceptance": ["Test etiketiyle taslak Release ve kurulum dosyası oluşuyor"],
+      "dependsOn": ["F1-02", "F1-29"]
+    },
+    {
+      "key": "F1-31", "slug": "v1-acceptance", "milestone": "F1",
+      "title": "Uçtan uca senaryolar ve v1 kabul testi",
+      "type": "test", "areas": ["kurulum", "oturum"], "priority": "zorunlu",
+      "summary": "v1'in gerçek koşullarda (temiz, standart kullanıcılı Windows 10) kabul edilmesi.",
+      "todo": [
+        "`tests/e2e` senaryoları (proje kararları test matrisi)",
+        "Kabul senaryosu: kurulum → giriş → sağ tıkla oturum → belge üzerinde çalışma ve “- düzenlendi” kopyası → oturum geçişi → AWL'yi kapat/aç → `--resume` → oturumu her yerden silme",
+        "Performans ölçümleri (PRF-01, PRF-02)",
+        "Erişilebilirlik kontrolü (klavye, odak, kontrast, ölçekleme)",
+        "Claude Code özelliklerinin doğrudan çalıştırmayla aynı davrandığının kontrolü"
+      ],
+      "requirements": "SRS §16 kabul koşulu · PRF-01, PRF-02, KUL-03, KUL-04, TRM-04",
+      "acceptance": ["Faz 1'in tüm Zorunlu gereksinimleri doğrulandı"],
+      "dependsOn": ["F1-14", "F1-21", "F1-22", "F1-24", "F1-25", "F1-26", "F1-28", "F1-30"]
+    },
+
+    {
+      "key": "F2-01", "slug": "conpty-host", "milestone": "F2",
+      "title": "ConPTY sunucusu",
+      "type": "altyapı", "areas": ["terminal"], "priority": "zorunlu",
+      "summary": "Claude'u AWL içinde çalıştırmak için sözde konsol katmanı.",
+      "todo": [
+        "CsWin32 ile `CreatePseudoConsole`, `ResizePseudoConsole`, `ClosePseudoConsole`",
+        "`PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE` ile süreç oluşturma; ortam değişkenleri doğrudan",
+        "Giriş/çıkış boruları ve kapanma yönetimi; entegrasyon testi"
+      ],
+      "requirements": "TRM-06 · D07",
+      "acceptance": ["Basit bir konsol uygulamasının çıktısı okunup girdisi yazılabiliyor"],
+      "dependsOn": ["F1-31"]
+    },
+    {
+      "key": "F2-02", "slug": "webview-xterm-bridge", "milestone": "F2",
+      "title": "WebView2 + xterm.js köprüsü",
+      "type": "altyapı", "areas": ["terminal"], "priority": "zorunlu",
+      "summary": "Terminal çıktısını AWL penceresinde doğru çizmek ve tuşları eksiksiz iletmek.",
+      "todo": [
+        "xterm.js'in yerel klasörden sunulması (virtual host mapping, internet yok)",
+        "~16 ms'lik çıktı paketleri; durumlu UTF-8 çözümleme",
+        "Yeniden boyutlandırma → `ResizePseudoConsole`",
+        "Tarayıcı kısayollarının kapatılması",
+        "WebView2 çalışma zamanı yoksa ayrı pencere yoluna düşme"
+      ],
+      "requirements": "TRM-06 · D07",
+      "acceptance": ["Türkçe karakterler ve renkler doğru görünüyor"],
+      "dependsOn": ["F2-01"]
+    },
+    {
+      "key": "F2-03", "slug": "embedded-terminal-view", "milestone": "F2",
+      "title": "Gömülü terminal görünümü ve oturumlar arası geçiş",
+      "type": "özellik", "areas": ["terminal", "arayüz"], "priority": "zorunlu",
+      "summary": "Oturumları AWL penceresinden ayrılmadan kullanmak.",
+      "todo": [
+        "Oturum başına bir terminal; arka plandaki süreçler çalışmaya devam eder",
+        "Her oturumda “Ayrı pencerede aç” seçeneği",
+        "Gömülü terminal için yeni `ITerminalLauncher` uygulaması"
+      ],
+      "requirements": "TRM-08, TRM-09 · D07, D17",
+      "acceptance": ["Oturumlar arasında geçişte hiçbir süreç kapanmıyor"],
+      "dependsOn": ["F2-02"]
+    },
+    {
+      "key": "F2-04", "slug": "embedded-drop", "milestone": "F2",
+      "title": "Gömülü terminale dosya bırakma",
+      "type": "özellik", "areas": ["belge", "terminal"], "priority": "önemli",
+      "summary": "Bırakılan dosyanın yolunu doğrudan Claude'un giriş satırına yazmak.",
+      "todo": ["Tırnak içindeki tam yolun terminal girdisine yazılması", "Birden çok dosya"],
+      "requirements": "BLG-08 · D08",
+      "acceptance": ["Bırakılan dosya yolu giriş satırında görünüyor"],
+      "dependsOn": ["F2-03"]
+    },
+    {
+      "key": "F2-05", "slug": "capability-checklist", "milestone": "F2",
+      "title": "Gömülü terminal yetenek kontrol listesi ve varsayılan yapma kararı",
+      "type": "test", "areas": ["terminal"], "priority": "zorunlu",
+      "summary": "Gömülü terminalin Claude Code'un hiçbir özelliğini kaybettirmediğini kanıtlamak (D17).",
+      "todo": [
+        "Slash komutları ve `/resume` seçicisi; izin ekranları",
+        "`Esc`, `Esc Esc`, `Shift+Tab`, `Ctrl+C`, `Shift+Enter`",
+        "`Alt+V` ile görsel yapıştırma; kaydırma, renkler, yeniden boyutlandırma",
+        "Türkçe karakterler; oturum geçişinde süreçlerin sürmesi",
+        "Sonuca göre gömülü terminali varsayılan yapma kararı"
+      ],
+      "requirements": "TRM-07 · D17",
+      "acceptance": ["Listenin tamamı geçti veya varsayılan yapılmadı"],
+      "dependsOn": ["F2-03"]
+    },
+    {
+      "key": "F2-06", "slug": "session-search", "milestone": "F2",
+      "title": "Oturum arama",
+      "type": "özellik", "areas": ["oturum", "arayüz"], "priority": "önemli",
+      "summary": "Çok sayıda oturum arasında hızlıca bulmak.",
+      "todo": ["Başlık ve klasör yoluna göre anlık süzme", "Arşivdekileri dahil etme seçeneği"],
+      "requirements": "OTR-21",
+      "acceptance": ["1.000 oturumda arama gecikmesiz"],
+      "dependsOn": ["F1-31"]
+    },
+    {
+      "key": "F2-07", "slug": "theme", "milestone": "F2",
+      "title": "Açık / Koyu / Sistem tema",
+      "type": "özellik", "areas": ["arayüz"], "priority": "önemli",
+      "summary": "Kullanıcının tercih ettiği görünümle çalışmak (D11).",
+      "todo": [
+        "Açık ve Koyu `ResourceDictionary`'leri",
+        "Sistem temasını okuma ve değişikliği izleme",
+        "Tercihin saklanması; kontrast kontrolü"
+      ],
+      "requirements": "AYR-05, KUL-03 · D11",
+      "acceptance": ["Her iki temada metin kontrastı WCAG AA"],
+      "dependsOn": ["F1-31"]
+    },
+
+    {
+      "key": "F3-01", "slug": "tool-catalog", "milestone": "F3",
+      "title": "Araç kataloğu ve Araçlar sekmesi",
+      "type": "özellik", "areas": ["araçlar", "arayüz"], "priority": "önemli",
+      "summary": "Ek araçları tek yerden sunmak; dışarıdan kod yüklemeden (D10).",
+      "todo": ["Yerel JSON katalog", "Araçlar sekmesinde listeleme", "Dış DLL veya çalıştırılabilir kod yüklenmez"],
+      "requirements": "ARC-01, ARC-04 · D06, D10",
+      "acceptance": ["Katalogdaki araçlar listeleniyor"],
+      "dependsOn": ["F1-31"]
+    },
+    {
+      "key": "F3-02", "slug": "web-tool", "milestone": "F3",
+      "title": "Web aracını tarayıcıda açma (GitHub Pages dönüştürücü)",
+      "type": "özellik", "areas": ["araçlar"], "priority": "önemli",
+      "summary": "Mevcut dosya dönüştürücüsünü AWL'den tek tıkla açmak.",
+      "todo": ["Web türündeki aracın varsayılan tarayıcıda açılması", "Dönüştürücünün kataloğa eklenmesi"],
+      "requirements": "ARC-02 · D10",
+      "acceptance": ["Dönüştürücü tek tıkla açılıyor"],
+      "dependsOn": ["F3-01"]
+    },
+    {
+      "key": "F3-03", "slug": "webview-tools", "milestone": "F3",
+      "title": "Araçları WebView2 içinde açma",
+      "type": "özellik", "areas": ["araçlar"], "priority": "isteğe bağlı",
+      "summary": "Web araçlarını AWL penceresinden ayrılmadan kullanmak.",
+      "todo": ["WebView2 içinde araç sekmesi", "İçerik güvenliği ve dosya erişimi sınırlarının değerlendirilmesi"],
+      "requirements": "ARC-03 · D10",
+      "acceptance": ["Araç AWL içinde açılıyor"],
+      "dependsOn": ["F3-02", "F2-02"]
+    },
+    {
+      "key": "F3-04", "slug": "udf-e2e", "milestone": "F3",
+      "title": "UDF düzenleme iş akışının uçtan uca doğrulanması",
+      "type": "test", "areas": ["belge"], "priority": "önemli",
+      "summary": "Claude'un bir UDF'yi kopya üzerinde düzenleyip UYAP Editör'de açılabilir bir dosya üretmesini gerçek kullanımda görmek (D23).",
+      "todo": [
+        "Claude'dan bir UDF'de değişiklik iste; “- düzenlendi.udf” kopyası oluşuyor mu?",
+        "Kopya UYAP Editör'de açılıyor mu?",
+        "E-imzalı belge için kopyanın imzasız olduğu kullanıcıya söyleniyor mu?"
+      ],
+      "requirements": "BLG-01, BLG-04 · D16, D23",
+      "acceptance": ["Üç madde de doğrulandı"],
+      "dependsOn": ["F1-31"]
+    }
+  ]
+}

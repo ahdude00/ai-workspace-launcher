@@ -1,0 +1,36 @@
+name: Görev
+description: Geliştirme, doğrulama veya altyapı görevi
+title: "[Fx-xx] "
+body:
+  - type: textarea
+    id: amac
+    attributes:
+      label: Amaç
+      description: Bu görev neden var, bittiğinde ne mümkün olacak?
+    validations:
+      required: true
+  - type: textarea
+    id: kapsam
+    attributes:
+      label: Yapılacaklar
+      description: Onay kutulu liste
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: input
+    id: gereksinimler
+    attributes:
+      label: Gereksinimler / kararlar
+      placeholder: "OTR-02, OTR-03 · D14"
+  - type: textarea
+    id: kabul
+    attributes:
+      label: Kabul kriterleri
+      value: |
+        - [ ]
+  - type: input
+    id: bagimliliklar
+    attributes:
+      label: Bağımlılıklar
+      placeholder: "#12, #14"

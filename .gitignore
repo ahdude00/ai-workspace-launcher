@@ -1,0 +1,35 @@
+# .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.rsuser
+TestResults/
+coverage*/
+*.coverage
+artifacts/
+publish/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Third-party binaries are downloaded at build time (pinned + SHA256), never committed
+third_party/*
+!third_party/README.md
+!third_party/versions.json
+
+# Installer output
+installer/Output/
+
+# Local-only files
+*_yedek.html
+.claude/settings.local.json
+Thumbs.db
+Desktop.ini
+
+# Private, full-context copies of the docs (never committed)
+_ozel/

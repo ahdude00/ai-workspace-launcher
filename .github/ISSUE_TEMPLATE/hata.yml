@@ -1,0 +1,31 @@
+name: Hata
+description: Beklenmeyen davranış bildirimi
+title: "[Hata] "
+labels: ["tür: hata"]
+body:
+  - type: textarea
+    id: ne-oldu
+    attributes:
+      label: Ne oldu?
+    validations:
+      required: true
+  - type: textarea
+    id: beklenen
+    attributes:
+      label: Ne bekleniyordu?
+    validations:
+      required: true
+  - type: textarea
+    id: adimlar
+    attributes:
+      label: Tekrar üretme adımları
+      value: |
+        1.
+  - type: input
+    id: surumler
+    attributes:
+      label: Sürümler
+      placeholder: "AWL 1.0.0 · Claude Code 2.x · Windows 10 22H2"
+  - type: markdown
+    attributes:
+      value: "Tanılama paketini eklemeden önce içinde kişisel veya gizli bilgi olmadığından emin olun."

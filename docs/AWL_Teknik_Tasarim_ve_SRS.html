@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>AWL Teknik Tasarım ve SRS</title>
+<style id="base-style">:root{--bg:#f6f7fb;--surface:#fff;--surface-2:#f0f3fa;--text:#202639;--muted:#69758a;--line:#dce2ed;--accent:#6751c9;--accent-soft:#eeeaff;--accent-2:#5440b2;--good:#12795a;--good-bg:#eaf8f1;--warn:#a15e0a;--warn-bg:#fff5de;--bad:#b84242;--bad-bg:#ffefee;--shadow:0 10px 35px rgba(30,42,70,.055);--sidebar:260px;--code:#152033;--code-text:#e4ecfc}
+html[data-theme=dark]{--bg:#111522;--surface:#1a2030;--surface-2:#242c40;--text:#edf0fc;--muted:#a8b1c9;--line:#39435a;--accent:#ae9fff;--accent-soft:#353058;--accent-2:#c7bdfb;--good:#70d0aa;--good-bg:#173a34;--warn:#f3ca84;--warn-bg:#44331f;--bad:#ffb1ad;--bad-bg:#422528;--shadow:0 12px 38px rgba(0,0,0,.15);--code:#0b1020;--code-text:#e4ecfc}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 "Segoe UI",Inter,system-ui,-apple-system,sans-serif}a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar);background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:10}.brand{display:flex;align-items:center;gap:12px;padding:24px 21px 18px;border-bottom:1px solid var(--line)}.brand-icon{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#8f79ff,#5240bb);color:#fff;font-size:21px;font-weight:900;letter-spacing:-2px}.brand strong{display:block;font-size:20px;letter-spacing:-.03em;line-height:1.2}.brand small{display:block;color:var(--muted);font-size:11px}.side-title{padding:23px 23px 7px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-size:10px;font-weight:800}.side-nav{padding:0 11px 12px;overflow-y:auto;flex:1}.side-nav a{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:9px;color:var(--muted);font-size:13px;font-weight:600;margin:2px 0}.side-nav a:hover,.side-nav a.active{color:var(--accent-2);background:var(--accent-soft);text-decoration:none}.nav-num{width:20px;display:inline-block;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}.side-bottom{padding:16px 18px 20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.main{margin-left:var(--sidebar);min-height:100vh}.topbar{height:67px;position:sticky;top:0;z-index:7;background:color-mix(in srgb,var(--surface) 92%,transparent);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 5.3%;backdrop-filter:blur(15px)}.topbar-title{font-weight:750;font-size:14px}.toolbar{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;white-space:nowrap}.btn:hover{border-color:var(--accent);background:var(--accent-soft)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.primary:hover{background:var(--accent-2)}.search{padding:8px 12px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:9px;min-width:190px;max-width:225px;font-size:12px}.content{max-width:1200px;padding:43px 5.3% 90px;margin:0 auto}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--accent-2);font-size:11px;font-weight:900;margin:0 0 12px}.hero{padding:38px 37px;border-radius:22px;background:radial-gradient(circle at 100% 0%,var(--accent-soft),transparent 50%),var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}h1{font-size:clamp(30px,4vw,46px);line-height:1.15;letter-spacing:-.045em;margin:0 0 15px}h2{font-size:26px;letter-spacing:-.035em;margin:0 0 14px;line-height:1.25}h3{font-size:17px;letter-spacing:-.018em;line-height:1.3;margin:0 0 10px}p{margin:9px 0 15px}.lead{font-size:17px;line-height:1.75;color:var(--muted);max-width:780px}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}.meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}.pill{padding:5px 10px;border-radius:999px;background:var(--surface-2);font-size:11px;font-weight:750;border:1px solid var(--line)}.pill.accent{background:var(--accent-soft);color:var(--accent-2);border-color:transparent}.section{padding-top:72px;scroll-margin-top:90px}.section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:22px}.section-head p{color:var(--muted);margin:5px 0 0}.section-index{font-size:12px;color:var(--accent-2);font-weight:800}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.card{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:var(--shadow)}.card h3{display:flex;align-items:center;gap:8px}.card p:last-child{margin-bottom:0}.card .icon{font-size:19px;color:var(--accent-2)}.metric{font-size:28px;font-weight:850;letter-spacing:-.035em}.metric-label{color:var(--muted);font-size:12px;font-weight:700}.note{padding:16px 18px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 11px 11px 0;margin:18px 0}.note.warn{background:var(--warn-bg);border-color:var(--warn)}.note.good{background:var(--good-bg);border-color:var(--good)}.note strong{display:block;margin-bottom:4px}.note p{margin:0}.list{padding-left:19px;margin:10px 0}.list li{margin:7px 0}.stack{display:grid;gap:13px}.decision{border:1px solid var(--line);background:var(--surface);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}.decision summary{cursor:pointer;padding:16px 19px;list-style:none;display:flex;align-items:center;gap:11px}.decision summary::-webkit-details-marker{display:none}.decision summary:after{content:'⌄';margin-left:auto;color:var(--muted);font-size:17px;transition:transform .2s}.decision[open] summary:after{transform:rotate(180deg)}.decision[open] summary{border-bottom:1px solid var(--line)}.decision .body{padding:18px 21px}.decision-title{font-size:14px;font-weight:800}.tag{font-size:10px;padding:3px 8px;border-radius:6px;white-space:nowrap;font-weight:800}.tag.final{background:var(--good-bg);color:var(--good)}.tag.test{background:var(--warn-bg);color:var(--warn)}.tag.future{background:var(--accent-soft);color:var(--accent-2)}.decision p{margin:7px 0}.decision .reason{margin-top:12px;padding:12px;background:var(--surface-2);border-radius:9px}.kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted)}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}table{width:100%;border-collapse:collapse;min-width:650px;font-size:13px}th{text-align:left;background:var(--surface-2);font-size:11px;letter-spacing:.04em}th,td{padding:13px 15px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}td:first-child{font-weight:750}.flow{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}.flow-box{padding:13px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;flex:1 1 140px;text-align:center;min-width:130px}.flow-box strong{display:block;font-size:12px}.flow-box small{color:var(--muted);font-size:11px}.arrow{align-self:center;color:var(--accent-2);font-size:18px;font-weight:850}.code{background:var(--code);color:var(--code-text);border-radius:12px;padding:17px 19px;font:12px/1.75 Consolas,"Cascadia Code",monospace;overflow:auto;white-space:pre;tab-size:2}.twocol{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.ux-app{background:var(--surface);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:var(--shadow)}.ux-titlebar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);font-size:12px;font-weight:800}.ux-body{display:grid;grid-template-columns:210px 1fr;min-height:425px}.ux-side{border-right:1px solid var(--line);padding:14px}.ux-nav{display:block;background:var(--accent-soft);color:var(--accent-2);padding:8px 10px;border-radius:8px;font-size:12px;font-weight:850;margin-bottom:5px}.ux-nav.ordinary{background:transparent;color:var(--muted)}.ux-sessions{font-size:12px;font-weight:800;margin:23px 0 10px;display:flex;justify-content:space-between}.ux-session{display:block;width:100%;text-align:left;background:transparent;border:0;padding:8px 9px;border-radius:7px;color:var(--muted);font-size:12px}.ux-session.selected{background:var(--accent-soft);color:var(--accent-2);font-weight:800}.ux-session:hover{background:var(--surface-2)}.ux-main{display:flex;flex-direction:column;min-width:0}.ux-header{padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}.terminal{background:#111623;color:#e4eaff;margin:0 13px 12px;border-radius:11px;flex:1;padding:17px 16px;white-space:pre-wrap;overflow:auto;font:12px/1.7 Consolas,"Cascadia Mono",monospace;min-height:300px}.term-accent{color:#a9a0ff}.term-dim{color:#99a5bf}.term-success{color:#83d6ad}.ux-helper{border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}.ux-helper button{background:var(--surface-2);border:1px solid var(--line);padding:7px 10px;border-radius:7px;color:var(--text);font-size:11px}.ux-helper small{margin-left:auto;color:var(--muted)}.ux-caption{font-size:12px;color:var(--muted);margin:11px 2px 0}.architecture{display:grid;gap:10px;max-width:860px;margin:0 auto}.arch-shell{background:var(--accent-soft);border:1px solid var(--accent);color:var(--text);border-radius:12px;text-align:center;padding:14px;font-weight:850}.arch-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.arch-node{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center;min-height:82px}.arch-node strong{display:block;font-size:12px}.arch-node span{font-size:11px;color:var(--muted)}.arch-down{text-align:center;color:var(--accent-2);font-weight:900}.checks{display:grid;gap:7px}.checks label{display:flex;gap:9px;align-items:start;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:13px}.checks input{margin-top:5px;accent-color:var(--accent)}.checks label.done{text-decoration:line-through;color:var(--muted)}.ref-list{display:grid;gap:7px}.ref-list a{padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:var(--surface);display:block;font-size:12px;overflow-wrap:anywhere}.footer{padding-top:55px;text-align:center;color:var(--muted);font-size:12px}.hide{display:none!important}:not(pre)>code{overflow-wrap:anywhere}
+@media(max-width:1060px){:root{--sidebar:210px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.twocol{grid-template-columns:1fr}.arch-row{grid-template-columns:repeat(2,1fr)}}@media(max-width:720px){.sidebar{display:none}.main{margin-left:0}.topbar{padding:0 18px}.topbar-title{display:none}.search{max-width:144px;min-width:100px}.content{padding:22px 16px 60px}.hero{padding:26px 19px}.grid,.grid.two{grid-template-columns:1fr}.ux-body{grid-template-columns:130px minmax(0,1fr)}.ux-side{padding:9px}.ux-header{align-items:start;flex-direction:column}.terminal{font-size:10px;padding:11px;min-height:340px}.ux-helper small{margin:0}.btn.print{display:none}.flow .arrow{display:none}}
+@media print{body{background:#fff;color:#111;font-size:11pt}.sidebar,.topbar,.btn{display:none!important}.main{margin:0}.content{max-width:none;padding:0}.hero,.card,.decision,.table-wrap,.ux-app{box-shadow:none}.section{padding-top:25px;break-before:auto}.decision .body{display:block!important}.decision{break-inside:avoid}.section-head{break-after:avoid}.terminal{print-color-adjust:exact}.ux-app{break-inside:avoid}details:not([open])>.body{display:block}details:not([open]) summary{border-bottom:1px solid #aaa}}</style>
+<style>
+.grid>*,.card,.kv>*{min-width:0}
+.part{margin-top:78px;padding:26px 30px;border-radius:18px;background:radial-gradient(circle at 100% 0%,var(--accent-soft),transparent 55%),var(--surface);border:1px solid var(--accent);box-shadow:var(--shadow)}
+.part h2{margin:0 0 6px;font-size:30px}.part p{margin:0;color:var(--muted)}
+.req td:first-child{white-space:nowrap;font:700 12px Consolas,"Cascadia Mono",monospace;color:var(--accent-2)}
+.req td:nth-child(3),.req td:nth-child(4){white-space:nowrap;text-align:center}
+.req td:nth-child(5){white-space:nowrap;font-size:11px;color:var(--muted)}
+.req td:nth-child(2){font-weight:400}
+.req th:nth-child(3),.req th:nth-child(4){text-align:center}
+h3.group{margin:30px 0 10px;display:flex;align-items:baseline;gap:10px}
+h3.group small{font-size:12px;color:var(--muted);font-weight:600}
+.filterbar{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
+.side-group{padding:14px 23px 4px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-2);font-size:9.5px;font-weight:900}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:13px}.kv b{color:var(--muted);font-weight:700}
+.rule{counter-reset:r;list-style:none;padding:0;margin:10px 0}.rule li{counter-increment:r;position:relative;padding:8px 10px 8px 42px;margin:6px 0;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.rule li:before{content:counter(r,decimal-leading-zero);position:absolute;left:11px;top:8px;font:800 11px Consolas,monospace;color:var(--accent-2)}
+</style>
+</head>
+<body>
+<aside class="sidebar" aria-label="Doküman menüsü">
+<div class="brand"><div class="brand-icon">A</div><div><strong>AWL</strong><small>Teknik Tasarım & SRS · v1.0 taslak</small></div></div>
+<nav class="side-nav" id="sideNav">
+<a href="#belge"><span class="nav-num">00</span> Belge hakkında</a>
+<div class="side-group">A · Teknik uygulama</div>
+<a href="#teknoloji"><span class="nav-num">01</span> Teknoloji yığını</a>
+<a href="#yapi"><span class="nav-num">02</span> Çözüm yapısı</a>
+<a href="#moduller"><span class="nav-num">03</span> Modüller ve arayüzler</a>
+<a href="#akislar"><span class="nav-num">04</span> Temel akışlar</a>
+<a href="#claude"><span class="nav-num">05</span> Claude Code entegrasyonu</a>
+<a href="#python"><span class="nav-num">06</span> Python, belgeler, UDF</a>
+<a href="#windows"><span class="nav-num">07</span> Windows entegrasyonu</a>
+<a href="#kod"><span class="nav-num">08</span> Kod standartları</a>
+<a href="#test"><span class="nav-num">09</span> Test ve kalite</a>
+<a href="#paket"><span class="nav-num">10</span> Derleme ve paketleme</a>
+<a href="#faz2"><span class="nav-num">11</span> Faz 2: gömülü terminal</a>
+<div class="side-group">B · Yazılım gereksinimleri</div>
+<a href="#srs-giris"><span class="nav-num">12</span> Giriş ve genel tanım</a>
+<a href="#srs-fonk"><span class="nav-num">13</span> Fonksiyonel gereksinimler</a>
+<a href="#srs-nfr"><span class="nav-num">14</span> Fonksiyonel olmayan</a>
+<a href="#srs-arayuz"><span class="nav-num">15</span> Dış arayüzler ve veri</a>
+<a href="#srs-iz"><span class="nav-num">16</span> İzlenebilirlik ve kabul</a>
+</nav>
+<div class="side-bottom">Kaynak: <i>AWL Proje Kararları v0.5</i><br>İnternet bağlantısı olmadan açılır.</div>
+</aside>
+<div class="main">
+<header class="topbar"><div class="topbar-title">AWL · Teknik tasarım ve yazılım gereksinim belirtimi</div><div class="toolbar"><input id="searchBox" class="search" type="search" placeholder="Bölüm / gereksinim ara..." aria-label="Dokümanda ara"><button class="btn" id="themeButton">☾ Koyu tema</button><button class="btn print" onclick="window.print()">⎙ Yazdır / PDF</button></div></header>
+<main class="content">
+
+<section id="belge" class="hero"><p class="eyebrow">Teknik doküman · v1.0 taslak · 22 Kasım 2026</p><h1>AWL Teknik Tasarım ve <span style="color:var(--accent)">Yazılım Gereksinimleri</span></h1><p class="lead">Bu belge, <i>AWL Proje Kararları ve Mimari (v0.5)</i> belgesindeki kararların nasıl uygulanacağını anlatır. <b>Bölüm A</b> teknolojileri, kod yapısını, temiz kod ve modülerlik kurallarını tarif eder. <b>Bölüm B</b> ise yazılımın karşılaması gereken gereksinimleri madde madde listeler.</p><div class="meta"><span class="pill accent">C# 14 / .NET 10</span><span class="pill">WPF + MVVM</span><span class="pill">SQLite</span><span class="pill">Claude Code CLI</span><span class="pill">uv + Python 3.13</span><span class="pill">Inno Setup (kullanıcı bazlı)</span></div>
+<div class="grid two" style="margin-top:20px"><div class="card"><h3>Nasıl okunmalı?</h3><p>Karar numaraları (<code>D01</code>–<code>D23</code>) proje kararları belgesine, gereksinim numaraları (<code>KUR-01</code> gibi) Bölüm B'ye atıftır. Kod örnekleri yön göstermek içindir; birebir kopyalanacak son kod değildir.</p></div><div class="card"><h3>Kapsam</h3><p>Ağırlık Faz 1 (MVP) üzerindedir. Faz 2 (gömülü terminal) ve Faz 3 (araçlar) için tasarım sınırları ve gereksinimler verilir, ayrıntılı tasarım o fazlara bırakılır.</p></div></div>
+<div class="note warn"><strong>Faz 0'a bağlı teknik varsayımlar</strong><p>Belgede “<b>F0 doğrulaması</b>” olarak işaretlenen her madde, geliştiricinin kendi ortamında (kendi bilgisayarı veya Windows 10 sanal makinesi) yapılacak Faz 0 testlerinin sonucuna göre değişebilir. Bunlar §16'daki açık konular listesinde toplanmıştır.</p></div></section>
+
+<div class="part"><h2>Bölüm A — Teknik uygulama</h2><p>Teknolojiler, mimari, kod yazım kuralları ve kalite pratikleri.</p></div>
+
+<section class="section" id="teknoloji"><div class="section-head"><div><span class="section-index">01 / Stack</span><h2>Teknoloji yığını</h2><p>Her seçim tek bir soruya göre yapıldı: <i>Windows 10'da kullanıcı bazlı kurulan (UAC istemi çıkarmayan) ve tek geliştiricinin bakımını yapabileceği en sade çözüm hangisi?</i></p></div></div>
+<div class="table-wrap"><table><thead><tr><th>Alan</th><th>Seçim</th><th>Gerekçe ve notlar</th></tr></thead><tbody>
+<tr><td>Dil ve çalışma zamanı</td><td>C# 14, <b>.NET 10 (LTS)</b>, self-contained <code>win-x64</code></td><td>Üç yıl destek. Self-contained yayımlandığı için makinede .NET kurulu olması gerekmez. <b>F0 doğrulaması:</b> .NET 10'un Windows 10'da desteklendiği resmi belgelerden ve bir Windows 10 sanal makinesinde teyit edilmeli.</td></tr>
+<tr><td>Arayüz</td><td>WPF + MVVM</td><td>Olgun ve Windows'a özel; Faz 2'de WebView2 ile doğal olarak birleşir.</td></tr>
+<tr><td>MVVM araçları</td><td><code>CommunityToolkit.Mvvm</code></td><td>Kaynak üreteçleri sayesinde az kod: <code>[ObservableProperty]</code>, <code>[RelayCommand]</code>, <code>IMessenger</code>.</td></tr>
+<tr><td>Uygulama altyapısı</td><td><code>Microsoft.Extensions.Hosting</code> (DI, Options, Logging)</td><td>Tek bileşim kökü; her modül kendi servis kaydını yapar.</td></tr>
+<tr><td>Veri</td><td>SQLite: <code>Microsoft.Data.Sqlite</code> + <code>Dapper</code></td><td>Tek dosya, sunucusuz. Şema küçük olduğu için ORM yerine hafif eşleyici ve elle yazılmış, ileri yönlü migration'lar.</td></tr>
+<tr><td>Günlükleme</td><td><code>Serilog</code> (Extensions.Logging + Sinks.File)</td><td>Boyut ve sayı sınırlı, dönen günlük dosyaları; yapılandırılmış alanlar.</td></tr>
+<tr><td>Dosya sistemi soyutlaması</td><td><code>System.IO.Abstractions</code></td><td>Core testleri gerçek diske dokunmadan çalışır.</td></tr>
+<tr><td>Süreç izleme</td><td><code>System.Management</code> (WMI)</td><td><code>claude.exe</code> süreçlerini komut satırındaki oturum kimliğinden tanımak için.</td></tr>
+<tr><td>Terminal (Faz 1)</td><td>Taşınabilir <b>Windows Terminal</b> ZIP; yoksa Windows konsolu</td><td>D17. Taşınabilir mod Windows 10 2004 (19041) ve üstünü ister; daha eski sürümde konsola düşülür.</td></tr>
+<tr><td>Gömülü terminal (Faz 2)</td><td><code>Microsoft.Web.WebView2</code> + <b>xterm.js</b> (pakete gömülü) + ConPTY</td><td>D07. ConPTY çağrıları <code>Microsoft.Windows.CsWin32</code> ile tür güvenli üretilir.</td></tr>
+<tr><td>Python</td><td><b>uv</b> (AWL paketine gömülü) + Python 3.13 + venv</td><td>D04. Kullanıcı klasörüne kurulur; paketler hash'li kilit dosyasıyla kurulur.</td></tr>
+<tr><td>Kurulum paketi</td><td><b>Inno Setup</b>, <code>PrivilegesRequired=lowest</code></td><td>Kullanıcı bazlı kurulum (UAC istemi yok), Türkçe sihirbaz, Uygulamalar listesinde kaldırıcı. Otomatik güncelleme yok (D21).</td></tr>
+<tr><td>Test</td><td><code>xUnit</code>, <code>NSubstitute</code>, <code>Shouldly</code>, <code>NetArchTest.Rules</code>, <code>pytest</code></td><td>FluentAssertions 8+ ticari lisansa geçtiği için seçilmedi. Mimari kurallar testle denetlenir.</td></tr>
+<tr><td>Kod kalitesi</td><td><code>.editorconfig</code>, .NET analizörleri, nullable, uyarılar = hata, Central Package Management</td><td>Kuralların insan dikkatine değil derleyiciye bağlı olması için.</td></tr>
+<tr><td>Tema</td><td>Kendi <code>ResourceDictionary</code> dosyaları (Açık/Koyu) + sistem temasını okuma</td><td>WPF'in yerleşik <code>ThemeMode</code> özelliği .NET 10'da hâlâ deneysel (<code>WPF0001</code>); kararlı hâle gelince geçilebilir.</td></tr>
+</tbody></table></div>
+<div class="note"><strong>Bilinçli olarak kullanılmayanlar</strong><p>ORM (EF Core), dinamik DLL eklenti sistemi, otomatik güncelleyici, Git for Windows, Node.js çalışma zamanı ve Claude Code yerine geçen herhangi bir sohbet motoru. Her biri ya bu ölçek için gereksiz bakım yükü getirir ya da proje kararlarıyla (D01, D19, D21, mimari) çelişir.</p></div>
+</section>
+
+<section class="section" id="yapi"><div class="section-head"><div><span class="section-index">02 / Solution</span><h2>Çözüm yapısı ve bağımlılık kuralları</h2><p>Üç proje, net bağımlılık yönü. Modüller ayrı proje değil, klasör ve namespace düzeyinde ayrılır.</p></div></div>
+<pre class="code">AWL/
+├── AWL.sln
+├── Directory.Build.props          # nullable, uyarılar = hata, analizörler, dil sürümü
+├── Directory.Packages.props       # tüm NuGet sürümleri tek yerde
+├── .editorconfig
+├── src/
+│   ├── AWL.Core/                  # saf .NET (net10.0): WPF, Registry, WMI yok
+│   │   ├── Common/                # Result, AppError, IClock
+│   │   ├── Sessions/              # Session, SessionService, SessionStateResolver
+│   │   ├── Categories/
+│   │   ├── Claude/                # ClaudeCli sabitleri, ClaudeCommandBuilder, arayüzler
+│   │   ├── Setup/                 # ISetupStep, SetupPipeline, adım tanımları
+│   │   ├── Configuration/         # AwlPaths, ClaudeSettingsWriter, ContextFileWriter
+│   │   ├── Retention/             # RetentionPolicy (D18)
+│   │   └── Tools/                 # araç kataloğu (Faz 3)
+│   ├── AWL.Infrastructure/        # Windows'a dokunan her şey (net10.0-windows)
+│   │   ├── Persistence/           # SQLite bağlantısı, migration'lar, repository'ler
+│   │   ├── Processes/             # terminal başlatıcıları, WMI süreç izleyici
+│   │   ├── Claude/                # kurulum, sürüm, geçmiş dosyaları
+│   │   ├── Python/                # uv ile ortam kurulumu
+│   │   ├── Shell/                 # HKCU sağ tık kayıtları
+│   │   ├── Ipc/                   # tek örnek kilidi + named pipe
+│   │   └── Diagnostics/           # Serilog yapılandırması, tanılama paketi
+│   └── AWL.Desktop/               # WPF uygulaması (net10.0-windows)
+│       ├── App.xaml(.cs)          # Host, DI, global hata yakalama
+│       ├── Views/   ViewModels/   Services/   # dialog, navigasyon, tema
+│       ├── Resources/             # Strings.resx (tr-TR), temalar, ikonlar
+│       └── Assets/                # awl-context.md şablonu, udf_tool.py, requirements.lock
+├── tests/
+│   ├── AWL.Core.Tests/
+│   ├── AWL.Infrastructure.Tests/  # yalnızca Windows'ta çalışan entegrasyon testleri
+│   ├── AWL.Architecture.Tests/    # bağımlılık kurallarının otomatik denetimi
+│   ├── python/                    # udf_tool.py için pytest
+│   └── e2e/                       # temiz Windows 10 üzerinde elle test senaryoları
+├── installer/AWL.iss              # Inno Setup betiği
+├── third_party/                   # uv.exe, Windows Terminal ZIP, xterm.js (sürümleri sabit)
+└── docs/adr/                      # karar kayıtları (D01…)</pre>
+<div class="grid two" style="margin-top:16px"><div class="card"><h3>Bağımlılık yönü</h3><ul class="list"><li><b>AWL.Core</b> hiçbir projeye bağımlı değildir. Platforma özel API kullanmaz (<code>net10.0</code>).</li><li><b>AWL.Infrastructure</b> yalnızca Core'a bağımlıdır ve Core'daki arayüzleri uygular.</li><li><b>AWL.Desktop</b> Core'a bağımlıdır. Infrastructure'a yalnızca bileşim kökünde (<code>App.xaml.cs</code>) servis kaydı için dokunur.</li><li>ViewModel'ler yalnızca Core arayüzlerini görür.</li></ul></div><div class="card"><h3>Kuralın denetimi</h3><p>Bu kurallar <code>AWL.Architecture.Tests</code> içinde NetArchTest ile yazılır ve her test çalıştırmasında denetlenir. Örneğin: “Core, <code>Microsoft.Win32</code>, <code>System.Windows</code> veya <code>System.Management</code> isim alanlarına bağımlı olamaz.” Kural ihlali derlemeyi değil testi kırar, ama birleştirmeden önce mutlaka görülür.</p></div></div>
+</section>
+
+<section class="section" id="moduller"><div class="section-head"><div><span class="section-index">03 / Modules</span><h2>Modüller ve arayüzler</h2><p>Her modül: bir klasör, küçük bir genel arayüz yüzeyi ve kendi DI kayıt metodu.</p></div></div>
+<div class="table-wrap"><table><thead><tr><th>Modül</th><th>Sorumluluk</th><th>Core tipleri</th><th>Infrastructure uygulamaları</th><th>Faz</th></tr></thead><tbody>
+<tr><td>Sessions</td><td>Oturum yaşam döngüsü, durum hesaplama, başlatma/devam ettirme</td><td><code>Session</code>, <code>SessionService</code>, <code>SessionStateResolver</code>, <code>ISessionRepository</code></td><td><code>SqliteSessionRepository</code></td><td>1</td></tr>
+<tr><td>Categories</td><td>Kategori CRUD ve sıralama</td><td><code>Category</code>, <code>ICategoryRepository</code></td><td><code>SqliteCategoryRepository</code></td><td>1</td></tr>
+<tr><td>Claude</td><td>Komut satırı, kurulum, süreç ve geçmiş dosyaları</td><td><code>ClaudeCli</code>, <code>ClaudeCommandBuilder</code>, <code>IClaudeInstallation</code>, <code>IClaudeProcessMonitor</code>, <code>IClaudeHistoryStore</code></td><td><code>PowerShellClaudeInstaller</code>, <code>WmiClaudeProcessMonitor</code>, <code>FileSystemClaudeHistoryStore</code></td><td>1</td></tr>
+<tr><td>Terminal</td><td>Claude'u gerçek bir terminal penceresinde açmak</td><td><code>ITerminalLauncher</code>, <code>ClaudeLaunchSpec</code></td><td><code>WindowsTerminalLauncher</code>, <code>ConsoleLauncher</code>, <code>TerminalLauncherSelector</code></td><td>1 (gömülü: 2)</td></tr>
+<tr><td>Setup</td><td>İlk kurulum, onarım, ön kontroller</td><td><code>ISetupStep</code>, <code>SetupPipeline</code>, <code>StepResult</code></td><td>Adımların Windows tarafı (PowerShell, uv, registry)</td><td>1</td></tr>
+<tr><td>Configuration</td><td>Yollar, <code>claude-settings.json</code>, <code>awl-context.md</code>, AWL ayarları</td><td><code>AwlPaths</code>, <code>ClaudeSettingsWriter</code>, <code>ContextFileWriter</code>, <code>AwlSettings</code></td><td>Bilinen klasörlerin çözümlenmesi</td><td>1</td></tr>
+<tr><td>Retention</td><td>Saklama süresi ve birlikte silme (D18)</td><td><code>RetentionPolicy</code>, <code>SessionDeletionService</code></td><td>—</td><td>1</td></tr>
+<tr><td>Shell</td><td>Sağ tık menüsü, komut satırı argümanları, tek örnek</td><td><code>ILaunchRequestSource</code>, <code>LaunchRequest</code>, <code>LaunchArgumentParser</code></td><td><code>HkcuShellIntegration</code>, <code>NamedPipeLaunchRequestSource</code></td><td>1</td></tr>
+<tr><td>Diagnostics</td><td>Günlük, tanılama paketi, sürüm bilgisi</td><td><code>IDiagnosticsService</code></td><td><code>DiagnosticsZipBuilder</code></td><td>1</td></tr>
+<tr><td>Tools</td><td>Araç kataloğu ve açma</td><td><code>ToolDefinition</code>, <code>IToolLauncher</code></td><td><code>BrowserToolLauncher</code>, <code>WebViewToolLauncher</code></td><td>3</td></tr>
+</tbody></table></div>
+<h3 style="margin-top:24px">Çekirdek tipler (yön gösterici)</h3>
+<pre class="code">// Core/Sessions/Session.cs — kalıcı veri; değişmez (immutable) kayıt
+public sealed record Session(
+    Guid Id,
+    string Title,
+    Guid? CategoryId,
+    string WorkspacePath,
+    Guid ClaudeSessionId,          // D14: AWL üretir
+    string? ClaudeVersion,         // D21: oturumun açıldığı Claude sürümü
+    bool IsArchived,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? LastOpenedAt,
+    DateTimeOffset? LastActivityAt);
+
+// Kalıcı değil; her seferinde hesaplanır
+public enum SessionState { Closed, Open, Archived, HistoryMissing, Error }
+
+public static class SessionStateResolver
+{
+    // Saf fonksiyon: kolay test edilir, yan etkisi yoktur
+    public static SessionState Resolve(Session s, bool isRunning, bool historyExists, bool hasError) =&gt;
+        hasError       ? SessionState.Error
+      : isRunning      ? SessionState.Open
+      : s.IsArchived   ? SessionState.Archived
+      : !historyExists &amp;&amp; s.LastOpenedAt is not null ? SessionState.HistoryMissing
+      : SessionState.Closed;
+}</pre>
+<pre class="code">// Core/Claude — dış dünyaya dokunan her şey bir arayüzün arkasında
+public interface IClaudeProcessMonitor
+{
+    IReadOnlySet&lt;Guid&gt; RunningSessionIds { get; }      // komut satırında --session-id / --resume taşıyanlar
+    event EventHandler? Changed;
+}
+
+public interface IClaudeHistoryStore
+{
+    HistoryInfo? Find(Guid claudeSessionId);           // var mı, son değişiklik zamanı
+    Task&lt;DeleteReport&gt; DeleteAsync(Guid claudeSessionId, CancellationToken ct);
+}
+
+public interface ITerminalLauncher
+{
+    bool IsAvailable { get; }
+    Task&lt;Result&gt; LaunchAsync(ClaudeLaunchSpec spec, string windowTitle, CancellationToken ct);
+}
+
+// Core/Setup — her kurulum adımı aynı sözleşmeye uyar
+public interface ISetupStep
+{
+    string Id { get; }                                 // "claude-install", "python-venv"…
+    string DisplayNameKey { get; }                     // Strings.resx anahtarı
+    Task&lt;StepCheck&gt; CheckAsync(CancellationToken ct);  // zaten tamam mı? (idempotans)
+    Task&lt;StepResult&gt; RunAsync(IProgress&lt;StepProgress&gt; progress, CancellationToken ct);
+}</pre>
+<pre class="code">// Her modül kendi kaydını yapar; bileşim kökü yalnızca bunları çağırır
+public static class SessionsModule
+{
+    public static IServiceCollection AddSessions(this IServiceCollection services) =&gt;
+        services.AddSingleton&lt;SessionService&gt;()
+                .AddSingleton&lt;ClaudeCommandBuilder&gt;()
+                .AddSingleton&lt;SessionDeletionService&gt;();
+}
+
+// AWL.Desktop/App.xaml.cs
+builder.Services
+    .AddCore()              // Sessions, Categories, Setup, Configuration, Retention…
+    .AddInfrastructure()    // SQLite, WMI, registry, uv, PowerShell, Serilog
+    .AddDesktop();          // ViewModel'ler, dialog/navigasyon/tema servisleri</pre>
+<div class="note"><strong>Modüller arası iletişim</strong><p>Modüller birbirinin iç sınıflarını kullanmaz; yalnızca genel arayüzlerini kullanır. Bir olayın birden fazla ekranı ilgilendirdiği durumlarda (ör. “oturum silindi”, “oturum durumu değişti”) <code>CommunityToolkit.Mvvm</code>'in <code>IMessenger</code>'ı ile küçük, değişmez mesaj kayıtları yayımlanır.</p></div>
+</section>
+
+<section class="section" id="akislar"><div class="section-head"><div><span class="section-index">04 / Flows</span><h2>Temel akışlar</h2><p>MVP'nin altı ana akışı ve her birinde hangi bileşenin ne yaptığı.</p></div></div>
+<div class="stack">
+<div class="card"><h3>① İlk çalıştırma ve onarım</h3><p><code>SetupPipeline</code> adımları sırayla çalıştırır. Her adım önce <code>CheckAsync</code> ile durumunu kontrol eder ve zaten tamamsa atlanır; bu sayede “Onar” aynı kod yolunu kullanır.</p><div class="flow"><div class="flow-box"><strong>Ön kontroller</strong><small>Windows, yazma, ağ, PS dil modu</small></div><div class="arrow">→</div><div class="flow-box"><strong>Claude Code</strong><small>bul / kur / sürüm</small></div><div class="arrow">→</div><div class="flow-box"><strong>Python</strong><small>uv, venv, paketler</small></div><div class="arrow">→</div><div class="flow-box"><strong>Yapılandırma</strong><small>settings, context, udf_tool</small></div><div class="arrow">→</div><div class="flow-box"><strong>Windows</strong><small>sağ tık, terminal</small></div><div class="arrow">→</div><div class="flow-box"><strong>Giriş</strong><small>Claude'un kendi akışı</small></div></div></div>
+<div class="card"><h3>② Yeni oturum</h3><ol class="list"><li>Kullanıcı başlık, klasör ve isteğe bağlı kategori girer; klasör doğrulanır (mutlak yol, mevcut).</li><li><code>SessionService</code> yeni bir <code>Session</code> oluşturur; <code>ClaudeSessionId = Guid.NewGuid()</code>.</li><li>Kayıt veritabanına yazılır; ardından <code>ClaudeCommandBuilder.Build(session, LaunchMode.New)</code> çalışır.</li><li><code>TerminalLauncherSelector</code> uygun başlatıcıyı seçer ve terminal penceresini açar.</li><li><code>WmiClaudeProcessMonitor</code> yeni süreci görünce durum “Açık” olur.</li></ol></div>
+<div class="card"><h3>③ Devam et</h3><ol class="list"><li>Oturum zaten açıksa ikinci süreç başlatılmaz; kullanıcı bilgilendirilir ve pencere öne getirilmeye çalışılır.</li><li>Geçmiş dosyası yoksa (“Geçmiş bulunamadı”) aynı klasörde yeni oturum açma önerilir.</li><li>Aksi hâlde <code>Build(session, LaunchMode.Resume)</code> ile <code>--resume &lt;uuid&gt;</code> kullanılır ve aynı başlatma yolu izlenir.</li></ol></div>
+<div class="card"><h3>④ Sağ tık ile açma</h3><ol class="list"><li>Gezgin, <code>AWL.exe --folder "&lt;yol&gt;"</code> komutunu çalıştırır.</li><li>Yeni süreç tek örnek kilidini alamazsa isteği named pipe ile çalışan örneğe iletir ve kapanır.</li><li>Çalışan örnek isteği doğrular ve “Yeni oturum” penceresini klasör dolu olarak açar. <code>--file</code> ile gelindiyse dosyanın klasörü seçilir ve tırnaklı yolu panoya kopyalanır.</li></ol></div>
+<div class="card"><h3>⑤ Oturumu silme (D18)</h3><ol class="list"><li>Onay ekranı neyin silineceğini ve işlemin geri alınamayacağını yazar.</li><li>Oturum açıksa kullanıcıya sorulur; onaylarsa süreç ağacı sonlandırılır.</li><li><code>IClaudeHistoryStore.DeleteAsync</code> Claude tarafındaki dosyaları siler.</li><li>Yalnızca bu adım tamamen başarılıysa AWL kaydı silinir. Kısmi hatada kayıt “Hata” durumuna geçer ve “Tekrar dene” sunulur; böylece hiçbir dosya sahipsiz kalmaz.</li></ol></div>
+<div class="card"><h3>⑥ Açılışta uzlaştırma ve saklama</h3><ol class="list"><li>Arka planda her oturum için geçmiş dosyası aranır; <code>LastActivityAt</code> dosyanın son değişiklik zamanından güncellenir.</li><li><code>RetentionPolicy</code>, saklama süresini aşmış ve açık olmayan oturumları belirler; bunlar ⑤'teki silme yoluyla her iki yerden silinir.</li><li>Süreç izleyici başlatılır ve durumlar arayüze yansır.</li></ol></div>
+</div>
+</section>
+
+<section class="section" id="claude"><div class="section-head"><div><span class="section-index">05 / Claude</span><h2>Claude Code entegrasyonu</h2><p>AWL, Claude Code'u değiştirmez; doğru klasörde, doğru parametrelerle, gerçek bir terminalde başlatır.</p></div></div>
+<div class="grid two"><div class="card"><h3>Konumlar</h3><div class="kv"><b>Program</b><span><code>%USERPROFILE%\.local\bin\claude.exe</code> (bulunamazsa <code>PATH</code> taranır)</span><b>Claude verisi</b><span><code>CLAUDE_CONFIG_DIR</code> tanımlıysa o, değilse <code>%USERPROFILE%\.claude</code></span><b>Dökümler</b><span><code>projects\&lt;klasör&gt;\&lt;uuid&gt;.jsonl</code></span><b>Debug günlüğü</b><span><code>debug\&lt;uuid&gt;.txt</code></span></div></div><div class="card"><h3>Kurallar</h3><ul class="list"><li>Bayrak adları yalnızca <code>ClaudeCli</code> sabitler sınıfında yazılır.</li><li>Döküm yolu hesaplanmaz, <b>oturum kimliğiyle aranır</b>; Claude'un klasör adlandırma kuralı değişse de çalışır.</li><li>AWL, Claude'un kimlik bilgisi dosyalarını okumaz.</li><li>Giriş, Claude'un kendi akışıyla terminalde yapılır.</li></ul></div></div>
+<h3 style="margin-top:22px">Komut satırının oluşturulması</h3>
+<pre class="code">public static class ClaudeCli
+{
+    public const string SessionId              = "--session-id";
+    public const string Resume                 = "--resume";
+    public const string Settings               = "--settings";
+    public const string AppendSystemPromptFile = "--append-system-prompt-file";
+    public const string Version                = "--version";
+}
+
+public sealed record ClaudeLaunchSpec(string Executable, IReadOnlyList&lt;string&gt; Arguments, string WorkingDirectory);
+
+public sealed class ClaudeCommandBuilder(AwlPaths paths, IClaudeInstallation claude)
+{
+    public ClaudeLaunchSpec Build(Session session, LaunchMode mode)
+    {
+        var id = session.ClaudeSessionId.ToString();
+        List&lt;string&gt; args = mode == LaunchMode.New
+            ? [ClaudeCli.SessionId, id]
+            : [ClaudeCli.Resume, id];
+
+        args.AddRange([ClaudeCli.Settings, paths.ClaudeSettingsFile,
+                       ClaudeCli.AppendSystemPromptFile, paths.ContextFile]);
+
+        return new ClaudeLaunchSpec(claude.ExecutablePath, args, session.WorkspacePath);
+    }
+}</pre>
+<h3 style="margin-top:22px">Terminal başlatıcıları (D17)</h3>
+<div class="grid two"><div class="card"><h3>Windows Terminal (taşınabilir)</h3><pre class="code">wt.exe -w new new-tab --title "&lt;başlık&gt;" -d "&lt;klasör&gt;"
+       "&lt;claude.exe&gt;" --resume &lt;uuid&gt; --settings … </pre><p><code>wt</code> komut satırında <code>;</code> karakteri yeni komut ayırıcıdır; başlık ve yollardaki <code>;</code> karakterleri <code>\;</code> olarak kaçırılmalıdır. Argümanlar her zaman <code>ProcessStartInfo.ArgumentList</code> ile verilir.</p></div><div class="card"><h3>Windows konsolu (yedek yol)</h3><p><code>claude.exe</code> doğrudan <code>ProcessStartInfo</code> ile başlatılır (<code>UseShellExecute = false</code>, <code>CreateNoWindow = false</code>, <code>WorkingDirectory</code> = oturum klasörü). AWL bir GUI uygulaması olduğu için konsol uygulaması kendi penceresini alır. Pencere başlığı Claude tarafından değiştirilebilir.</p></div></div>
+<div class="note warn"><strong>Teknik ayrıntılandırma TA-01: ortam değişkenleri terminal türüne güvenilerek taşınmaz</strong><p>Windows Terminal yeni sekmelerde ortam değişkenlerini kayıt defterinden yeniden yükleyebilir. Bu durumda AWL'nin verdiği <code>PATH</code> veya <code>VIRTUAL_ENV</code> Claude'a ulaşmayabilir. Bu yüzden:</p><p>(1) <code>AWL_HOME</code> ve <code>VIRTUAL_ENV</code> değişkenleri, <code>claude-settings.json</code> içindeki <code>env</code> alanıyla Claude'a verilir.</p><p>(2) Python her zaman <b>tam yoluyla</b> çağrılır ve bu yol <code>awl-context.md</code> içinde yazar. Tek başına <code>python</code> komutu Microsoft Store kısayoluna gidebilir.</p><p>Bu, D04'teki “PATH aktarımı” yaklaşımının uygulanabilir hâlidir. <b>F0 doğrulaması.</b></p></div>
+<h3 style="margin-top:22px">AWL'nin Claude'a verdiği dosyalar</h3>
+<div class="grid two"><div class="card"><h3><code>claude-settings.json</code> (D16–D18)</h3><pre class="code">{
+  "permissions": { "defaultMode": "default" },
+  "cleanupPeriodDays": 3650,
+  "env": {
+    "AWL_HOME": "C:\\Users\\…\\AppData\\Local\\AWL",
+    "VIRTUAL_ENV": "C:\\Users\\…\\AppData\\Local\\AWL\\.venv"
+  }
+}</pre><p class="tiny">Değerleri <code>ClaudeSettingsWriter</code> üretir; <code>cleanupPeriodDays</code> AWL ayarlarındaki saklama süresinden gelir.</p></div><div class="card"><h3><code>awl-context.md</code> şablonu (D15, D16, D20, D23)</h3><pre class="code"># AWL çalışma ortamı
+- Yanıtlarını Türkçe ver.
+- Python: "{PythonExe}" (her zaman bu tam yolu kullan).
+  Paket kurmak için: "{PythonExe}" -m pip install &lt;paket&gt;
+- Orijinal belgeleri değiştirme. Bir belgede değişiklik
+  istenirse önce kopyasını al, değişikliği kopyada yap.
+  Kopyanın adı: "&lt;ad&gt; - düzenlendi.&lt;uzantı&gt;"
+  (varsa "- düzenlendi (2)").
+- Bir dosyayı yine de doğrudan değiştirdiysen adına
+  "- düzenlendi" ekle ve kullanıcıya söyle.
+- DOCX/PDF/XLSX işlerinde önce belge skill'lerini kullan;
+  sonuç alınamazsa Python kütüphanelerini kullan.
+- UDF dosyaları için: "{PythonExe}" "{UdfTool}" --help
+- Yeni üretilen dosyaları "AWL_Ciktilar" klasörüne yaz.</pre></div></div>
+<h3 style="margin-top:22px">Kurulum, süreç izleme ve geçmiş</h3>
+<div class="table-wrap"><table><thead><tr><th>Konu</th><th>Uygulama</th></tr></thead><tbody>
+<tr><td>Kurulum</td><td><code>powershell.exe -NoProfile -NonInteractive -Command "irm https://claude.ai/install.ps1 | iex"</code>. Çıktı günlüğe yazılır. Yürütme ilkesi (ExecutionPolicy) değiştirilmez; Constrained Language Mode bir adımı engellerse durum açıklanır ve elle kurulum talimatı gösterilir.</td></tr>
+<tr><td>Sürüm</td><td><code>claude --version</code> çıktısı ayrıştırılır; açılışta ve her oturum başlatmada kaydedilir (D21).</td></tr>
+<tr><td>Süreç izleme</td><td>2 saniyede bir WMI sorgusu: <code>SELECT ProcessId, CommandLine FROM Win32_Process WHERE Name = 'claude.exe'</code>. Komut satırındaki UUID'ler <code>RunningSessionIds</code> kümesine dönüştürülür; küme değişince <code>Changed</code> olayı yayımlanır.</td></tr>
+<tr><td>Geçmişi bulma</td><td><code>projects</code> altında <code>&lt;uuid&gt;.jsonl</code> aranır (dizin ağacı küçük olduğu için yeterince hızlı); sonuç kısa süreli önbelleğe alınır.</td></tr>
+<tr><td>Geçmişi silme</td><td><code>&lt;uuid&gt;.jsonl</code>, varsa aynı adlı klasör, <code>debug\&lt;uuid&gt;.txt</code> ve Faz 0'da belirlenecek oturuma ait diğer yollar. Bu ek yollar koda gömülmez, <code>ClaudeHistoryOptions.ExtraSessionPaths</code> yapılandırmasında tutulur.</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="section" id="python"><div class="section-head"><div><span class="section-index">06 / Runtime</span><h2>Python ortamı, belge araçları ve UDF</h2><p>Sistem Python'una dokunmadan, proxy ve TLS denetimi olan ağlara uyumlu, tekrar üretilebilir bir ortam.</p></div></div>
+<pre class="code"># Ortam değişkenleri (yalnızca AWL'nin başlattığı uv süreçleri için)
+UV_PYTHON_INSTALL_DIR = %LOCALAPPDATA%\AWL\runtime\python
+UV_CACHE_DIR          = %LOCALAPPDATA%\AWL\cache\uv
+UV_NATIVE_TLS         = 1          # ağda TLS denetimi varsa Windows sertifika deposunu kullan
+
+uv python install 3.13
+uv venv "%LOCALAPPDATA%\AWL\.venv" --python 3.13 --seed            # --seed: pip de kurulur
+uv pip install --python "%LOCALAPPDATA%\AWL\.venv\Scripts\python.exe" ^
+               -r requirements.lock --require-hashes</pre>
+<div class="grid two" style="margin-top:16px"><div class="card"><h3>Paket kilidi</h3><p><code>requirements.in</code> doğrudan bağımlılıkları listeler: <code>python-docx</code>, <code>pypdf</code>, <code>pdfplumber</code>, <code>openpyxl</code>, <code>pandas</code>, <code>reportlab</code>, <code>lxml</code>. Kilit dosyası geliştirici makinesinde <code>uv pip compile requirements.in --generate-hashes -o requirements.lock</code> ile üretilir ve depoya eklenir. Kullanıcı makinesinde paket sürümleri hiçbir zaman “en son” olarak çözülmez.</p></div><div class="card"><h3>Belge skill'leri (D20)</h3><p>Skill'ler AWL paketine <b>gömülmez</b>; lisans koşulları nedeniyle Claude'un resmi plugin mekanizmasıyla kurulur. Oturuma özel yükleme mümkün değilse kullanıcı düzeyinde kurulur (<b>F0 doğrulaması</b>). Bazı skill adımları Node.js, LibreOffice veya pandoc isteyebilir. Bunlar yoksa Claude, D20 gereği Python kütüphanelerine geçer; AWL bu araçları kurmaz.</p></div></div>
+<h3 style="margin-top:22px"><code>udf_tool.py</code> sözleşmesi (D23)</h3>
+<div class="table-wrap"><table><thead><tr><th>Komut</th><th>Ne yapar</th><th>Çıktı</th></tr></thead><tbody>
+<tr><td><code>info &lt;dosya.udf&gt;</code></td><td>ZIP girdilerini, boyutlarını ve sıkıştırma türlerini listeler.</td><td>JSON</td></tr>
+<tr><td><code>text &lt;dosya.udf&gt;</code></td><td>İçerik XML'inden düz metni çıkarır.</td><td>UTF-8 metin</td></tr>
+<tr><td><code>unpack &lt;dosya.udf&gt; &lt;klasör&gt;</code></td><td>Arşivi düzenleme için bir klasöre açar ve girdi sırasını bir manifest dosyasına yazar.</td><td>Klasör + manifest</td></tr>
+<tr><td><code>pack &lt;klasör&gt; &lt;yeni.udf&gt;</code></td><td>Klasörü manifestteki sırayla ve özgün sıkıştırma türleriyle yeniden paketler.</td><td>Yeni UDF dosyası</td></tr>
+</tbody></table></div>
+<ol class="rule"><li>Yalnızca Python standart kütüphanesi kullanılır (<code>zipfile</code>, <code>xml.etree</code>, <code>json</code>, <code>argparse</code>); venv'e bağımlı değildir.</li><li><code>pack</code> hedef olarak kaynak UDF dosyasını kabul etmez; önce geçici dosyaya yazar, başarılı olursa yeniden adlandırır.</li><li>Değiştirilmeyen girdiler bayt düzeyinde aynı kalır.</li><li>Hata mesajları Türkçe ve tek satırdır; çıkış kodu sıfırdan farklıdır.</li><li><code>tests/python</code> içinde gerçek örnek UDF ile aç-paketle-karşılaştır testi bulunur.</li></ol>
+</section>
+
+<section class="section" id="windows"><div class="section-head"><div><span class="section-index">07 / Windows</span><h2>Windows entegrasyonu</h2><p>Yalnızca kullanıcı kapsamı (HKCU ve kullanıcı klasörleri); hiçbir işlem UAC istemi tetiklemez.</p></div></div>
+<div class="table-wrap"><table><thead><tr><th>Amaç</th><th>Kayıt defteri anahtarı</th><th>Komut</th></tr></thead><tbody>
+<tr><td>Klasöre sağ tık</td><td><code>HKCU\Software\Classes\Directory\shell\AWL</code></td><td><code>"…\AWL.exe" --folder "%1"</code></td></tr>
+<tr><td>Klasör arka planı</td><td><code>HKCU\Software\Classes\Directory\Background\shell\AWL</code></td><td><code>"…\AWL.exe" --folder "%V"</code></td></tr>
+<tr><td>Desteklenen dosyalar</td><td><code>HKCU\Software\Classes\SystemFileAssociations\&lt;.uzantı&gt;\shell\AWL</code> (<code>.pdf .docx .xlsx .udf .png .jpg</code>)</td><td><code>"…\AWL.exe" --file "%1"</code></td></tr>
+</tbody></table></div>
+<p class="tiny">Görünen ad <code>MUIVerb</code> = “AWL ile aç”, simge <code>Icon</code> = AWL.exe. Windows 11'de bu girişler “Diğer seçenekleri göster” altında görünür. Kaldırmada yalnızca bu anahtarlar silinir.</p>
+<div class="grid two" style="margin-top:14px"><div class="card"><h3>Komut satırı sözleşmesi</h3><pre class="code">AWL.exe                     # normal açılış
+AWL.exe --folder "&lt;yol&gt;"     # yeni oturum, klasör dolu
+AWL.exe --file "&lt;yol&gt;"       # dosyanın klasöründe yeni oturum</pre><p><code>LaunchArgumentParser</code> saf bir fonksiyondur: bilinmeyen argümanları reddeder, yolun mutlak olduğunu ve var olduğunu doğrular, <code>\\.\</code> ve <code>\\?\</code> gibi aygıt yollarını kabul etmez.</p></div><div class="card"><h3>Tek örnek ve IPC</h3><ul class="list"><li>Kilit: <code>Mutex</code> adı <code>Local\AWL-&lt;kullanıcı SID&gt;</code>.</li><li>İletişim: <code>NamedPipeServerStream</code>, adı <code>AWL-&lt;SID&gt;</code>; <code>PipeSecurity</code> yalnızca mevcut kullanıcıya izin verir.</li><li>Mesaj: <code>{"kind":"folder","path":"…"}</code>. Çalışan örnek, gelen yolu yeniden doğrular.</li></ul></div></div>
+<div class="note"><strong>Yollar</strong><p>Bilinen klasörler her zaman <code>Environment.GetFolderPath</code> ile çözülür ve <code>AwlPaths</code> içinde tek yerde tutulur; kod içinde sabit sürücü harfi veya kullanıcı adı geçmez. Türkçe karakter ve boşluk içeren yollar test matrisinin zorunlu parçasıdır.</p></div>
+</section>
+
+<section class="section" id="kod"><div class="section-head"><div><span class="section-index">08 / Clean code</span><h2>Kod standartları, temiz kod ve modülerlik</h2><p>Bu kurallar kodu bir yıl sonra açan kişinin (büyük olasılıkla sen) işini kolaylaştırmak için var.</p></div></div>
+<div class="grid two">
+<div class="card"><h3>Temel ilkeler</h3><ol class="rule"><li><b>Tek sorumluluk:</b> Bir sınıfın değişmesi için tek bir neden olmalı. “Manager” ve “Helper” gibi her şeyi yapan sınıflar yazılmaz.</li><li><b>Saf çekirdek, kirli kenar:</b> Karar veren mantık (komut oluşturma, durum hesaplama, saklama kuralı, argüman doğrulama) yan etkisiz fonksiyonlardır. Dosya, süreç, registry, ağ ve saat yalnızca kenarlarda kullanılır.</li><li><b>Arayüz yalnızca sınırda:</b> Her sınıfa arayüz yazılmaz. Arayüz yalnızca dış dünyaya dokunan veya değiştirilebilir olması gereken bileşenler için yazılır.</li><li><b>Açık bağımlılıklar:</b> Bağımlılıklar yalnızca constructor ile alınır. Service locator, statik değiştirilebilir durum ve gizli singleton yoktur.</li><li><b>YAGNI:</b> Bugün gerekmeyen soyutlama yazılmaz (D10, mimari: <code>IAiSessionProvider</code> yok).</li><li><b>Değişmez veri:</b> Modeller <code>record</code>'dur; değişiklik <code>with</code> ifadesiyle yeni kopya üretir.</li></ol></div>
+<div class="card"><h3>Adlandırma ve dil</h3><ul class="list"><li>Kod, tanımlayıcılar ve commit mesajları <b>İngilizce</b>; kullanıcıya görünen her metin <b>Türkçe</b> ve <code>Strings.resx</code> içinde. Kod içinde Türkçe arayüz metni bulunmaz.</li><li>Standart .NET adlandırması: tipler ve metotlar <code>PascalCase</code>, alanlar <code>_camelCase</code>, asenkron metotlar <code>…Async</code>.</li><li>İsimler niyeti anlatır: <code>ResolveState</code>, <code>BuildLaunchSpec</code>; <code>DoWork</code> veya <code>Process</code> değil.</li><li>Sihirli metin ve sayı yoktur: Claude bayrakları <code>ClaudeCli</code>'de, yollar <code>AwlPaths</code>'te, süreler <code>Options</code> sınıflarında.</li></ul><h3 style="margin-top:16px">Boyut rehberi</h3><p>Metot ~30 satırı, sınıf ~200 satırı geçiyorsa bölünmesi gerekip gerekmediği sorgulanır. Bu katı bir kural değil, bir uyarı işaretidir.</p></div>
+<div class="card"><h3>Asenkron kod</h3><ul class="list"><li>Giriş/çıkış yapan her metot <code>async</code> ve <code>CancellationToken</code> alır.</li><li><code>.Result</code>, <code>.Wait()</code> ve <code>async void</code> yasak; tek istisna olay işleyicileridir.</li><li>Komutlar <code>AsyncRelayCommand</code> ile yazılır; çalışırken düğme otomatik devre dışı kalır.</li><li>Uzun işler ilerlemeyi <code>IProgress&lt;T&gt;</code> ile bildirir.</li></ul></div>
+<div class="card"><h3>Hata yönetimi</h3><p>Beklenen hatalar (ağ yok, dosya bulunamadı, sistem politikası engelledi) <b>istisna değil sonuç</b> olarak döner. İstisnalar programlama hataları ve gerçekten beklenmeyen durumlar içindir.</p><pre class="code">public sealed record AppError(string Code, string UserMessageKey, string? Detail = null);
+
+public readonly record struct Result(AppError? Error)
+{
+    public bool IsSuccess =&gt; Error is null;
+    public static Result Ok() =&gt; new(null);
+    public static Result Fail(AppError e) =&gt; new(e);
+}</pre><p>Global yakalayıcılar (<code>DispatcherUnhandledException</code>, <code>TaskScheduler.UnobservedTaskException</code>, <code>AppDomain.UnhandledException</code>) ayrıntıyı günlüğe yazar ve kullanıcıya sade bir mesaj gösterir.</p></div>
+<div class="card"><h3>MVVM kuralları</h3><ul class="list"><li>Code-behind yalnızca görünüme özgü davranış içerir (odak, animasyon); iş mantığı içermez.</li><li>ViewModel'ler <code>System.Windows</code> tiplerine bağımlı değildir; dialoglar <code>IDialogService</code>, sayfalar <code>INavigationService</code> ile açılır.</li><li>View ↔ ViewModel eşleşmesi <code>DataTemplate</code> ile yapılır.</li><li>Uzun listeler (oturumlar) UI sanallaştırması kullanır.</li></ul></div>
+<div class="card"><h3>Güvenli kod</h3><ul class="list"><li>Süreçler yalnızca <code>ArgumentList</code> ile başlatılır; komut dizesi birleştirilmez.</li><li>Registry komutlarında yollar her zaman tırnak içindedir.</li><li>Dışarıdan gelen her yol (argüman, pipe, sürükle-bırak) aynı doğrulayıcıdan geçer.</li><li>AWL kullanıcı belgelerini değiştirmez, taşımaz, silmez.</li></ul></div>
+<div class="card"><h3>Günlükleme</h3><ul class="list"><li>Yapılandırılmış alanlar kullanılır: <code>{SessionId}</code>, <code>{Step}</code>, <code>{DurationMs}</code>.</li><li><b>Günlüğe asla yazılmayanlar:</b> belge içeriği, sohbet içeriği, oturum başlığı, kimlik bilgileri. Dosya yolları yalnızca varsayılan olarak kapalı olan Debug seviyesinde yazılır.</li><li>Varsayılan seviye Information; dosya başına 5 MB, en fazla 10 dosya.</li></ul></div>
+<div class="card"><h3>Yorum ve dokümantasyon</h3><ul class="list"><li>Yorumlar “ne”yi değil “neden”i anlatır; kod zaten neyi yaptığını söylemeli.</li><li>Core'daki genel API'ler XML doc yorumu taşır.</li><li>Bir kararı değiştiren her PR, <code>docs/adr</code> altında ilgili ADR'yi günceller veya yenisini ekler.</li></ul></div>
+</div>
+<h3 style="margin-top:24px">Derleyici ile zorlanan kurallar</h3>
+<pre class="code">&lt;!-- Directory.Build.props --&gt;
+&lt;Project&gt;
+  &lt;PropertyGroup&gt;
+    &lt;LangVersion&gt;latest&lt;/LangVersion&gt;
+    &lt;Nullable&gt;enable&lt;/Nullable&gt;
+    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
+    &lt;TreatWarningsAsErrors&gt;true&lt;/TreatWarningsAsErrors&gt;
+    &lt;AnalysisLevel&gt;latest-recommended&lt;/AnalysisLevel&gt;
+    &lt;EnforceCodeStyleInBuild&gt;true&lt;/EnforceCodeStyleInBuild&gt;
+    &lt;ManagePackageVersionsCentrally&gt;true&lt;/ManagePackageVersionsCentrally&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;</pre>
+<div class="grid two" style="margin-top:16px"><div class="card"><h3>Sürüm kontrolü</h3><ul class="list"><li><code>main</code> her zaman derlenir ve testleri geçer; iş kısa ömürlü dallarda yapılır.</li><li>Commit mesajları Conventional Commits biçiminde: <code>feat(sessions): resume missing-history state</code>.</li><li>Küçük ve tek konulu değişiklikler; bir PR bir gereksinim grubunu aşmamalı.</li></ul></div><div class="card"><h3>Tamamlandı tanımı</h3><div class="checks"><label><input type="checkbox"> İlgili gereksinim kimlikleri commit/PR'da anılıyor</label><label><input type="checkbox"> Derleme uyarısız; tüm testler geçiyor</label><label><input type="checkbox"> Yeni Core mantığı birim testli</label><label><input type="checkbox"> Kullanıcı metinleri <code>Strings.resx</code>'te</label><label><input type="checkbox"> Günlük kurallarına uyuluyor</label><label><input type="checkbox"> Gerekiyorsa ADR güncel</label></div></div></div>
+</section>
+
+<section class="section" id="test"><div class="section-head"><div><span class="section-index">09 / Quality</span><h2>Test ve kalite stratejisi</h2><p>Mantığın çoğu saf çekirdekte olduğu için testlerin çoğu hızlı birim testleridir.</p></div></div>
+<div class="table-wrap"><table><thead><tr><th>Katman</th><th>Ne test edilir</th><th>Nasıl</th></tr></thead><tbody>
+<tr><td>Birim (Core)</td><td><code>ClaudeCommandBuilder</code>, <code>SessionStateResolver</code>, <code>RetentionPolicy</code>, <code>LaunchArgumentParser</code>, <code>ClaudeSettingsWriter</code>, <code>ContextFileWriter</code>, <code>SetupPipeline</code> akışı</td><td>xUnit + NSubstitute + Shouldly; dosya sistemi <code>MockFileSystem</code>. Hedef: Core satır kapsamı ≥ %70.</td></tr>
+<tr><td>Entegrasyon (Infrastructure)</td><td>SQLite repository ve migration'lar, HKCU kayıtları, geçmiş dosyası arama/silme, terminal başlatma</td><td>Geçici klasör ve geçici veritabanı; registry testleri yalnızca <code>HKCU\Software\AWL.Tests</code> altında çalışır ve kendini temizler.</td></tr>
+<tr><td>Mimari</td><td>Bağımlılık yönü, Core'un platformdan bağımsızlığı, ViewModel'lerin WPF'ten bağımsızlığı</td><td>NetArchTest.Rules</td></tr>
+<tr><td>Python</td><td><code>udf_tool.py</code>: aç → paketle → karşılaştır</td><td>pytest + anonimleştirilmiş gerçek UDF örneği</td></tr>
+<tr><td>Uçtan uca</td><td>Proje kararları belgesindeki test matrisi</td><td>Temiz, standart kullanıcılı bir Windows 10 sanal makinesinde elle yürütülen senaryolar (<code>tests/e2e</code>)</td></tr>
+</tbody></table></div>
+<div class="note good"><strong>Sürekli entegrasyon (isteğe bağlı)</strong><p>Depo GitHub'daysa <code>windows-latest</code> üzerinde her push'ta derleme, birim/mimari/entegrasyon testleri ve pytest çalıştırılır. Yayın paketi elle üretilir (D21).</p></div>
+</section>
+
+<section class="section" id="paket"><div class="section-head"><div><span class="section-index">10 / Build</span><h2>Derleme, paketleme ve sürüm</h2><p>Tek kurulum dosyası, kullanıcı bazlı kurulum, temiz kaldırma.</p></div></div>
+<pre class="code">dotnet publish src/AWL.Desktop -c Release -r win-x64 --self-contained ^
+  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+# WPF kırpmayı (trimming) desteklemez; PublishTrimmed kullanılmaz.
+
+iscc installer/AWL.iss      # → AWL-Setup-&lt;sürüm&gt;.exe</pre>
+<div class="grid two" style="margin-top:16px"><div class="card"><h3>Inno Setup betiğinin içeriği</h3><ul class="list"><li><code>PrivilegesRequired=lowest</code>, <code>DefaultDirName={localappdata}\Programs\AWL</code></li><li>Türkçe dil dosyası; Başlat menüsü kısayolu</li><li><code>third_party</code> içeriği: <code>uv.exe</code>, Windows Terminal ZIP'i (+ <code>.portable</code> dosyası), Faz 2'de xterm.js</li><li>Kurulum sonunda AWL açılır; asıl kurulum adımlarını AWL'nin kurulum sihirbazı yürütür.</li><li>Kaldırıcı, AWL'nin <code>--uninstall-cleanup</code> modunu çağırarak HKCU kayıtlarını siler; kullanıcı belgelerine dokunmaz.</li></ul></div><div class="card"><h3>Sürümleme</h3><ul class="list"><li>SemVer: <code>1.0.0</code>; derleme sürümü <code>AssemblyInformationalVersion</code> ile EXE'ye yazılır.</li><li>Yeni sürüm, eskisinin üzerine kurulur; <code>%APPDATA%\AWL</code> ve <code>%LOCALAPPDATA%\AWL</code> korunur.</li><li>Veritabanı migration'ları yalnızca ileri yönlüdür ve açılışta otomatik çalışır.</li><li>İlk sürüm kod imzası olmadan dağıtılır; kurulum talimatı SmartScreen uyarısında yapılacak adımı anlatır (D22).</li></ul></div></div>
+</section>
+
+<section class="section" id="faz2"><div class="section-head"><div><span class="section-index">11 / Phase 2</span><h2>Faz 2: gömülü terminal tasarım sınırları</h2><p>Faz 1 kodu, bu fazın eklenmesi için yeniden yazılmaya gerek bırakmayacak şekilde kurulur: gömülü terminal yalnızca yeni bir <code>ITerminalLauncher</code> ve bir görünümdür.</p></div></div>
+<div class="flow"><div class="flow-box"><strong>xterm.js</strong><small>WebView2 içinde, yerel dosyadan</small></div><div class="arrow">⇄</div><div class="flow-box"><strong>TerminalBridge</strong><small>WebMessage ↔ akışlar</small></div><div class="arrow">⇄</div><div class="flow-box"><strong>ConPtyHost</strong><small>CreatePseudoConsole</small></div><div class="arrow">⇄</div><div class="flow-box"><strong>claude.exe</strong><small>oturum klasöründe</small></div></div>
+<div class="grid two" style="margin-top:16px"><div class="card"><h3>Uygulama notları</h3><ul class="list"><li>xterm.js ve eklentileri <code>SetVirtualHostNameToFolderMapping</code> ile yerel klasörden sunulur; internet gerekmez.</li><li>Çıkış ~16 ms'lik paketler hâlinde gönderilir; UTF-8 çözümlemesi bölünmüş çok baytlı karakterleri korumak için durumlu bir <code>Decoder</code> ile yapılır.</li><li>Pencere boyutu değişince <code>ResizePseudoConsole</code> çağrılır.</li><li>Tarayıcı kısayolları kapatılır (<code>AreBrowserAcceleratorKeysEnabled = false</code>); tuşların tamamı Claude'a gider.</li><li>Ortam değişkenleri <code>CreateProcess</code> ile doğrudan verilebildiği için TA-01 sorunu bu yolda yoktur.</li><li>WebView2 çalışma zamanı yoksa “Ayrı pencerede aç” yolu kullanılır.</li></ul></div><div class="card"><h3>Kabul: yetenek kontrol listesi (D17)</h3><div class="checks"><label><input type="checkbox"> Slash komutları ve <code>/resume</code> seçicisi</label><label><input type="checkbox"> İzin ekranları ve seçim tuşları</label><label><input type="checkbox"> <code>Esc</code>, <code>Esc Esc</code>, <code>Shift+Tab</code>, <code>Ctrl+C</code></label><label><input type="checkbox"> <code>Shift+Enter</code> ile çok satırlı giriş</label><label><input type="checkbox"> <code>Alt+V</code> ile görsel yapıştırma</label><label><input type="checkbox"> Kaydırma, renkler, yeniden boyutlandırma</label><label><input type="checkbox"> Türkçe karakterler (ç, ğ, ı, İ, ö, ş, ü)</label><label><input type="checkbox"> Oturumlar arası geçişte süreçlerin sürmesi</label></div></div></div>
+</section>
+
+<div class="part"><h2>Bölüm B — Yazılım Gereksinim Belirtimi (SRS)</h2><p>Gereksinimler doğrulanabilir, tekil ve izlenebilir olacak şekilde yazılmıştır.</p></div>
+
+<section class="section" id="srs-giris"><div class="section-head"><div><span class="section-index">12 / SRS</span><h2>Giriş ve genel tanım</h2><p>Amaç, kapsam, tanımlar, kullanıcılar, ortam ve kısıtlar.</p></div></div>
+<div class="grid two"><div class="card"><h3>12.1 Amaç</h3><p>Bu bölüm, AWL v1'in (Faz 1) ve sonraki fazların karşılaması gereken işlevsel ve işlevsel olmayan gereksinimleri tanımlar. Geliştirme, test ve kabul için tek referanstır.</p><h3 style="margin-top:14px">12.2 Kapsam</h3><p>AWL, Windows 10'da teknik bilgisi sınırlı bir kullanıcının Claude Code'u kurmadan uğraşmadan kullanmasını, belgelerle çalışmasını, birden çok oturumu düzenli yönetmesini ve ileride yeni araçlar ekleyebilmesini sağlayan sade bir masaüstü uygulamasıdır. Claude Code, Python ve gerekli kütüphaneler ilk açılışta AWL tarafından otomatik kurulur; kullanıcı hiçbir bileşeni elle kurmaz. Sohbetin kendisi Claude Code'un kendi arayüzünde gerçekleşir.</p></div><div class="card"><h3>12.3 Öncelik ve faz gösterimi</h3><div class="kv"><b><span class="tag final">Z</span></b><span>Zorunlu: olmadan sürüm kabul edilmez</span><b><span class="tag test">Ö</span></b><span>Önemli: olmalı, ama gerekçeli olarak ertelenebilir</span><b><span class="tag future">İ</span></b><span>İsteğe bağlı: zaman kalırsa</span><b>F1 / F2 / F3</b><span>Faz 1 (MVP), Faz 2 (gömülü terminal), Faz 3 (araçlar)</span><b>Kaynak</b><span>Proje kararı (D..) veya plan bölümü</span></div></div></div>
+<h3 style="margin-top:22px">12.4 Tanımlar</h3>
+<div class="table-wrap"><table><thead><tr><th>Terim</th><th>Anlamı</th></tr></thead><tbody>
+<tr><td>Oturum</td><td>AWL'de kayıtlı, bir çalışma klasörüne ve bir Claude oturum kimliğine bağlı çalışma birimi.</td></tr>
+<tr><td>Çalışma klasörü</td><td>Claude'un içinde başlatıldığı, kullanıcının belgelerini içeren klasör.</td></tr>
+<tr><td>Claude oturum kimliği</td><td>AWL'nin ürettiği ve <code>--session-id</code> / <code>--resume</code> ile kullandığı UUID.</td></tr>
+<tr><td>Döküm (geçmiş)</td><td>Claude Code'un konuşmayı sakladığı <code>&lt;uuid&gt;.jsonl</code> dosyası ve ilişkili dosyalar.</td></tr>
+<tr><td>Düzenlenmiş kopya</td><td>Değişiklik istenen belgenin “<i>ad</i> - düzenlendi” adlı kopyası (D16).</td></tr>
+<tr><td>AWL_HOME</td><td><code>%LOCALAPPDATA%\AWL</code>: Python ortamı, araçlar, yapılandırma ve günlükler.</td></tr>
+<tr><td>Ön kontroller</td><td>Kurulumdan önce ortamın uygunluğunu denetleyen adımlar.</td></tr>
+</tbody></table></div>
+<div class="grid two" style="margin-top:16px">
+<div class="card"><h3>12.5 Kullanıcı sınıfları</h3><ul class="list"><li><b>Son kullanıcı:</b> Teknik bilgisi sınırlı, terminal kullanmayan, belgelerle çalışan tek kullanıcı. Claude Code'u, Python'u veya kütüphaneleri kendisi kurmaz; ilk açılışta hepsini AWL kurar.</li><li><b>Geliştirici / bakımcı:</b> Destek veren, kurulum paketini hazırlayan ve tanılama paketlerini inceleyen kişi.</li></ul></div>
+<div class="card"><h3>12.6 Çalışma ortamı</h3><ul class="list"><li>Windows 10 1809+ veya Windows 11, x64; standart kullanıcı hesabı (yükseltilmiş yetki gerekmez).</li><li>İnternet erişimi (kurulum ve Claude kullanımı için); ağda proxy olabilir.</li><li>Ücretli bir Claude planı ve hesabı.</li><li>Taşınabilir Windows Terminal için Windows 10 2004+.</li></ul></div>
+<div class="card"><h3>12.7 Tasarım ve uygulama kısıtları</h3><ul class="list"><li>Yükseltilmiş yetki (UAC onayı) gerektiren hiçbir işlem yapılamaz; her şey kullanıcı klasörüne kurulur (D03).</li><li>Kullanıcıdan hiçbir bileşeni elle kurması veya komut çalıştırması istenemez (D03).</li><li>Sistem güvenlik politikaları aşılmaya çalışılamaz (D03, D22).</li><li>Claude Code'un kendisi kullanılır; yeniden yazılmaz, giriş/çıkışına aracılık edilmez (D01, D02, D17).</li><li>Otomatik güncelleme yoktur (D21). Arayüz dili Türkçedir.</li></ul></div>
+<div class="card"><h3>12.8 Varsayımlar ve bağımlılıklar</h3><ul class="list"><li>Claude Code'un resmi kurulum betiği ve CLI bayrakları (<code>--session-id</code>, <code>--resume</code>, <code>--settings</code>, <code>--append-system-prompt-file</code>) kullanılabilir durumdadır.</li><li>uv ile Python indirmek için GitHub'a, paketler için PyPI'ye erişim vardır.</li><li>Claude Code sürüm değişiklikleri bu bayrakları ve dosya konumlarını bozabilir; bu bir risk olarak izlenir.</li><li>AWL'nin kurulacağı bilgisayarlar önceden test edilemez. Ortam kısıtları (PowerShell dil modu, uygulama engelleme kuralları, proxy) çalışma anında ön kontrollerle tespit edilir, kullanıcıya açıklanır ve tanılama paketine yazılır (D22).</li></ul></div>
+</div>
+</section>
+
+<section class="section" id="srs-fonk"><div class="section-head"><div><span class="section-index">13 / FR</span><h2>Fonksiyonel gereksinimler</h2><p>Her gereksinim, sistemin yapması gereken tek bir doğrulanabilir davranışı tanımlar.</p></div></div>
+<div class="filterbar" role="group" aria-label="Faza göre süz"><button class="btn primary" data-faz="all">Tümü</button><button class="btn" data-faz="1">Faz 1</button><button class="btn" data-faz="2">Faz 2</button><button class="btn" data-faz="3">Faz 3</button></div>
+
+<h3 class="group">13.1 Kurulum ve ilk çalıştırma <small>KUR</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>KUR-01</td><td>AWL, UAC istemi çıkarmadan, kullanıcı bazlı olarak <code>%LOCALAPPDATA%\Programs\AWL</code> altına kurulmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03</td></tr>
+<tr data-faz="1"><td>KUR-02</td><td>Kurulum, Başlat menüsü kısayolu ve Windows “Uygulamalar” listesinde görünen bir kaldırma kaydı oluşturmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03</td></tr>
+<tr data-faz="1"><td>KUR-03</td><td>İlk açılışta kurulum sihirbazı açılmalı ve adımları sırayla, durumlarıyla birlikte göstermelidir: ön kontroller, Claude Code, Python ortamı, yapılandırma, Windows entegrasyonu, giriş.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03</td></tr>
+<tr data-faz="1"><td>KUR-20</td><td>Son kullanıcı hiçbir bileşeni elle kurmamalı ve hiçbir komut çalıştırmamalıdır; Claude Code, Python ve gerekli kütüphaneler ilk açılışta AWL tarafından otomatik kurulmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03</td></tr>
+<tr data-faz="1"><td>KUR-04</td><td>Ön kontroller şunları denetlemeli ve sonucu Türkçe açıklamalıdır: Windows sürümü ve mimarisi, kullanıcı klasörlerine yazma izni, Claude ve indirme adreslerine erişim, PowerShell dil modu.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03, D19</td></tr>
+<tr data-faz="1"><td>KUR-05</td><td>Claude Code zaten kuruluysa sürümü doğrulanmalı ve yeniden kurulmamalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §06</td></tr>
+<tr data-faz="1"><td>KUR-06</td><td>Claude Code kurulu değilse ilk açılışta, kullanıcıdan hiçbir işlem istenmeden resmi kurulum betiğiyle kullanıcı klasörüne kurulmalı ve <code>claude --version</code> ile doğrulanmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D01, D03</td></tr>
+<tr data-faz="1"><td>KUR-07</td><td>AWL Git for Windows kurmamalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D19</td></tr>
+<tr data-faz="1"><td>KUR-08</td><td>AWL'ye özel Python çalışma ortamı ve sanal ortam, uv ile <code>AWL_HOME</code> altında oluşturulmalı; sistem Python'u ve kullanıcı <code>PATH</code>'i değiştirilmemelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D04</td></tr>
+<tr data-faz="1"><td>KUR-09</td><td>Temel belge paketleri hash'li kilit dosyasındaki sabit sürümlerle sanal ortama kurulmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D04, D20</td></tr>
+<tr data-faz="1"><td>KUR-10</td><td><code>claude-settings.json</code> (izin modu, saklama süresi, ortam değişkenleri) ve <code>awl-context.md</code> oluşturulmalı; ayarlar değiştiğinde yeniden yazılmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D15, D16, D18</td></tr>
+<tr data-faz="1"><td>KUR-11</td><td><code>udf_tool.py</code>, <code>AWL_HOME\tools</code> altına kurulmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D23</td></tr>
+<tr data-faz="1"><td>KUR-12</td><td>Belge skill'leri Claude'un resmi plugin mekanizmasıyla kurulmalı; kurulamazsa kurulum durmamalı, kullanıcı bilgilendirilmelidir.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>D20</td></tr>
+<tr data-faz="1"><td>KUR-13</td><td>Windows 10 2004 veya üstündeyse taşınabilir Windows Terminal <code>AWL_HOME\tools</code> altına yerleştirilmelidir.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>D17</td></tr>
+<tr data-faz="1"><td>KUR-14</td><td>Her kurulum adımı tekrar çalıştırılabilir olmalı; tamamlanmış adım atlanmalı, başarısız adım “Tekrar dene” ile yeniden çalıştırılabilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §06</td></tr>
+<tr data-faz="1"><td>KUR-15</td><td>Başarısız bir adımda kullanıcıya ne olduğu ve ne yapması gerektiği Türkçe gösterilmeli, teknik ayrıntı günlüğe yazılmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §06</td></tr>
+<tr data-faz="1"><td>KUR-16</td><td>Claude girişi Claude'un kendi akışıyla yapılmalı; AWL parola, token veya kimlik bilgisi istememeli, saklamamalı, okumamalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §10</td></tr>
+<tr data-faz="1"><td>KUR-17</td><td>Ayarlar'daki “Onar” komutu tüm kurulum adımlarını yeniden denetlemeli ve eksikleri tamamlamalıdır.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>Plan §11</td></tr>
+<tr data-faz="1"><td>KUR-18</td><td>Kaldırma yalnızca AWL'nin oluşturduğu dosya ve kayıtları silmelidir. Kullanıcı belgeleri, düzenlenmiş kopyalar ve <code>AWL_Ciktilar</code> silinmemeli; Claude Code'un ve oturum geçmişinin kaldırılması ayrıca sorulmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §06</td></tr>
+<tr data-faz="1"><td>KUR-19</td><td>Bir sistem kısıtlaması (AppLocker, Constrained Language Mode, proxy, antivirüs) bir adımı engellerse AWL bunu aşmaya çalışmamalı; durumu açıklamalı ve destek için paylaşılabilecek teknik bir özet sunmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03, D22</td></tr>
+</tbody></table></div>
+
+<h3 class="group">13.2 Oturum yönetimi <small>OTR</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>OTR-01</td><td>Kullanıcı başlık, çalışma klasörü ve isteğe bağlı kategoriyle yeni oturum oluşturabilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D06</td></tr>
+<tr data-faz="1"><td>OTR-02</td><td>Yeni oturumda AWL bir UUID üretmeli ve Claude'u <code>--session-id &lt;uuid&gt;</code> ile başlatmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D14</td></tr>
+<tr data-faz="1"><td>OTR-03</td><td>Kayıtlı bir oturum, kendi çalışma klasöründe <code>--resume &lt;uuid&gt;</code> ile devam ettirilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D14</td></tr>
+<tr data-faz="1"><td>OTR-04</td><td>Her başlatmada <code>--settings</code> ve <code>--append-system-prompt-file</code> parametreleri AWL'nin dosyalarıyla verilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D15</td></tr>
+<tr data-faz="1"><td>OTR-05</td><td>Oturumlar sol panelde kategoriye göre gruplanarak listelenmelidir; kategorisiz oturumlar ayrı bir grupta görünmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D06</td></tr>
+<tr data-faz="1"><td>OTR-06</td><td>Her oturumun durumu görünmelidir: Açık, Kapalı, Arşivde, Geçmiş bulunamadı, Hata.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D12</td></tr>
+<tr data-faz="1"><td>OTR-07</td><td>“Açık” durumu, oturum kimliğini taşıyan <code>claude.exe</code> süreci izlenerek belirlenmeli ve en geç 3 saniye içinde güncellenmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D12</td></tr>
+<tr data-faz="1"><td>OTR-08</td><td>Açık bir oturum yeniden açılmak istendiğinde ikinci bir süreç başlatılmamalı; kullanıcı bilgilendirilmeli ve terminal penceresi öne getirilmeye çalışılmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D12</td></tr>
+<tr data-faz="1"><td>OTR-09</td><td>Birden fazla oturum aynı anda açık olabilmeli; aynı klasörde birden fazla oturum desteklenmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §05</td></tr>
+<tr data-faz="1"><td>OTR-10</td><td>Kullanıcı bir oturumu yeniden adlandırabilmeli, kategorisini değiştirebilmeli, arşivleyebilmeli ve arşivden çıkarabilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §05</td></tr>
+<tr data-faz="1"><td>OTR-11</td><td>Silinen oturum için onay sonrası AWL kaydı, Claude dökümü, debug günlüğü ve Faz 0'da belirlenen oturuma ait diğer Claude dosyaları silinmelidir. Kullanıcı belgeleri, düzenlenmiş kopyalar ve çıktılar silinmemelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D18</td></tr>
+<tr data-faz="1"><td>OTR-12</td><td>Silme onay ekranı, silinecekleri ve işlemin geri alınamayacağını açıkça belirtmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D18</td></tr>
+<tr data-faz="1"><td>OTR-13</td><td>Açık bir oturum silinmek istendiğinde önce kapatılması gerektiği bildirilmeli; kullanıcı onaylarsa süreç sonlandırılmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D18</td></tr>
+<tr data-faz="1"><td>OTR-14</td><td>Silmenin Claude tarafı kısmen başarısız olursa AWL kaydı silinmemeli; oturum “Hata” durumuna geçmeli ve silme tekrar denenebilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D18</td></tr>
+<tr data-faz="1"><td>OTR-15</td><td>Uygulama açılışında her oturum için döküm varlığı ve süreç durumu yeniden hesaplanmalı; son etkinlik zamanı döküm dosyasının değişiklik zamanından alınmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D12</td></tr>
+<tr data-faz="1"><td>OTR-16</td><td>Saklama süresini aşmış ve açık olmayan oturumlar açılışta AWL'den ve Claude'dan birlikte silinmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D18</td></tr>
+<tr data-faz="1"><td>OTR-17</td><td>“Geçmiş bulunamadı” durumundaki oturum için aynı klasörde yeni oturum başlatma ve kaydı silme seçenekleri sunulmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D18</td></tr>
+<tr data-faz="1"><td>OTR-18</td><td>Oturumun açıldığı Claude Code sürümü kaydedilmelidir.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>D21</td></tr>
+<tr data-faz="1"><td>OTR-19</td><td>Oturumun çalışma klasörü ve <code>AWL_Ciktilar</code> klasörü Gezgin'de tek tıkla açılabilmelidir.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>Plan §04</td></tr>
+<tr data-faz="1"><td>OTR-20</td><td>Çalışma klasörü artık yoksa oturum başlatılmamalı; kullanıcıya yeni klasör seçme veya kaydı silme seçeneği sunulmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §05</td></tr>
+<tr data-faz="2"><td>OTR-21</td><td>Oturumlar başlığa ve klasör yoluna göre aranabilmelidir.</td><td><span class="tag test">Ö</span></td><td>F2</td><td>Plan §11</td></tr>
+</tbody></table></div>
+
+<h3 class="group">13.3 Kategoriler <small>KAT</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>KAT-01</td><td>Kullanıcı kategori oluşturabilmeli, yeniden adlandırabilmeli, sıralayabilmeli ve silebilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D06</td></tr>
+<tr data-faz="1"><td>KAT-02</td><td>Bir kategori silindiğinde içindeki oturumlar silinmemeli, “Kategorisiz” grubuna taşınmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D06</td></tr>
+</tbody></table></div>
+
+<h3 class="group">13.4 Terminal ve Claude Code'un çalıştırılması <small>TRM</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>TRM-01</td><td>Claude Code gerçek bir terminal penceresinde açılmalı; AWL Claude'un giriş ve çıkışına aracılık etmemelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D02, D17</td></tr>
+<tr data-faz="1"><td>TRM-02</td><td>Taşınabilir Windows Terminal varsa o, yoksa Windows konsolu kullanılmalı; tercih Ayarlar'dan değiştirilebilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D17</td></tr>
+<tr data-faz="1"><td>TRM-03</td><td>Terminal penceresi veya sekmesi, açılışta oturum başlığını taşımalıdır.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>D17</td></tr>
+<tr data-faz="1"><td>TRM-04</td><td>AWL'den açılan bir oturumda Claude Code'un tüm komut, kısayol ve özellikleri, Claude'un doğrudan çalıştırıldığı durumla aynı davranmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D17</td></tr>
+<tr data-faz="1"><td>TRM-05</td><td>Python ortamının yolu ve <code>AWL_HOME</code>, terminal türünden bağımsız olarak Claude'a ulaştırılmalıdır (<code>env</code> ayarı ve bağlam dosyası).</td><td><span class="tag final">Z</span></td><td>F1</td><td>D04, TA-01</td></tr>
+<tr data-faz="2"><td>TRM-06</td><td>Gömülü terminal, WebView2 + xterm.js + ConPTY ile AWL penceresi içinde sunulmalıdır.</td><td><span class="tag final">Z</span></td><td>F2</td><td>D07</td></tr>
+<tr data-faz="2"><td>TRM-07</td><td>Gömülü terminal, yetenek kontrol listesinin tamamını geçmeden varsayılan yapılmamalıdır.</td><td><span class="tag final">Z</span></td><td>F2</td><td>D17</td></tr>
+<tr data-faz="2"><td>TRM-08</td><td>Her oturum için “Ayrı pencerede aç” seçeneği her zaman bulunmalıdır.</td><td><span class="tag final">Z</span></td><td>F2</td><td>D17</td></tr>
+<tr data-faz="2"><td>TRM-09</td><td>Oturumlar arasında geçiş yapıldığında arka plandaki terminal süreçleri çalışmaya devam etmelidir.</td><td><span class="tag final">Z</span></td><td>F2</td><td>D07</td></tr>
+</tbody></table></div>
+
+<h3 class="group">13.5 Belgeler ve dosyalar <small>BLG</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>BLG-01</td><td>Bağlam dosyası, orijinal belgelerin değiştirilmemesini, değişikliğin “<i>ad</i> - düzenlendi” kopyasında yapılmasını ve doğrudan değiştirilen dosyanın adına “- düzenlendi” eklenmesini söyleyen kopya kuralını içermelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D16</td></tr>
+<tr data-faz="1"><td>BLG-02</td><td>Bağlam dosyası, belge işlerinde önce skill'lerin, sonuç alınamazsa Python kütüphanelerinin kullanılacağını belirtmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D20</td></tr>
+<tr data-faz="1"><td>BLG-03</td><td>Bağlam dosyası Python'un tam yolunu, paket kurma komutunu, <code>udf_tool.py</code> kullanımını ve çıktıların <code>AWL_Ciktilar</code> klasörüne yazılacağını içermelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D04, D15, D23</td></tr>
+<tr data-faz="1"><td>BLG-04</td><td><code>udf_tool.py</code>; <code>info</code>, <code>text</code>, <code>unpack</code>, <code>pack</code> komutlarını sağlamalı ve <code>pack</code> değiştirilmeyen ZIP girdilerini bayt düzeyinde korumalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D23</td></tr>
+<tr data-faz="1"><td>BLG-05</td><td><code>udf_tool.py pack</code> kaynak UDF dosyasının üzerine yazmayı reddetmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D16, D23</td></tr>
+<tr data-faz="1"><td>BLG-06</td><td>AWL'nin kendisi kullanıcı belgelerini değiştirmemeli, taşımamalı ve silmemelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D16</td></tr>
+<tr data-faz="1"><td>BLG-07</td><td>AWL penceresine bırakılan bir dosyanın tırnak içindeki tam yolu panoya kopyalanmalı ve kullanıcıya Claude penceresine yapıştırması söylenmelidir.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>D08</td></tr>
+<tr data-faz="2"><td>BLG-08</td><td>Gömülü terminalde bırakılan dosyanın tırnak içindeki tam yolu doğrudan Claude'un giriş satırına yazılmalıdır.</td><td><span class="tag test">Ö</span></td><td>F2</td><td>D08</td></tr>
+</tbody></table></div>
+
+<h3 class="group">13.6 Windows entegrasyonu <small>SAG</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>SAG-01</td><td>Bir klasöre sağ tıklandığında “AWL ile aç” seçeneği bulunmalı ve klasör dolu bir “Yeni oturum” penceresi açmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D09</td></tr>
+<tr data-faz="1"><td>SAG-02</td><td>Klasörün boş alanına sağ tıklandığında aynı seçenek o klasör için bulunmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D09</td></tr>
+<tr data-faz="1"><td>SAG-03</td><td><code>.pdf .docx .xlsx .udf .png .jpg</code> dosyalarına sağ tıklandığında “AWL ile aç”, dosyanın klasöründe yeni oturum penceresini açmalı ve dosya yolunu panoya kopyalamalıdır.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>D09</td></tr>
+<tr data-faz="1"><td>SAG-04</td><td>Komut satırı argümanları doğrulanmalıdır: yalnızca bilinen bayraklar, mutlak ve var olan yollar; aygıt yolları reddedilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D09</td></tr>
+<tr data-faz="1"><td>SAG-05</td><td>AWL zaten açıksa yeni istek çalışan örneğe iletilmeli; ikinci bir AWL penceresi açılmamalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D09</td></tr>
+<tr data-faz="1"><td>SAG-06</td><td>Boşluk, Türkçe karakter ve noktalı virgül içeren yollar tüm akışlarda doğru işlenmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §11</td></tr>
+<tr data-faz="1"><td>SAG-07</td><td>Kaldırma sırasında yalnızca AWL'nin oluşturduğu HKCU anahtarları silinmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §06</td></tr>
+</tbody></table></div>
+
+<h3 class="group">13.7 Ayarlar ve görünüm <small>AYR</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>AYR-01</td><td>Saklama süresi gün olarak ayarlanabilmeli (varsayılan 3650); değişince <code>claude-settings.json</code> güncellenmeli ve aynı süre AWL kayıtlarına uygulanmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D18</td></tr>
+<tr data-faz="1"><td>AYR-02</td><td>Terminal tercihi (Windows Terminal / Windows konsolu) ayarlanabilmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D17</td></tr>
+<tr data-faz="1"><td>AYR-03</td><td>Arayüzdeki tüm metinler Türkçe olmalı ve kaynak dosyalarından gelmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan</td></tr>
+<tr data-faz="1"><td>AYR-04</td><td>“Hakkında” ekranı AWL, Claude Code, Python sürümlerini ve üçüncü taraf lisanslarını göstermelidir.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>D21</td></tr>
+<tr data-faz="2"><td>AYR-05</td><td>Tema Açık, Koyu veya Sistem olarak seçilebilmeli; tercih saklanmalıdır.</td><td><span class="tag test">Ö</span></td><td>F2</td><td>D11</td></tr>
+</tbody></table></div>
+
+<h3 class="group">13.8 Tanılama <small>TAN</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>TAN-01</td><td>Günlükler <code>AWL_HOME\logs</code> altında boyut ve sayı sınırlı dönen dosyalara yazılmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §06</td></tr>
+<tr data-faz="1"><td>TAN-02</td><td>Günlükler belge içeriği, sohbet içeriği, oturum başlığı veya kimlik bilgisi içermemelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §10</td></tr>
+<tr data-faz="1"><td>TAN-03</td><td>“Tanılama paketini kaydet” komutu günlükleri, sürüm bilgilerini ve ön kontrol sonuçlarını tek bir ZIP dosyası olarak kullanıcının seçtiği yere kaydetmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §11</td></tr>
+<tr data-faz="1"><td>TAN-04</td><td>Her açılışta Claude Code sürümü günlüğe yazılmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D21</td></tr>
+<tr data-faz="1"><td>TAN-05</td><td>Beklenmeyen hatalar yakalanmalı; kullanıcıya sade bir mesaj gösterilmeli, ayrıntı günlüğe yazılmalı ve veri tutarlılığı korunmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>—</td></tr>
+</tbody></table></div>
+
+<h3 class="group">13.9 Araçlar <small>ARC</small></h3>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="3"><td>ARC-01</td><td>Araçlar sekmesi, yerel bir JSON kataloğunda tanımlı araçları listelemelidir.</td><td><span class="tag test">Ö</span></td><td>F3</td><td>D06, D10</td></tr>
+<tr data-faz="3"><td>ARC-02</td><td>Web türündeki bir araç (ör. GitHub Pages dosya dönüştürücü) varsayılan tarayıcıda açılabilmelidir.</td><td><span class="tag test">Ö</span></td><td>F3</td><td>D10</td></tr>
+<tr data-faz="3"><td>ARC-03</td><td>Web araçları isteğe bağlı olarak AWL içinde WebView2 ile açılabilmelidir.</td><td><span class="tag future">İ</span></td><td>F3</td><td>D10</td></tr>
+<tr data-faz="3"><td>ARC-04</td><td>Araç sistemi dışarıdan DLL veya çalıştırılabilir kod yüklememelidir.</td><td><span class="tag final">Z</span></td><td>F3</td><td>Plan §09</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="section" id="srs-nfr"><div class="section-head"><div><span class="section-index">14 / NFR</span><h2>Fonksiyonel olmayan gereksinimler</h2><p>Performans, güvenlik, güvenilirlik, kullanılabilirlik, uyumluluk ve bakım yapılabilirlik.</p></div></div>
+<div class="table-wrap"><table class="req"><thead><tr><th>Kimlik</th><th>Gereksinim</th><th>Öncelik</th><th>Faz</th><th>Kaynak</th></tr></thead><tbody>
+<tr data-faz="1"><td>PRF-01</td><td>AWL, tipik bir bilgisayarda (SSD) soğuk açılışta 3 saniye, sıcak açılışta 1,5 saniye içinde kullanılabilir olmalıdır.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>PRF-02</td><td>“Aç” veya “Devam et”e tıklandıktan sonra terminal penceresi, Claude'un kendi açılış süresi hariç 2 saniye içinde görünmelidir.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>PRF-03</td><td>Oturum listesi 1.000 oturumla akıcı kaydırılabilmelidir.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>PRF-04</td><td>Süreç izleme boşta ortalama %1'den az CPU kullanmalıdır.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>GUV-01</td><td>Hiçbir işlem yükseltilmiş yetki gerektirmemeli veya UAC istemi tetiklememelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03</td></tr>
+<tr data-faz="1"><td>GUV-02</td><td>AWL; AppLocker, WDAC, Constrained Language Mode, yürütme ilkesi, proxy veya antivirüs kısıtlarını aşmaya ya da devre dışı bırakmaya çalışmamalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03, D22</td></tr>
+<tr data-faz="1"><td>GUV-03</td><td>AWL, Claude Code'un kimlik bilgisi dosyalarını okumamalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §10</td></tr>
+<tr data-faz="1"><td>GUV-04</td><td>AWL telemetri göndermemeli; ağa yalnızca kurulum/onarım indirmeleri ve kullanıcının açtığı araç bağlantıları için çıkmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §10</td></tr>
+<tr data-faz="1"><td>GUV-05</td><td>Dış süreçler yalnızca argüman listesiyle başlatılmalı; komut dizesi birleştirilmemelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §10</td></tr>
+<tr data-faz="1"><td>GUV-06</td><td>Kayıt defterine yalnızca HKCU altına yazılmalı ve komutlardaki yollar tırnak içinde olmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D09</td></tr>
+<tr data-faz="1"><td>GUV-07</td><td>Claude Code yalnızca resmi kaynaktan kurulmalı; uv ve Windows Terminal, sürümü sabit olarak AWL paketinde gelmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §06</td></tr>
+<tr data-faz="1"><td>GUV-08</td><td>Python paketleri hash doğrulamalı kilit dosyasıyla kurulmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D04</td></tr>
+<tr data-faz="1"><td>GUV-09</td><td>Tek örnek iletişim kanalı yalnızca mevcut kullanıcıya açık olmalı ve gelen her veri doğrulanmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D09</td></tr>
+<tr data-faz="1"><td>GVL-01</td><td>Veritabanı WAL modunda çalışmalı ve tüm yazmalar işlem içinde yapılmalıdır; uygulama çökse bile veritabanı tutarlı kalmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>GVL-02</td><td>AWL kapanınca açık Claude oturumları kapanmamalı; AWL yeniden açıldığında bu oturumları “Açık” olarak tanımalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D12, D17</td></tr>
+<tr data-faz="1"><td>KUL-01</td><td>AWL'nin kendi işlevleri terminal bilgisi gerektirmemeli; metinler teknik terim içermeyen sade Türkçe olmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §01</td></tr>
+<tr data-faz="1"><td>KUL-02</td><td>Her hata mesajı ne olduğunu ve kullanıcının ne yapması gerektiğini içermelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §06</td></tr>
+<tr data-faz="1"><td>KUL-03</td><td>Tüm işlevler klavyeyle kullanılabilmeli, odak görünür olmalı ve metin kontrastı WCAG 2.1 AA düzeyini sağlamalıdır.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>D11</td></tr>
+<tr data-faz="1"><td>KUL-04</td><td>Arayüz %100–%200 ekran ölçeklemesinde bozulmadan görünmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>KUL-05</td><td>Geri alınamaz işlemler açık bir onay gerektirmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D18</td></tr>
+<tr data-faz="1"><td>UYM-01</td><td>AWL, Windows 10 1809+ ve Windows 11 x64 üzerinde çalışmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03</td></tr>
+<tr data-faz="1"><td>UYM-02</td><td>AWL, makinede .NET kurulu olmasını gerektirmemelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03</td></tr>
+<tr data-faz="1"><td>UYM-03</td><td>Ağ sürücüsündeki ve OneDrive ile eşitlenen klasörler çalışma klasörü olarak seçilebilmelidir (en iyi çaba).</td><td><span class="tag future">İ</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>BAK-01</td><td>Kod, §02'deki üç projeli yapıya ve bağımlılık yönüne uymalı; bu kurallar otomatik testle denetlenmelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>Plan §09</td></tr>
+<tr data-faz="1"><td>BAK-02</td><td>Derleme uyarısız olmalı; nullable referans türleri ve analizörler açık olmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>BAK-03</td><td>AWL.Core birim test satır kapsamı en az %70 olmalıdır.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>—</td></tr>
+<tr data-faz="1"><td>BAK-04</td><td>Claude CLI bayrak adları ve Claude dosya konumları kodda tek bir yerde tanımlanmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D21</td></tr>
+<tr data-faz="1"><td>BAK-05</td><td>Her karar değişikliği <code>docs/adr</code> altında kayıt altına alınmalıdır.</td><td><span class="tag test">Ö</span></td><td>F1</td><td>Plan §09</td></tr>
+<tr data-faz="1"><td>TAS-01</td><td>AWL tek bir kurulum dosyasıyla dağıtılmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D03</td></tr>
+<tr data-faz="1"><td>TAS-02</td><td>Otomatik güncelleme olmamalı; yeni sürüm eskisinin üzerine kurulduğunda kullanıcı verisi ve ayarlar korunmalıdır.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D21</td></tr>
+<tr data-faz="1"><td>LIS-01</td><td>Pakete giren üçüncü taraf bileşenlerin lisansları dağıtıma uygun olmalı; Anthropic belge skill'leri pakete gömülmemelidir.</td><td><span class="tag final">Z</span></td><td>F1</td><td>D20</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="section" id="srs-arayuz"><div class="section-head"><div><span class="section-index">15 / Interfaces</span><h2>Dış arayüzler ve veri gereksinimleri</h2><p>Ekranlar, yazılım arayüzleri, iletişim ve kalıcı veri.</p></div></div>
+<div class="grid two"><div class="card"><h3>15.1 Kullanıcı arayüzü (Faz 1)</h3><ul class="list"><li><b>Ana pencere:</b> sol panelde Sohbet / Araçlar gezinmesi, “Yeni oturum” düğmesi, kategoriye göre gruplu oturum listesi, Ayarlar. Sağ panelde seçili oturumun başlığı, klasörü, durumu ve “Aç / Devam et”, “Klasörü aç”, “Çıktılar”, “Sil” düğmeleri ile dosya bırakma alanı.</li><li><b>Yeni oturum penceresi:</b> başlık, klasör seçici, kategori.</li><li><b>Kurulum sihirbazı:</b> adım listesi, ilerleme, hata açıklaması, “Tekrar dene”, “Tanılama paketini kaydet”.</li><li><b>Ayarlar:</b> saklama süresi, terminal tercihi, Onar, Hakkında.</li><li><b>Onay pencereleri:</b> silme ve süreç sonlandırma.</li></ul></div><div class="card"><h3>15.2 İletişim arayüzleri</h3><ul class="list"><li>HTTPS: <code>claude.ai</code> (kurulum betiği ve Claude ikili dosyası), GitHub (uv üzerinden Python), PyPI (paketler).</li><li>Sistem proxy ayarları kullanılır; uv için Windows sertifika deposu (<code>UV_NATIVE_TLS</code>).</li><li>Claude'un kendi ağ trafiği Claude Code'un sorumluluğundadır.</li></ul></div></div>
+<h3 style="margin-top:22px">15.3 Yazılım arayüzleri</h3>
+<div class="table-wrap"><table><thead><tr><th>Arayüz</th><th>Kullanım</th><th>Risk / not</th></tr></thead><tbody>
+<tr><td>Claude Code CLI</td><td><code>--session-id</code>, <code>--resume</code>, <code>--settings</code>, <code>--append-system-prompt-file</code>, <code>--version</code></td><td>Sürüm değişikliği bayrakları etkileyebilir; sürüm her açılışta günlüğe yazılır.</td></tr>
+<tr><td>Claude veri klasörü</td><td><code>projects\…\&lt;uuid&gt;.jsonl</code> (okuma: varlık ve zaman; silme), <code>debug\&lt;uuid&gt;.txt</code> (silme)</td><td>Döküm içeriği okunmaz. Ek dosya konumları Faz 0'da belirlenir.</td></tr>
+<tr><td>uv</td><td>Python kurulumu, venv, paket kurulumu</td><td>AWL paketinde sabit sürüm.</td></tr>
+<tr><td>PowerShell</td><td>Yalnızca Claude Code kurulum betiği</td><td>Kısıtlı dil modunda başarısız olabilir.</td></tr>
+<tr><td>Windows Terminal (<code>wt.exe</code>)</td><td>Yeni pencere/sekme açma</td><td><code>;</code> kaçırma; ortam değişkenleri (TA-01).</td></tr>
+<tr><td>Windows Kayıt Defteri</td><td>HKCU sağ tık kayıtları</td><td>Yalnızca AWL anahtarları.</td></tr>
+<tr><td>WMI</td><td><code>Win32_Process</code> sorgusu</td><td>Yalnızca kullanıcının kendi süreçleri.</td></tr>
+</tbody></table></div>
+<h3 style="margin-top:22px">15.4 Kalıcı veri</h3>
+<pre class="code">-- %APPDATA%\AWL\awl.db  (SQLite, WAL)
+CREATE TABLE schema_version (version INTEGER NOT NULL);
+
+CREATE TABLE categories (
+  id          TEXT PRIMARY KEY,            -- UUID
+  name        TEXT NOT NULL,
+  sort_order  INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE sessions (
+  id                 TEXT PRIMARY KEY,     -- UUID (AWL)
+  title              TEXT NOT NULL,
+  category_id        TEXT NULL REFERENCES categories(id) ON DELETE SET NULL,
+  workspace_path     TEXT NOT NULL,
+  claude_session_id  TEXT NOT NULL UNIQUE, -- UUID (D14)
+  claude_version     TEXT NULL,            -- D21
+  is_archived        INTEGER NOT NULL DEFAULT 0,
+  last_error_code    TEXT NULL,            -- "Hata" durumu için (OTR-14)
+  created_at         TEXT NOT NULL,        -- ISO 8601
+  last_opened_at     TEXT NULL,
+  last_activity_at   TEXT NULL
+);
+
+-- Faz 3
+CREATE TABLE tools (id TEXT PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL,
+                    target TEXT NOT NULL, sort_order INTEGER NOT NULL DEFAULT 0);</pre>
+<div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>Dosya</th><th>Konum</th><th>İçerik</th></tr></thead><tbody>
+<tr><td><code>settings.json</code></td><td><code>%APPDATA%\AWL</code></td><td>Saklama süresi, terminal tercihi, tema, kurulum adımlarının durumu</td></tr>
+<tr><td><code>claude-settings.json</code></td><td><code>%LOCALAPPDATA%\AWL\config</code></td><td>Claude'a <code>--settings</code> ile verilen ayarlar</td></tr>
+<tr><td><code>awl-context.md</code></td><td><code>%LOCALAPPDATA%\AWL\config</code></td><td>Claude'a <code>--append-system-prompt-file</code> ile verilen kurallar</td></tr>
+<tr><td>Günlükler</td><td><code>%LOCALAPPDATA%\AWL\logs</code></td><td>Hassas veri içermeyen çalışma kayıtları</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="section" id="srs-iz"><div class="section-head"><div><span class="section-index">16 / Traceability</span><h2>İzlenebilirlik, kabul ve açık konular</h2><p>Her proje kararının hangi gereksinimlerle karşılandığı ve v1'in ne zaman kabul edileceği.</p></div></div>
+<div class="table-wrap"><table><thead><tr><th>Karar</th><th>Konu</th><th>Gereksinimler</th></tr></thead><tbody>
+<tr><td>D01</td><td>Gerçek Claude Code CLI</td><td>KUR-06, TRM-01, TRM-04</td></tr>
+<tr><td>D02</td><td>Tek mesaj girişi</td><td>TRM-01</td></tr>
+<tr><td>D03</td><td>Kullanıcı bazlı, otomatik kurulum</td><td>KUR-01…04, KUR-19, KUR-20, GUV-01, GUV-02, UYM-01, UYM-02, TAS-01</td></tr>
+<tr><td>D04</td><td>İzole Python</td><td>KUR-08, KUR-09, TRM-05, BLG-03, GUV-08</td></tr>
+<tr><td>D05</td><td>Hook ile kısıtlama yok</td><td>Kapsam dışı (hook yazılmaz)</td></tr>
+<tr><td>D06</td><td>Oturumlar ve Araçlar düzeni</td><td>OTR-01, OTR-05, KAT-01, KAT-02, ARC-01</td></tr>
+<tr><td>D07</td><td>Gömülü terminal</td><td>TRM-06, TRM-09</td></tr>
+<tr><td>D08</td><td>Dosya bırakma, ekran görüntüsü</td><td>BLG-07, BLG-08</td></tr>
+<tr><td>D09</td><td>Sağ tık menüsü</td><td>SAG-01…07, GUV-06, GUV-09</td></tr>
+<tr><td>D10</td><td>Modüler araçlar</td><td>ARC-01…03</td></tr>
+<tr><td>D11</td><td>Tema</td><td>AYR-05, KUL-03</td></tr>
+<tr><td>D12</td><td>Oturum durumları</td><td>OTR-06…08, OTR-15, GVL-02</td></tr>
+<tr><td>D13</td><td>Cowork'süz Desktop</td><td>Bağımlılık değil; gereksinim yok</td></tr>
+<tr><td>D14</td><td>Oturum kimliğini AWL üretir</td><td>OTR-02, OTR-03</td></tr>
+<tr><td>D15</td><td>Bağlam dosyası</td><td>KUR-10, OTR-04, BLG-03</td></tr>
+<tr><td>D16</td><td>Kopya kuralı</td><td>BLG-01, BLG-05, BLG-06</td></tr>
+<tr><td>D17</td><td>Gerçek terminal, eksiksiz Claude</td><td>KUR-13, TRM-01…05, TRM-07, TRM-08, AYR-02</td></tr>
+<tr><td>D18</td><td>Saklama ve birlikte silme</td><td>OTR-11…14, OTR-16, OTR-17, AYR-01, KUL-05</td></tr>
+<tr><td>D19</td><td>Git for Windows yok</td><td>KUR-04, KUR-07</td></tr>
+<tr><td>D20</td><td>Skill önce, sonra Python</td><td>KUR-09, KUR-12, BLG-02, LIS-01</td></tr>
+<tr><td>D21</td><td>Otomatik güncelleme yok</td><td>OTR-18, AYR-04, TAN-04, BAK-04, TAS-02</td></tr>
+<tr><td>D22</td><td>İmzasız dağıtım, kısıtların çalışma anında tespiti</td><td>KUR-04, KUR-19, GUV-02, TAN-03</td></tr>
+<tr><td>D23</td><td>UDF = ZIP + XML</td><td>KUR-11, BLG-04, BLG-05</td></tr>
+</tbody></table></div>
+<div class="note good"><strong>v1 (Faz 1) kabul koşulu</strong><p>Faz 1'e ait tüm <b>Zorunlu</b> gereksinimler, temiz ve standart kullanıcılı bir Windows 10 makinesinde doğrulanmış olmalıdır. Özellikle şu senaryo baştan sona çalışmalıdır: kurulum → Claude girişi → klasöre sağ tıklayıp oturum açma → Claude ile bir belge üzerinde çalışıp “- düzenlendi” kopyası alma → başka oturuma geçme → AWL'yi kapatıp açma → eski oturumu <code>--resume</code> ile sürdürme → bir oturumu her yerden silme.</p></div>
+<div class="grid two" style="margin-top:16px"><div class="card"><h3>Kapsam dışı</h3><ul class="list"><li>Claude Code yerine geçen sohbet arayüzü veya başka yapay zekâ sağlayıcıları</li><li>Hook ile komut denetimi (D05)</li><li>Orijinal belgeler için talimat ötesinde teknik koruma (D16, kabul edilen risk)</li><li>Otomatik güncelleme (D21)</li><li>Dinamik DLL eklentileri</li><li>macOS / Linux, çok kullanıcı, bulut eşitleme</li><li>Cowork'ün yerine geçmek (D13)</li></ul></div><div class="card"><h3>Açık konular (Faz 0'a bağlı)</h3><ol class="list"><li>.NET 10'un Windows 10'da desteklenmesi.</li><li>TA-01: Windows Terminal'de ortam değişkenlerinin taşınması; <code>env</code> ayarının yeterliliği.</li><li>Belge skill'lerinin oturuma özel yüklenip yüklenemeyeceği.</li><li>Oturuma ait diğer Claude dosyalarının konumu (D18).</li><li>Yeniden paketlenen UDF'nin UYAP Editör'de açılması (D23).</li></ol></div></div>
+</section>
+
+<div class="footer">AWL — Teknik Tasarım ve Yazılım Gereksinim Belirtimi · v1.0 taslak · 22 Kasım 2026<br>Kaynak belge: AWL Proje Kararları ve Mimari v0.5</div>
+</main></div>
+<script>
+(function(){
+ const root=document.documentElement,btn=document.getElementById('themeButton');let theme='light';
+ try{const s=localStorage.getItem('awl-doc-theme');if(s==='dark'||s==='light')theme=s;}catch(e){}
+ function setTheme(t){theme=t;root.dataset.theme=t;btn.textContent=t==='dark'?'☀ Açık tema':'☾ Koyu tema';try{localStorage.setItem('awl-doc-theme',t);}catch(e){}}
+ setTheme(theme);btn.addEventListener('click',()=>setTheme(theme==='light'?'dark':'light'));
+ const navs=[...document.querySelectorAll('.side-nav a')];
+ function activeNav(){let c=navs[0];for(const a of navs){const el=document.querySelector(a.getAttribute('href'));if(el&&el.getBoundingClientRect().top<160)c=a;}navs.forEach(a=>a.classList.toggle('active',a===c));}
+ addEventListener('scroll',activeNav,{passive:true});activeNav();
+ const search=document.getElementById('searchBox');
+ search.addEventListener('input',()=>{const q=search.value.trim().toLocaleLowerCase('tr-TR');
+  document.querySelectorAll('section.section').forEach(s=>s.classList.toggle('hide',!!q&&!s.textContent.toLocaleLowerCase('tr-TR').includes(q)));
+  document.querySelectorAll('table.req tbody tr').forEach(r=>r.classList.toggle('hide',!!q&&!r.textContent.toLocaleLowerCase('tr-TR').includes(q)));});
+ document.querySelectorAll('[data-faz]').forEach(b=>{if(b.tagName!=='BUTTON')return;b.addEventListener('click',()=>{
+  document.querySelectorAll('button[data-faz]').forEach(x=>x.classList.toggle('primary',x===b));
+  const f=b.dataset.faz;document.querySelectorAll('#srs-fonk table.req tbody tr').forEach(r=>r.classList.toggle('hide',f!=='all'&&r.dataset.faz!==f));});});
+ document.querySelectorAll('.checks input').forEach(i=>i.addEventListener('change',()=>i.closest('label').classList.toggle('done',i.checked)));
+})();
+</script>
+</body>
+</html>
