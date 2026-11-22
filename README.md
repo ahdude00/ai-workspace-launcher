@@ -1,5 +1,7 @@
 # AWL — AI Workspace Launcher
 
+[![CI](https://github.com/ahdude00/ai-workspace-launcher/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ahdude00/ai-workspace-launcher/actions/workflows/ci.yml)
+
 Windows 10'da teknik bilgisi sınırlı bir kullanıcının **Claude Code**'u kurmadan uğraşmadan kullanmasını, belgelerle çalışmasını, birden çok oturumu düzenli yönetmesini ve ileride yeni araçlar ekleyebilmesini sağlayan sade masaüstü uygulaması.
 
 - **Kullanıcı hiçbir şeyi elle kurmaz.** Claude Code, Python ve gerekli kütüphaneler ilk açılışta AWL tarafından otomatik olarak, kullanıcı klasörüne kurulur.
