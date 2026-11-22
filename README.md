@@ -21,6 +21,16 @@ HTML belgeleri indirip tarayıcıda açın (GitHub önizlemesi HTML'i çalışt�
 
 C# / .NET 10 · WPF + MVVM · SQLite · Claude Code CLI · uv + Python · Inno Setup (kullanıcı bazlı kurulum) · GitHub Actions
 
+## Derleme
+
+Gerekenler: Windows 10/11, [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
+
+```powershell
+dotnet build AWL.sln
+dotnet test AWL.sln
+dotnet publish src/AWL.Desktop -p:PublishProfile=win-x64   # → artifacts/publish/win-x64/AWL.exe
+```
+
 ## Geliştirme akışı (kısa)
 
 1. Her görev bir GitHub issue'sudur (`[F1-08] …`); issue'lar milestone'larla fazlara ayrılır.

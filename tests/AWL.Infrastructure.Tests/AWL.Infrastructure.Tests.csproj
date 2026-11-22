@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Integration tests that need Windows (SQLite, registry under HKCU\Software\AWL.Tests, …) -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AWL.Infrastructure\AWL.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

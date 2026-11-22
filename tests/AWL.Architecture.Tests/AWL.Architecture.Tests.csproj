@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Guards the dependency direction (BAK-01). NetArchTest rules are added in F1-03. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AWL.Core\AWL.Core.csproj" />
+    <ProjectReference Include="..\..\src\AWL.Infrastructure\AWL.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
