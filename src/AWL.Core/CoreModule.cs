@@ -1,4 +1,7 @@
+using AWL.Core.Common;
+using AWL.Core.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AWL.Core;
 
@@ -8,9 +11,12 @@ namespace AWL.Core;
 /// </summary>
 public static class CoreModule
 {
+    /// <summary>Registers shared Core services and returns the same service collection.</summary>
     public static IServiceCollection AddCore(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
+        services.TryAddSingleton<IClock, SystemClock>();
+        services.TryAddSingleton<AwlPaths>(_ => AwlPaths.FromEnvironment());
         return services;
     }
 }
