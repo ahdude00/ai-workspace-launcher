@@ -18,4 +18,13 @@
   <data name="MainWindowWelcome" xml:space="preserve">
     <value>Hoş geldiniz. AWL hazırlanıyor; oturumlar ve kurulum yakında burada olacak.</value>
   </data>
+  <data name="UnexpectedErrorTitle" xml:space="preserve">
+    <value>AWL hatası</value>
+  </data>
+  <data name="UnexpectedErrorMessage" xml:space="preserve">
+    <value>Beklenmeyen bir hata oluştu. Lütfen işlemi yeniden deneyin.</value>
+  </data>
+  <data name="StartupErrorMessage" xml:space="preserve">
+    <value>AWL başlatılamadı. Lütfen uygulamayı yeniden açmayı deneyin.</value>
+  </data>
 </root>

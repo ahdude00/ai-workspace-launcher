@@ -1,5 +1,7 @@
 using AWL.Core;
+using AWL.Core.Configuration;
 using AWL.Infrastructure;
+using AWL.Infrastructure.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,8 +21,10 @@ internal static class AppHost
             ContentRootPath = AppContext.BaseDirectory,
         });
 
-        // File logging (Serilog) arrives with F1-05; until then no console/debug providers.
         builder.Logging.ClearProviders();
+        builder.Logging.SetMinimumLevel(LogLevel.Information);
+        builder.Services.AddSingleton<ILoggerProvider>(services => FileLogging.CreateProvider(
+            services.GetRequiredService<AwlPaths>(), new LoggingOptions()));
 
         builder.Services
             .AddCore()
