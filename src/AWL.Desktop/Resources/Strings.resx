@@ -27,4 +27,19 @@
   <data name="StartupErrorMessage" xml:space="preserve">
     <value>AWL başlatılamadı. Lütfen uygulamayı yeniden açmayı deneyin.</value>
   </data>
+  <data name="ClaudePowerShellRestricted" xml:space="preserve">
+    <value>PowerShell kısıtlı dil modunda olduğu için Claude Code kurulamadı. Kurumunuzun BT ekibinden kullanıcı hesabınıza Claude Code kurulmasını isteyin ve AWL'yi yeniden açın.</value>
+  </data>
+  <data name="ClaudeInstallFailed" xml:space="preserve">
+    <value>Claude Code kurulumu tamamlanamadı. İnternet bağlantınızı kontrol edip AWL'yi yeniden açın. Sorun sürerse AWL günlüğünü BT ekibinizle paylaşın.</value>
+  </data>
+  <data name="ClaudeVersionFailed" xml:space="preserve">
+    <value>Claude Code bulundu ancak sürümü doğrulanamadı. Terminalde claude --version komutunu kontrol edip AWL'yi yeniden açın.</value>
+  </data>
+  <data name="ClaudeSetupBlocked" xml:space="preserve">
+    <value>Claude Code kurulum veya sürüm denetimi çalıştırılamadı. AWL günlüğündeki hata kodunu BT ekibinizle paylaşın.</value>
+  </data>
+  <data name="ClaudeSetupTimeout" xml:space="preserve">
+    <value>Claude Code kurulumu veya sürüm denetimi zaman aşımına uğradı. Bağlantınızı kontrol edip AWL'yi yeniden açın.</value>
+  </data>
 </root>
