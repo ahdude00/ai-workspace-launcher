@@ -63,4 +63,5 @@
   <data name="TerminalSetupFailed" xml:space="preserve">
     <value>Taşınabilir Windows Terminal kurulamadı. AWL kurulum dosyalarını ve araç klasörünün yazma izinlerini kontrol edip yeniden deneyin.</value>
   </data>
+  <data name="ClaudeStopFailed" xml:space="preserve"><value>Oturum kapatılamadı. Claude terminalini kapatıp yeniden deneyin.</value></data>
 </root>

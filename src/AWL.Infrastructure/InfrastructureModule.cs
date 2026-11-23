@@ -32,6 +32,9 @@ public static class InfrastructureModule
         services.TryAddSingleton<IClaudeInstallation>(provider => new PowerShellClaudeInstaller(
             provider.GetRequiredService<AwlPaths>(), provider.GetRequiredService<ILogger<PowerShellClaudeInstaller>>(),
             ChildProcess.RunAsync, () => Environment.GetEnvironmentVariable("PATH")));
+        services.TryAddSingleton<WmiClaudeProcessMonitor>();
+        services.TryAddSingleton<IClaudeProcessMonitor>(p => p.GetRequiredService<WmiClaudeProcessMonitor>());
+        services.AddHostedService(p => p.GetRequiredService<WmiClaudeProcessMonitor>());
         services.TryAddSingleton<IAwlSettingsStore, JsonAwlSettingsStore>();
         services.TryAddSingleton<SqliteDatabase>();
         services.TryAddSingleton<ISessionRepository, SqliteSessionRepository>();

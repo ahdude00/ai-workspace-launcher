@@ -3,11 +3,14 @@
   <!-- Everything that touches Windows: SQLite, processes, registry, uv, logging -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>AWL.Infrastructure</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" />
+    <PackageReference Include="System.Management" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Serilog.Extensions.Logging" />
