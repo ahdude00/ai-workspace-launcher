@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Documents/udf_tool.py" LogicalName="AWL.udf_tool.py" />
     <None Update="Python/Assets/requirements.lock;Python/Assets/check_environment.py"
           Link="Assets/Python/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest"
           CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
