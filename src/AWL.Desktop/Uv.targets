@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup>
+    <AwlUvVersion>0.13.9</AwlUvVersion>
+    <AwlUvDirectory>$(BaseIntermediateOutputPath)uv/$(AwlUvVersion)</AwlUvDirectory>
+    <AwlUvArchive>$(AwlUvDirectory)/uv-windows-x64.zip</AwlUvArchive>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(AwlUvDirectory)/uv.exe" Link="third_party/uv.exe"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"
+             ExcludeFromSingleFile="true" />
+  </ItemGroup>
+  <Target Name="PrepareAwlUv" BeforeTargets="PrepareForBuild" Inputs="$(MSBuildThisFileFullPath)"
+          Outputs="$(AwlUvDirectory)/uv.exe" Condition="'$(DesignTimeBuild)' != 'true'">
+    <DownloadFile SourceUrl="https://github.com/astral-sh/uv/releases/download/$(AwlUvVersion)/uv-x86_64-pc-windows-msvc.zip"
+                  DestinationFolder="$(AwlUvDirectory)" DestinationFileName="uv-windows-x64.zip" Retries="2" />
+    <VerifyFileHash File="$(AwlUvArchive)" Algorithm="SHA256"
+                    Hash="EDD61F7F5728A56CC62455386661860BDFC7BAB65872F39B0C25BDCC1D8E1BEB" />
+    <Unzip SourceFiles="$(AwlUvArchive)" DestinationFolder="$(AwlUvDirectory)" Include="uv.exe" />
+    <Touch Files="$(AwlUvDirectory)/uv.exe" />
+  </Target>
+</Project>
