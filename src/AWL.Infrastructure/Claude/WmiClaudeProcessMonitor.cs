@@ -83,7 +83,7 @@ internal sealed partial class WmiClaudeProcessMonitor(ILogger<WmiClaudeProcessMo
         {
             return result;
         }
-        string query = "SELECT ProcessId, CommandLine FROM Win32_Process WHERE Name = 'claude.exe'";
+        string query = "SELECT Handle, ProcessId, CommandLine FROM Win32_Process WHERE Name = 'claude.exe'";
         if (pid.HasValue)
         {
             query += FormattableString.Invariant($" AND ProcessId = {pid.Value}");
@@ -99,9 +99,9 @@ internal sealed partial class WmiClaudeProcessMonitor(ILogger<WmiClaudeProcessMo
                 {
                     continue;
                 }
-                object[] owner = [string.Empty];
-                if (row.InvokeMethod("GetOwnerSid", owner) is uint status && status == 0 &&
-                    string.Equals(owner[0] as string, sid, StringComparison.Ordinal))
+                using var owner = row.InvokeMethod("GetOwnerSid", null, null);
+                if (owner?["ReturnValue"] is uint status && status == 0 &&
+                    string.Equals(owner["Sid"] as string, sid, StringComparison.Ordinal))
                 {
                     result.Add((id, checked((int)(uint)row["ProcessId"])));
                 }

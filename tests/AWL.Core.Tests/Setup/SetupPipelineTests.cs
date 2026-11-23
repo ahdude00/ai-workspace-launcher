@@ -19,7 +19,10 @@ public sealed class SetupPipelineTests
         var pipeline = new SetupPipeline([first, second, last], settings);
         var summary = new List<string>();
 
-        (await pipeline.RunAsync(summary.Add, default)).IsSuccess.ShouldBeFalse();
+        var updates = new List<(string, SetupProgress)>();
+        (await pipeline.RunAsync(summary.Add, (id, state) => updates.Add((id, state)), default)).IsSuccess.ShouldBeFalse();
+        Assert.Equal([("first", SetupProgress.Running), ("first", SetupProgress.Completed),
+            ("second", SetupProgress.Running), ("second", SetupProgress.Failed)], updates);
         settings.Received().SetStepStatus("second", SetupStepStatus.Failed);
         await last.DidNotReceive().RunAsync(default);
 

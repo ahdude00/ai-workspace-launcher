@@ -33,20 +33,21 @@ public sealed class WmiClaudeProcessMonitorTests(ITestOutputHelper output)
             return;
         }
         var id = Guid.NewGuid();
-        var folder = Directory.CreateTempSubdirectory();
+        bool started = false;
         using var monitor = new WmiClaudeProcessMonitor(NullLogger<WmiClaudeProcessMonitor>.Instance);
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
         using var process = new Process();
         try
         {
-            string executable = Path.Combine(folder.FullName, "claude.exe");
-            File.Copy(Path.Combine(Environment.SystemDirectory, "cmd.exe"), executable);
+            string executable = Path.Combine(AppContext.BaseDirectory, "ClaudeFixture", "claude.exe");
             process.StartInfo = new ProcessStartInfo(executable)
             {
-                UseShellExecute = false, CreateNoWindow = true, RedirectStandardInput = true,
-                ArgumentList = { "/d", "/q", "/k", "rem", "--session-id", id.ToString("D") },
+                UseShellExecute = false, CreateNoWindow = true, RedirectStandardInput = true, RedirectStandardOutput = true,
+                ArgumentList = { "--session-id", id.ToString("D") },
             };
-            process.Start().ShouldBeTrue();
+            started = process.Start();
+            started.ShouldBeTrue();
+            (await process.StandardOutput.ReadLineAsync(timeout.Token)).ShouldBe("ready");
             var detected = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             var removed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             monitor.Changed += (_, _) =>
@@ -78,12 +79,12 @@ public sealed class WmiClaudeProcessMonitorTests(ITestOutputHelper output)
         finally
         {
             await monitor.StopAsync(CancellationToken.None);
-            if (process.StartInfo.FileName.Length > 0 && !process.HasExited)
+            if (started && !process.HasExited)
             {
                 process.Kill(entireProcessTree: true);
                 await process.WaitForExitAsync(CancellationToken.None);
             }
-            folder.Delete(recursive: true);
+
         }
     }
 }
