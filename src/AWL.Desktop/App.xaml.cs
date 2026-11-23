@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Windows;
 using AWL.Core.Claude;
+using AWL.Core.Python;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +48,15 @@ public partial class App : Application
             {
                 ShowError(Strings.ResourceManager.GetString(result.Error.UserMessageKey, CultureInfo.CurrentUICulture)
                     ?? Strings.ClaudeInstallFailed);
+                return;
+            }
+
+            stopping.ThrowIfCancellationRequested();
+            var python = _host.Services.GetRequiredService<IPythonEnvironment>();
+            var setup = await python.EnsureReadyAsync(stopping);
+            if (!setup.IsSuccess && !stopping.IsCancellationRequested)
+            {
+                ShowError(Strings.PythonSetupFailed);
             }
         }
         catch (OperationCanceledException) when (stopping.IsCancellationRequested)

@@ -42,4 +42,7 @@
   <data name="ClaudeSetupTimeout" xml:space="preserve">
     <value>Claude Code kurulumu veya sürüm denetimi zaman aşımına uğradı. Bağlantınızı kontrol edip AWL'yi yeniden açın.</value>
   </data>
+  <data name="PythonSetupFailed" xml:space="preserve">
+    <value>Belge araçları için Python ortamı hazırlanamadı. Bağlantınızı kontrol edip AWL'yi yeniden açın. Sorun sürerse AWL günlüğünü BT ekibinizle paylaşın.</value>
+  </data>
 </root>
