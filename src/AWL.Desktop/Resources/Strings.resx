@@ -63,4 +63,25 @@
   <data name="TerminalSetupFailed" xml:space="preserve">
     <value>Taşınabilir Windows Terminal kurulamadı. AWL kurulum dosyalarını ve araç klasörünün yazma izinlerini kontrol edip yeniden deneyin.</value>
   </data>
+  <data name="SetupTitle" xml:space="preserve"><value>İlk kurulum</value></data>
+  <data name="SetupDescription" xml:space="preserve"><value>AWL, bu bilgisayarda gereken araçları hazırlıyor.</value></data>
+  <data name="Step_preflight" xml:space="preserve"><value>Bilgisayar denetimi</value></data>
+  <data name="Step_claude" xml:space="preserve"><value>Claude Code</value></data>
+  <data name="Step_python" xml:space="preserve"><value>Python ortamı</value></data>
+  <data name="Step_configuration" xml:space="preserve"><value>Yapılandırma dosyaları</value></data>
+  <data name="Step_udf" xml:space="preserve"><value>UDF belge aracı</value></data>
+  <data name="Step_windows_terminal" xml:space="preserve"><value>Terminal</value></data>
+  <data name="Step_login" xml:space="preserve"><value>Claude hesabına giriş</value></data>
+  <data name="StepWaiting" xml:space="preserve"><value>Bekliyor</value></data>
+  <data name="StepRunning" xml:space="preserve"><value>İşleniyor</value></data>
+  <data name="StepCompleted" xml:space="preserve"><value>Tamamlandı</value></data>
+  <data name="StepFailed" xml:space="preserve"><value>Hata</value></data>
+  <data name="LoginInstructions" xml:space="preserve"><value>Açılan terminalde Claude hesabınıza giriş yapın. Ardından bu pencereye dönüp girişinizi tamamladığınızı onaylayın.</value></data>
+  <data name="ConfirmLogin" xml:space="preserve"><value>Girişimi tamamladım</value></data>
+  <data name="RetryButton" xml:space="preserve"><value>Tekrar dene</value></data>
+  <data name="CopySummary" xml:space="preserve"><value>Teknik özeti kopyala</value></data>
+  <data name="Copied" xml:space="preserve"><value>Özet kopyalandı</value></data>
+  <data name="CopyFailed" xml:space="preserve"><value>Pano meşgul. Yeniden deneyin.</value></data>
+  <data name="LoginTitle" xml:space="preserve"><value>Claude hesabına giriş</value></data>
+  <data name="ReopenTerminal" xml:space="preserve"><value>Terminali yeniden aç</value></data>
 </root>

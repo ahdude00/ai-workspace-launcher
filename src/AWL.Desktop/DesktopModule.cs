@@ -1,3 +1,4 @@
+using AWL.Core.Setup;
 using AWL.Desktop.ViewModels;
 using AWL.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,5 +13,6 @@ internal static class DesktopModule
     public static IServiceCollection AddDesktop(this IServiceCollection services) =>
         services
             .AddSingleton<MainWindowViewModel>()
-            .AddSingleton<MainWindow>();
+            .AddSingleton<MainWindow>()
+            .AddSingleton<ISetupStep, ClaudeLoginStep>();
 }
