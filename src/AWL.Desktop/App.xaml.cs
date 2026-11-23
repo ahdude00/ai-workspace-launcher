@@ -1,11 +1,12 @@
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
-using AWL.Core.Configuration;
 using AWL.Core.Claude;
+using AWL.Core.Configuration;
 using AWL.Core.Python;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Views;
+using AWL.Infrastructure.Documents;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -38,6 +39,7 @@ public partial class App : Application
                 ?? "unknown";
             LogStartup(logger, version);
 
+            UdfToolInstaller.EnsureInstalled(_host.Services.GetRequiredService<AwlPaths>());
             _host.Services.GetRequiredService<IAwlSettingsStore>().RefreshClaudeFiles();
             _host.Start();
             stopping = _host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
