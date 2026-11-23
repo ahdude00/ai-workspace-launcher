@@ -40,6 +40,7 @@ public partial class App : Application
             LogStartup(logger, version);
 
             UdfToolInstaller.EnsureInstalled(_host.Services.GetRequiredService<AwlPaths>());
+            _host.Services.GetRequiredService<IAwlSettingsStore>().RefreshClaudeFiles();
             _host.Start();
             stopping = _host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
             MainWindow = _host.Services.GetRequiredService<MainWindow>();
