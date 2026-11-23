@@ -1,7 +1,7 @@
 <Project>
   <!-- Central package versions (Teknik Tasarım §02) -->
   <ItemGroup>
-    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageVersion Include="Dapper" Version="2.1.100" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
