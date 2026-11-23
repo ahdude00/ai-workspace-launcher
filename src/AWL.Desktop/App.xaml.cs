@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Windows;
+using AWL.Core.Configuration;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,7 @@ public partial class App : Application
                 ?? "unknown";
             LogStartup(logger, version);
 
+            _host.Services.GetRequiredService<IAwlSettingsStore>().RefreshClaudeFiles();
             _host.Start();
             MainWindow = _host.Services.GetRequiredService<MainWindow>();
             MainWindow.Show();
