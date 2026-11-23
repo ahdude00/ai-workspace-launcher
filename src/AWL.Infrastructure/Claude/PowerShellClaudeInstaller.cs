@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using AWL.Core.Claude;
 using AWL.Core.Common;
 using AWL.Core.Configuration;
+using AWL.Infrastructure.Processes;
 using Microsoft.Extensions.Logging;
 
 namespace AWL.Infrastructure.Claude;

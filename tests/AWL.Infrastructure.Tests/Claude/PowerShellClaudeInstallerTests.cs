@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using AWL.Core.Configuration;
 using AWL.Infrastructure.Claude;
+using AWL.Infrastructure.Processes;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AWL.Infrastructure.Tests.Claude;

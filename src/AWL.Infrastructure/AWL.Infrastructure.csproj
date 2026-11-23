@@ -19,4 +19,10 @@
     <ProjectReference Include="..\AWL.Core\AWL.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Python/Assets/requirements.lock;Python/Assets/check_environment.py"
+          Link="Assets/Python/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
 </Project>

@@ -1,10 +1,10 @@
 using System.Diagnostics;
 
-namespace AWL.Infrastructure.Claude;
+namespace AWL.Infrastructure.Processes;
 
 internal sealed record CommandOutput(int ExitCode, string StandardOutput, string StandardError);
 
-internal static class ClaudeProcess
+internal static class ChildProcess
 {
     internal static async Task<CommandOutput> RunAsync(ProcessStartInfo info, CancellationToken cancellationToken)
     {
