@@ -57,4 +57,10 @@
   <data name="SetupPackageSaved" xml:space="preserve">
     <value>BT ekibinizle paylaşabileceğiniz kurulum özetinin konumu:</value>
   </data>
+  <data name="TerminalLaunchFailed" xml:space="preserve">
+    <value>Terminal açılamadı. Çalışma klasörünü ve Claude Code kurulumunu kontrol edin.</value>
+  </data>
+  <data name="TerminalSetupFailed" xml:space="preserve">
+    <value>Taşınabilir Windows Terminal kurulamadı. AWL kurulum dosyalarını ve araç klasörünün yazma izinlerini kontrol edip yeniden deneyin.</value>
+  </data>
 </root>

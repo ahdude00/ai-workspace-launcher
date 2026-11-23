@@ -4,6 +4,8 @@ using AWL.Core.Configuration;
 using AWL.Core.Python;
 using AWL.Core.Sessions;
 using AWL.Core.Setup;
+using AWL.Core.Terminal;
+using AWL.Infrastructure.Terminal;
 using AWL.Infrastructure.Setup;
 using AWL.Infrastructure.Claude;
 using AWL.Infrastructure.Configuration;
@@ -39,6 +41,13 @@ public static class InfrastructureModule
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, PythonStep>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, ConfigurationStep>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, UdfStep>());
+        services.TryAddSingleton<PortableTerminalStep>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, PortableTerminalStep>());
+        services.TryAddSingleton<WindowsTerminalLauncher>();
+        services.TryAddSingleton<ConsoleLauncher>();
+        services.TryAddSingleton<ITerminalLauncher>(provider => new TerminalLauncherSelector(
+            provider.GetRequiredService<IAwlSettingsStore>(), provider.GetRequiredService<WindowsTerminalLauncher>(),
+            provider.GetRequiredService<ConsoleLauncher>()));
         services.TryAddSingleton<SetupPipeline>();
         return services;
     }
