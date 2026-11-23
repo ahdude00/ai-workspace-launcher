@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Reflection;
 using System.Windows;
+using AWL.Core.Claude;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,9 +18,10 @@ public partial class App : Application
     private IHost? _host;
     private GlobalExceptionHandler? _exceptionHandler;
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        CancellationToken stopping = default;
 
         try
         {
@@ -34,8 +37,21 @@ public partial class App : Application
             LogStartup(logger, version);
 
             _host.Start();
+            stopping = _host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
             MainWindow = _host.Services.GetRequiredService<MainWindow>();
             MainWindow.Show();
+
+            var installation = _host.Services.GetRequiredService<IClaudeInstallation>();
+            var result = await installation.EnsureInstalledAsync(stopping);
+            if (!result.IsSuccess && !stopping.IsCancellationRequested)
+            {
+                ShowError(Strings.ResourceManager.GetString(result.Error.UserMessageKey, CultureInfo.CurrentUICulture)
+                    ?? Strings.ClaudeInstallFailed);
+            }
+        }
+        catch (OperationCanceledException) when (stopping.IsCancellationRequested)
+        {
+            // The user closed AWL during setup.
         }
         catch (Exception exception)
         {
@@ -47,6 +63,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _host?.Services.GetService<IHostApplicationLifetime>()?.StopApplication();
         _exceptionHandler?.Detach();
         _host?.Dispose();
         base.OnExit(e);
