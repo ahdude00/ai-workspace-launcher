@@ -68,7 +68,7 @@ public partial class App : Application
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                 {
                     // Keep the on-screen summary available even on a read-only disk.
-                    LogSetup(logger, $"setup-diagnostics: 0x{ex.HResult:X8}");
+                    LogDiagnosticsWriteFailure(logger, ex.HResult);
                 }
                 string details = string.Join(Environment.NewLine, summary);
                 if (MessageBox.Show(MainWindow, string.Join(Environment.NewLine, message, details, Strings.RetrySetup),
@@ -108,6 +108,9 @@ public partial class App : Application
 
         MessageBox.Show(message, Strings.UnexpectedErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error);
     }
+
+    [LoggerMessage(EventId = 1020, Level = LogLevel.Warning, Message = "Setup diagnostics could not be saved (HRESULT {HResult:X8}).")]
+    private static partial void LogDiagnosticsWriteFailure(ILogger logger, int hResult);
 
     [LoggerMessage(EventId = 1019, Level = LogLevel.Information, Message = "Setup: {Summary}")]
     private static partial void LogSetup(ILogger logger, string summary);
