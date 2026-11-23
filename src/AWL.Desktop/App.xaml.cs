@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
+using AWL.Core.Configuration;
 using AWL.Core.Claude;
 using AWL.Core.Python;
 using AWL.Desktop.Resources;
@@ -37,6 +38,7 @@ public partial class App : Application
                 ?? "unknown";
             LogStartup(logger, version);
 
+            _host.Services.GetRequiredService<IAwlSettingsStore>().RefreshClaudeFiles();
             _host.Start();
             stopping = _host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
             MainWindow = _host.Services.GetRequiredService<MainWindow>();
