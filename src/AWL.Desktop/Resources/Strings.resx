@@ -54,4 +54,7 @@
   <data name="RetrySetup" xml:space="preserve">
     <value>Kurulumu yeniden denemek istiyor musunuz?</value>
   </data>
+  <data name="SetupPackageSaved" xml:space="preserve">
+    <value>BT ekibinizle paylaşabileceğiniz kurulum özetinin konumu:</value>
+  </data>
 </root>

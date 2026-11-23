@@ -1,7 +1,10 @@
 using System.Globalization;
 using System.Reflection;
+using System.IO;
 using System.Windows;
 using AWL.Core.Setup;
+using AWL.Core.Configuration;
+using AWL.Infrastructure.Diagnostics;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +60,16 @@ public partial class App : Application
 
                 string message = Strings.ResourceManager.GetString(result.Error.UserMessageKey, CultureInfo.CurrentUICulture)
                     ?? Strings.StartupErrorMessage;
+                try
+                {
+                    string package = SetupDiagnostics.Save(_host.Services.GetRequiredService<AwlPaths>(), version, summary);
+                    summary.Add(Strings.SetupPackageSaved + Environment.NewLine + package);
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    // Keep the on-screen summary available even on a read-only disk.
+                    LogSetup(logger, $"setup-diagnostics: 0x{ex.HResult:X8}");
+                }
                 string details = string.Join(Environment.NewLine, summary);
                 if (MessageBox.Show(MainWindow, string.Join(Environment.NewLine, message, details, Strings.RetrySetup),
                     Strings.UnexpectedErrorTitle, MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
