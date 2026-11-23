@@ -10,14 +10,23 @@ public interface ISetupStep
     Task<Result> RunAsync(CancellationToken token);
 }
 
+public enum SetupProgress { Running, Completed, Failed }
+
 public sealed class SetupPipeline(IEnumerable<ISetupStep> steps, IAwlSettingsStore settings)
 {
-    public async Task<Result> RunAsync(Action<string> report, CancellationToken token)
+    private readonly ISetupStep[] _steps = steps.ToArray();
+
+    public IEnumerable<string> StepIds => _steps.Select(step => step.Id);
+
+    public Task<Result> RunAsync(Action<string> report, CancellationToken token) => RunAsync(report, null, token);
+
+    public async Task<Result> RunAsync(Action<string> report, Action<string, SetupProgress>? progress, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(report);
-        foreach (var step in steps)
+        foreach (var step in _steps)
         {
             token.ThrowIfCancellationRequested();
+            progress?.Invoke(step.Id, SetupProgress.Running);
             Result result;
             try
             {
@@ -28,6 +37,7 @@ public sealed class SetupPipeline(IEnumerable<ISetupStep> steps, IAwlSettingsSto
                 {
                     settings.SetStepStatus(step.Id, SetupStepStatus.Completed);
                     report($"{step.Id}: {(ready ? "güncel" : "tamamlandı")}");
+                    progress?.Invoke(step.Id, SetupProgress.Completed);
                     continue;
                 }
             }
@@ -36,6 +46,7 @@ public sealed class SetupPipeline(IEnumerable<ISetupStep> steps, IAwlSettingsSto
                 result = Result.Fail(new AppError("SetupBlocked", "SetupBlocked", $"0x{ex.HResult:X8}"));
             }
 
+            progress?.Invoke(step.Id, SetupProgress.Failed);
             report($"{step.Id}: {result.Error!.Code} {result.Error.Detail}");
             try
             {

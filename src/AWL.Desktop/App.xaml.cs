@@ -41,23 +41,38 @@ public partial class App : Application
 
             _host.Start();
             stopping = _host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
-            MainWindow = _host.Services.GetRequiredService<MainWindow>();
+            var window = _host.Services.GetRequiredService<MainWindow>();
+            MainWindow = window;
             MainWindow.Show();
 
             var pipeline = _host.Services.GetRequiredService<SetupPipeline>();
+            var wizard = window.Wizard;
+            var settings = _host.Services.GetRequiredService<IAwlSettingsStore>();
+            bool firstRun = settings.Load().SetupSteps.GetValueOrDefault("login") != SetupStepStatus.Completed;
             while (!stopping.IsCancellationRequested)
             {
+                wizard.Reset(pipeline.StepIds);
+                if (firstRun)
+                {
+                    wizard.Visibility = Visibility.Visible;
+                    window.Welcome.Visibility = Visibility.Collapsed;
+                }
                 var summary = new List<string>();
                 var result = await pipeline.RunAsync(line =>
                 {
                     summary.Add(line);
                     LogSetup(logger, line);
-                }, stopping);
+                }, (id, status) => Dispatcher.Invoke(() => wizard.Update(id, status)), stopping);
                 if (result.IsSuccess || stopping.IsCancellationRequested)
                 {
+                    wizard.Visibility = Visibility.Collapsed;
+                    window.Welcome.Visibility = Visibility.Visible;
                     break;
                 }
 
+                firstRun = true;
+                wizard.Visibility = Visibility.Visible;
+                window.Welcome.Visibility = Visibility.Collapsed;
                 string message = Strings.ResourceManager.GetString(result.Error.UserMessageKey, CultureInfo.CurrentUICulture)
                     ?? Strings.StartupErrorMessage;
                 try
@@ -71,11 +86,7 @@ public partial class App : Application
                     LogDiagnosticsWriteFailure(logger, ex.HResult);
                 }
                 string details = string.Join(Environment.NewLine, summary);
-                if (MessageBox.Show(MainWindow, string.Join(Environment.NewLine, message, details, Strings.RetrySetup),
-                    Strings.UnexpectedErrorTitle, MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
-                {
-                    break;
-                }
+                await wizard.WaitForRetryAsync(message, details, stopping);
             }
         }
         catch (OperationCanceledException) when (stopping.IsCancellationRequested)
