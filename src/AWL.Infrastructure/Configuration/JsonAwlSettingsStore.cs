@@ -8,6 +8,8 @@ namespace AWL.Infrastructure.Configuration;
 internal sealed partial class JsonAwlSettingsStore(AwlPaths paths, ILogger<JsonAwlSettingsStore> logger)
     : IAwlSettingsStore
 {
+    private static readonly Lock FileAccessLock = new();
+
     private static readonly JsonSerializerOptions Options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -23,12 +25,15 @@ internal sealed partial class JsonAwlSettingsStore(AwlPaths paths, ILogger<JsonA
     {
         try
         {
-            using var file = File.Open(paths.SettingsFile, FileMode.Open, FileAccess.Read,
-                FileShare.Read | FileShare.Delete);
-            var settings = JsonSerializer.Deserialize<AwlSettings>(file, Options);
-            if (settings is not null && IsValid(settings))
+            lock (FileAccessLock)
             {
-                return settings;
+                using var file = File.Open(paths.SettingsFile, FileMode.Open, FileAccess.Read,
+                    FileShare.Read | FileShare.Delete);
+                var settings = JsonSerializer.Deserialize<AwlSettings>(file, Options);
+                if (settings is not null && IsValid(settings))
+                {
+                    return settings;
+                }
             }
         }
         catch (FileNotFoundException)
@@ -67,7 +72,10 @@ internal sealed partial class JsonAwlSettingsStore(AwlPaths paths, ILogger<JsonA
                 file.Flush(flushToDisk: true);
             }
 
-            File.Move(temporaryFile, paths.SettingsFile, overwrite: true);
+            lock (FileAccessLock)
+            {
+                File.Move(temporaryFile, paths.SettingsFile, overwrite: true);
+            }
         }
         finally
         {

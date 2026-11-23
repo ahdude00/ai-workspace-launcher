@@ -63,6 +63,7 @@ public sealed class AwlSettingsStoreTests : IDisposable
         File.WriteAllText(_paths.SettingsFile, content);
 
         _store.Load().RetentionDays.ShouldBe(3650);
+        _provider.Dispose();
         var log = File.ReadAllText(Directory.GetFiles(_paths.LogsDirectory).Single());
         log.ShouldContain("Invalid AWL settings");
         log.ShouldNotContain("private-content");
