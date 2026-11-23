@@ -1,3 +1,4 @@
+using AWL.Core.Claude;
 using AWL.Core.Common;
 using AWL.Core.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ public static class CoreModule
     public static IServiceCollection AddCore(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
+        services.TryAddSingleton<ClaudeCommandBuilder>();
         services.TryAddSingleton<IClock, SystemClock>();
         services.TryAddSingleton<AwlPaths>(_ => AwlPaths.FromEnvironment());
         return services;
