@@ -3,6 +3,8 @@ using AWL.Core.Claude;
 using AWL.Core.Configuration;
 using AWL.Core.Python;
 using AWL.Core.Sessions;
+using AWL.Core.Setup;
+using AWL.Infrastructure.Setup;
 using AWL.Infrastructure.Claude;
 using AWL.Infrastructure.Configuration;
 using AWL.Infrastructure.Persistence;
@@ -32,6 +34,12 @@ public static class InfrastructureModule
         services.TryAddSingleton<SqliteDatabase>();
         services.TryAddSingleton<ISessionRepository, SqliteSessionRepository>();
         services.TryAddSingleton<ICategoryRepository, SqliteCategoryRepository>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, PreflightStep>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, ClaudeStep>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, PythonStep>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, ConfigurationStep>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, UdfStep>());
+        services.TryAddSingleton<SetupPipeline>();
         return services;
     }
 }

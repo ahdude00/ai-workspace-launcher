@@ -51,6 +51,23 @@ public sealed class AwlSettingsStoreTests : IDisposable
         ReadCleanupPeriod().ShouldBe(90);
     }
 
+    [Fact]
+    public void Step_checkpoints_preserve_preferences_and_do_not_regenerate_Claude_files()
+    {
+        _store.Save(new AwlSettings { RetentionDays = 42, TerminalPreference = TerminalPreference.WindowsConsole });
+        File.Delete(_paths.ContextFile);
+        _store.SetStepStatus("claude", SetupStepStatus.Completed);
+        _store.SetStepStatus("python", SetupStepStatus.Failed);
+        _store.SetStepStatus("python", SetupStepStatus.Completed);
+
+        var saved = _store.Load();
+        saved.RetentionDays.ShouldBe(42);
+        saved.TerminalPreference.ShouldBe(TerminalPreference.WindowsConsole);
+        saved.SetupSteps["claude"].ShouldBe(SetupStepStatus.Completed);
+        saved.SetupSteps["python"].ShouldBe(SetupStepStatus.Completed);
+        File.Exists(_paths.ContextFile).ShouldBeFalse();
+    }
+
     private int ReadCleanupPeriod()
     {
         using var json = JsonDocument.Parse(File.ReadAllText(_paths.ClaudeSettingsFile));

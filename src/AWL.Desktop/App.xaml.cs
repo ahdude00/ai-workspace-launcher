@@ -1,12 +1,12 @@
 using System.Globalization;
 using System.Reflection;
+using System.IO;
 using System.Windows;
-using AWL.Core.Claude;
+using AWL.Core.Setup;
 using AWL.Core.Configuration;
-using AWL.Core.Python;
+using AWL.Infrastructure.Diagnostics;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Views;
-using AWL.Infrastructure.Documents;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -39,28 +39,43 @@ public partial class App : Application
                 ?? "unknown";
             LogStartup(logger, version);
 
-            UdfToolInstaller.EnsureInstalled(_host.Services.GetRequiredService<AwlPaths>());
-            _host.Services.GetRequiredService<IAwlSettingsStore>().RefreshClaudeFiles();
             _host.Start();
             stopping = _host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
             MainWindow = _host.Services.GetRequiredService<MainWindow>();
             MainWindow.Show();
 
-            var installation = _host.Services.GetRequiredService<IClaudeInstallation>();
-            var result = await installation.EnsureInstalledAsync(stopping);
-            if (!result.IsSuccess && !stopping.IsCancellationRequested)
+            var pipeline = _host.Services.GetRequiredService<SetupPipeline>();
+            while (!stopping.IsCancellationRequested)
             {
-                ShowError(Strings.ResourceManager.GetString(result.Error.UserMessageKey, CultureInfo.CurrentUICulture)
-                    ?? Strings.ClaudeInstallFailed);
-                return;
-            }
+                var summary = new List<string>();
+                var result = await pipeline.RunAsync(line =>
+                {
+                    summary.Add(line);
+                    LogSetup(logger, line);
+                }, stopping);
+                if (result.IsSuccess || stopping.IsCancellationRequested)
+                {
+                    break;
+                }
 
-            stopping.ThrowIfCancellationRequested();
-            var python = _host.Services.GetRequiredService<IPythonEnvironment>();
-            var setup = await python.EnsureReadyAsync(stopping);
-            if (!setup.IsSuccess && !stopping.IsCancellationRequested)
-            {
-                ShowError(Strings.PythonSetupFailed);
+                string message = Strings.ResourceManager.GetString(result.Error.UserMessageKey, CultureInfo.CurrentUICulture)
+                    ?? Strings.StartupErrorMessage;
+                try
+                {
+                    string package = SetupDiagnostics.Save(_host.Services.GetRequiredService<AwlPaths>(), version, summary);
+                    summary.Add(Strings.SetupPackageSaved + Environment.NewLine + package);
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    // Keep the on-screen summary available even on a read-only disk.
+                    LogDiagnosticsWriteFailure(logger, ex.HResult);
+                }
+                string details = string.Join(Environment.NewLine, summary);
+                if (MessageBox.Show(MainWindow, string.Join(Environment.NewLine, message, details, Strings.RetrySetup),
+                    Strings.UnexpectedErrorTitle, MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                {
+                    break;
+                }
             }
         }
         catch (OperationCanceledException) when (stopping.IsCancellationRequested)
@@ -93,6 +108,12 @@ public partial class App : Application
 
         MessageBox.Show(message, Strings.UnexpectedErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error);
     }
+
+    [LoggerMessage(EventId = 1020, Level = LogLevel.Warning, Message = "Setup diagnostics could not be saved (HRESULT {HResult:X8}).")]
+    private static partial void LogDiagnosticsWriteFailure(ILogger logger, int hResult);
+
+    [LoggerMessage(EventId = 1019, Level = LogLevel.Information, Message = "Setup: {Summary}")]
+    private static partial void LogSetup(ILogger logger, string summary);
 
     [LoggerMessage(EventId = 1000, Level = LogLevel.Information, Message = "AWL starting. Version: {Version}")]
     private static partial void LogStartup(ILogger logger, string version);

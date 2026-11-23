@@ -7,5 +7,7 @@ public interface IAwlSettingsStore
     /// <summary>Regenerates both Claude files from the current AWL settings.</summary>
     void RefreshClaudeFiles();
 
+    void SetStepStatus(string id, SetupStepStatus status);
+
     void Save(AwlSettings settings);
 }

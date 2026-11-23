@@ -45,4 +45,16 @@
   <data name="PythonSetupFailed" xml:space="preserve">
     <value>Belge araçları için Python ortamı hazırlanamadı. Bağlantınızı kontrol edip AWL'yi yeniden açın. Sorun sürerse AWL günlüğünü BT ekibinizle paylaşın.</value>
   </data>
+  <data name="SetupPreflightFailed" xml:space="preserve">
+    <value>Kurulum ön kontrollerinde sorun bulundu. Aşağıdaki özeti BT ekibinizle paylaşabilirsiniz.</value>
+  </data>
+  <data name="SetupBlocked" xml:space="preserve">
+    <value>Kurulum adımı engellendi. Klasör ve uygulama izinlerini kontrol ettikten sonra AWL’yi yeniden açın.</value>
+  </data>
+  <data name="RetrySetup" xml:space="preserve">
+    <value>Kurulumu yeniden denemek istiyor musunuz?</value>
+  </data>
+  <data name="SetupPackageSaved" xml:space="preserve">
+    <value>BT ekibinizle paylaşabileceğiniz kurulum özetinin konumu:</value>
+  </data>
 </root>

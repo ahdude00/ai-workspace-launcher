@@ -14,7 +14,7 @@ public enum SetupStepStatus
 }
 
 /// <summary>AWL preferences and the last known state of each setup step.</summary>
-public sealed class AwlSettings
+public sealed record AwlSettings
 {
     public int RetentionDays { get; init; } = 3650;
 

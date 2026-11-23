@@ -68,6 +68,20 @@ internal sealed partial class JsonAwlSettingsStore(AwlPaths paths, ILogger<JsonA
         }
     }
 
+    public void SetStepStatus(string id, SetupStepStatus status)
+    {
+        lock (FileAccessLock)
+        {
+            var settings = Load();
+            if (settings.SetupSteps.TryGetValue(id, out var existing) && existing == status)
+            {
+                return;
+            }
+            var steps = new Dictionary<string, SetupStepStatus>(settings.SetupSteps) { [id] = status };
+            WriteFile(paths.SettingsFile, stream => JsonSerializer.Serialize(stream, settings with { SetupSteps = steps }, Options));
+        }
+    }
+
     public void RefreshClaudeFiles()
     {
         lock (FileAccessLock)

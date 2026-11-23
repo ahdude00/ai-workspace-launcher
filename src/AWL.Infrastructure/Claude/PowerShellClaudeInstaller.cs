@@ -25,7 +25,15 @@ internal sealed partial class PowerShellClaudeInstaller(
 
     public string? ExecutablePath { get; private set; }
 
-    public async Task<Result<string>> EnsureInstalledAsync(CancellationToken cancellationToken)
+    public async Task<bool> CheckAsync(CancellationToken cancellationToken)
+    {
+        return FindExecutable() is not null && (await VerifyAsync(install: false, cancellationToken).ConfigureAwait(false)).IsSuccess;
+    }
+
+    public Task<Result<string>> EnsureInstalledAsync(CancellationToken cancellationToken) =>
+        VerifyAsync(install: true, cancellationToken);
+
+    private async Task<Result<string>> VerifyAsync(bool install, CancellationToken cancellationToken)
     {
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(TimeSpan.FromMinutes(10));
@@ -36,19 +44,23 @@ internal sealed partial class PowerShellClaudeInstaller(
             string? executable = FindExecutable();
             if (executable is null)
             {
+                if (!install)
+                {
+                    return Failure("ClaudeInstallFailed");
+                }
                 string powershell = Path.Combine(Environment.SystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe");
-                CommandOutput install = await run(StartInfo(powershell, "-NoProfile", "-NonInteractive",
+                CommandOutput installOutput = await run(StartInfo(powershell, "-NoProfile", "-NonInteractive",
                     "-Command", InstallCommand), timeout.Token).ConfigureAwait(false);
                 // Raw installer output can contain user paths and proxy credentials.
-                LogInstallerOutput(logger, install.ExitCode, InstallerCategory().Match(install.StandardOutput).Groups[1].Value,
-                    install.StandardOutput.Length, install.StandardError.Length);
-                if (install.ExitCode == RestrictedLanguage)
+                LogInstallerOutput(logger, installOutput.ExitCode, InstallerCategory().Match(installOutput.StandardOutput).Groups[1].Value,
+                    installOutput.StandardOutput.Length, installOutput.StandardError.Length);
+                if (installOutput.ExitCode == RestrictedLanguage)
                 {
                     return Failure("ClaudePowerShellRestricted");
                 }
 
                 executable = FindExecutable();
-                if (install.ExitCode != 0 || executable is null)
+                if (installOutput.ExitCode != 0 || executable is null)
                 {
                     return Failure("ClaudeInstallFailed");
                 }

@@ -5,23 +5,30 @@ namespace AWL.Infrastructure.Documents;
 
 public static class UdfToolInstaller
 {
+    private static Stream OpenAsset() => typeof(UdfToolInstaller).Assembly.GetManifestResourceStream("AWL.udf_tool.py")
+        ?? throw new InvalidOperationException("Missing bundled UDF tool.");
+
+    public static bool IsCurrent(AwlPaths paths)
+    {
+        ArgumentNullException.ThrowIfNull(paths);
+        if (!File.Exists(paths.UdfToolFile))
+        {
+            return false;
+        }
+        using var asset = OpenAsset();
+        using var installed = File.Open(paths.UdfToolFile, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete);
+        return SHA256.HashData(installed).SequenceEqual(SHA256.HashData(asset));
+    }
+
     public static void EnsureInstalled(AwlPaths paths)
     {
         ArgumentNullException.ThrowIfNull(paths);
-        using Stream asset = typeof(UdfToolInstaller).Assembly.GetManifestResourceStream("AWL.udf_tool.py")
-            ?? throw new InvalidOperationException("Missing bundled UDF tool.");
-        Directory.CreateDirectory(paths.ToolsDirectory);
-        if (File.Exists(paths.UdfToolFile))
+        if (IsCurrent(paths))
         {
-            using var installed = File.Open(paths.UdfToolFile, FileMode.Open, FileAccess.Read,
-                FileShare.Read | FileShare.Delete);
-            if (SHA256.HashData(installed).SequenceEqual(SHA256.HashData(asset)))
-            {
-                return;
-            }
-            asset.Position = 0;
+            return;
         }
-
+        using var asset = OpenAsset();
+        Directory.CreateDirectory(paths.ToolsDirectory);
         string temporary = Path.Combine(paths.ToolsDirectory, Path.GetRandomFileName());
         var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None);
         try
