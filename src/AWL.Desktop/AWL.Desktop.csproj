@@ -30,5 +30,6 @@
   </ItemGroup>
 
   <Import Project="Uv.targets" />
+  <Import Project="WindowsTerminal.targets" />
 
 </Project>

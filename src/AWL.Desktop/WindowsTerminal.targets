@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <AwlTerminalVersion>1.25.3131.0</AwlTerminalVersion>
+    <AwlTerminalDir>$(BaseIntermediateOutputPath)terminal/$(AwlTerminalVersion)</AwlTerminalDir>
+    <AwlTerminalZip>$(AwlTerminalDir)/windows-terminal.zip</AwlTerminalZip>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(AwlTerminalZip)" Link="third_party/windows-terminal.zip" CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+  <Target Name="DownloadAwlTerminal" Inputs="$(MSBuildThisFileFullPath)" Outputs="$(AwlTerminalZip)">
+    <DownloadFile SourceUrl="https://github.com/microsoft/terminal/releases/download/v$(AwlTerminalVersion)/Microsoft.WindowsTerminal_$(AwlTerminalVersion)_x64.zip"
+                  DestinationFolder="$(AwlTerminalDir)" DestinationFileName="windows-terminal.zip" Retries="2" />
+  </Target>
+  <Target Name="VerifyAwlTerminal" BeforeTargets="PrepareForBuild" DependsOnTargets="DownloadAwlTerminal" Condition="'$(DesignTimeBuild)' != 'true'">
+    <VerifyFileHash File="$(AwlTerminalZip)" Algorithm="SHA256" Hash="273D6F1502ECA1B5BD95C43F5D4D7EC72CC503DF340102F8659717E5BEAD3437" />
+  </Target>
+</Project>
