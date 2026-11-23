@@ -61,21 +61,56 @@ internal sealed partial class JsonAwlSettingsStore(AwlPaths paths, ILogger<JsonA
             throw new ArgumentException("Invalid AWL settings.", nameof(settings));
         }
 
-        Directory.CreateDirectory(paths.RoamingDataDirectory);
-        string temporaryFile = Path.Combine(paths.RoamingDataDirectory, Path.GetRandomFileName());
+        lock (FileAccessLock)
+        {
+            WriteFile(paths.SettingsFile, stream => JsonSerializer.Serialize(stream, settings, Options));
+            WriteClaudeFiles(settings);
+        }
+    }
+
+    public void SetStepStatus(string id, SetupStepStatus status)
+    {
+        lock (FileAccessLock)
+        {
+            var settings = Load();
+            if (settings.SetupSteps.TryGetValue(id, out var existing) && existing == status)
+            {
+                return;
+            }
+            var steps = new Dictionary<string, SetupStepStatus>(settings.SetupSteps) { [id] = status };
+            WriteFile(paths.SettingsFile, stream => JsonSerializer.Serialize(stream, settings with { SetupSteps = steps }, Options));
+        }
+    }
+
+    public void RefreshClaudeFiles()
+    {
+        lock (FileAccessLock)
+        {
+            WriteClaudeFiles(Load());
+        }
+    }
+
+    private void WriteClaudeFiles(AwlSettings settings)
+    {
+        WriteFile(paths.ContextFile, stream => ContextFileWriter.Write(stream, paths));
+        WriteFile(paths.ClaudeSettingsFile, stream => ClaudeSettingsWriter.Write(stream, paths, settings));
+    }
+
+    private static void WriteFile(string destination, Action<Stream> write)
+    {
+        string directory = Path.GetDirectoryName(destination)!;
+        Directory.CreateDirectory(directory);
+        string temporaryFile = Path.Combine(directory, Path.GetRandomFileName());
         var file = new FileStream(temporaryFile, FileMode.CreateNew, FileAccess.Write, FileShare.None);
         try
         {
             using (file)
             {
-                JsonSerializer.Serialize(file, settings, Options);
+                write(file);
                 file.Flush(flushToDisk: true);
             }
 
-            lock (FileAccessLock)
-            {
-                File.Move(temporaryFile, paths.SettingsFile, overwrite: true);
-            }
+            File.Move(temporaryFile, destination, overwrite: true);
         }
         finally
         {

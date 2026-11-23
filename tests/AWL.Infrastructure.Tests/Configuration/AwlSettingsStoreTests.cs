@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AWL.Core.Configuration;
 using AWL.Infrastructure.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,46 @@ public sealed class AwlSettingsStoreTests : IDisposable
         settings.TerminalPreference.ShouldBe(TerminalPreference.WindowsTerminal);
         settings.SetupSteps.ShouldBeEmpty();
         File.Exists(_paths.SettingsFile).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Refresh_uses_defaults_and_save_regenerates_both_Claude_files()
+    {
+        _store.RefreshClaudeFiles();
+        ReadCleanupPeriod().ShouldBe(3650);
+        string originalContext = File.ReadAllText(_paths.ContextFile);
+        File.WriteAllText(_paths.ContextFile, "stale");
+
+        _store.Save(new AwlSettings { RetentionDays = 90 });
+        ReadCleanupPeriod().ShouldBe(90);
+        File.ReadAllText(_paths.ContextFile).ShouldBe(originalContext);
+
+        File.Delete(_paths.ClaudeSettingsFile);
+        _store.RefreshClaudeFiles();
+        ReadCleanupPeriod().ShouldBe(90);
+    }
+
+    [Fact]
+    public void Step_checkpoints_preserve_preferences_and_do_not_regenerate_Claude_files()
+    {
+        _store.Save(new AwlSettings { RetentionDays = 42, TerminalPreference = TerminalPreference.WindowsConsole });
+        File.Delete(_paths.ContextFile);
+        _store.SetStepStatus("claude", SetupStepStatus.Completed);
+        _store.SetStepStatus("python", SetupStepStatus.Failed);
+        _store.SetStepStatus("python", SetupStepStatus.Completed);
+
+        var saved = _store.Load();
+        saved.RetentionDays.ShouldBe(42);
+        saved.TerminalPreference.ShouldBe(TerminalPreference.WindowsConsole);
+        saved.SetupSteps["claude"].ShouldBe(SetupStepStatus.Completed);
+        saved.SetupSteps["python"].ShouldBe(SetupStepStatus.Completed);
+        File.Exists(_paths.ContextFile).ShouldBeFalse();
+    }
+
+    private int ReadCleanupPeriod()
+    {
+        using var json = JsonDocument.Parse(File.ReadAllText(_paths.ClaudeSettingsFile));
+        return json.RootElement.GetProperty("cleanupPeriodDays").GetInt32();
     }
 
     [Fact]
@@ -90,6 +131,7 @@ public sealed class AwlSettingsStoreTests : IDisposable
             _store.Save(new AwlSettings { RetentionDays = days });
             _store.Load().RetentionDays.ShouldBeInRange(1, 31);
         });
+        ReadCleanupPeriod().ShouldBe(_store.Load().RetentionDays);
         Directory.GetFiles(_paths.RoamingDataDirectory).ShouldBe([_paths.SettingsFile]);
     }
 
