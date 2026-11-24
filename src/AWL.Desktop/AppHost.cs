@@ -2,6 +2,7 @@ using AWL.Core;
 using AWL.Core.Configuration;
 using AWL.Infrastructure;
 using AWL.Infrastructure.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,8 @@ internal static class AppHost
         builder.Services.AddSingleton<ILoggerProvider>(services => FileLogging.CreateProvider(
             services.GetRequiredService<AwlPaths>(), new LoggingOptions()));
 
+        builder.Services.AddSingleton(builder.Configuration.GetSection("ClaudeHistory").Get<ClaudeHistoryOptions>()
+            ?? new ClaudeHistoryOptions());
         builder.Services
             .AddCore()
             .AddInfrastructure()
