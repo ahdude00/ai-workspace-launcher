@@ -132,4 +132,18 @@
   <data name="EditButton" xml:space="preserve"><value>_Düzenle</value></data>
   <data name="ArchiveButton" xml:space="preserve"><value>Ar_şivle</value></data>
   <data name="UnarchiveButton" xml:space="preserve"><value>Arşi_vden çıkar</value></data>
+  <data name="ManageCategoriesButton" xml:space="preserve"><value>Kate_goriler</value></data>
+  <data name="CategoriesTitle" xml:space="preserve"><value>Kategoriler</value></data>
+  <data name="CategoriesHint" xml:space="preserve"><value>Oturumlarınızı konu veya projeye göre gruplayın. Bir kategoriyi silmek içindeki oturumları silmez; onlar “Kategorisiz” grubuna geçer.</value></data>
+  <data name="CategoryNameLabel" xml:space="preserve"><value>Kategori _adı</value></data>
+  <data name="AddCategoryButton" xml:space="preserve"><value>_Ekle</value></data>
+  <data name="RenameCategoryButton" xml:space="preserve"><value>_Yeniden adlandır</value></data>
+  <data name="MoveUpButton" xml:space="preserve"><value>Yukarı _taşı</value></data>
+  <data name="MoveDownButton" xml:space="preserve"><value>Aşağı ta_şı</value></data>
+  <data name="DeleteCategoryButton" xml:space="preserve"><value>_Sil</value></data>
+  <data name="CloseButton" xml:space="preserve"><value>Kapat</value></data>
+  <data name="CategoryDeleteConfirm" xml:space="preserve"><value>“{0}” kategorisi silinsin mi? İçindeki oturumlar silinmez, “Kategorisiz” grubuna taşınır.</value></data>
+  <data name="CategoryNotFound" xml:space="preserve"><value>Kategori bulunamadı. Liste yenilenmiş olabilir; yeniden deneyin.</value></data>
+  <data name="CategoryNameInvalid" xml:space="preserve"><value>Kategori için 1-60 karakter arasında bir ad girin.</value></data>
+  <data name="CategoryNameTaken" xml:space="preserve"><value>Bu adda bir kategori zaten var. Başka bir ad girin.</value></data>
 </root>

@@ -36,6 +36,16 @@ internal sealed class WpfDialogService : IDialogService
         return window.ShowDialog() == true;
     }
 
+    public void ShowCategoryManager(CategoryManagerViewModel manager)
+    {
+        var window = new CategoryManagerWindow(manager);
+        if (Owner is { } owner)
+        {
+            window.Owner = owner;
+        }
+        window.ShowDialog();
+    }
+
     // The active window (for example an open editor) owns new dialogs; otherwise the main window does.
     private static Window? Owner =>
         Application.Current?.Windows.OfType<Window>().FirstOrDefault(window => window.IsActive)

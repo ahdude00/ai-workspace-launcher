@@ -33,14 +33,14 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private const int ArchiveOrder = int.MaxValue;
 
     private readonly SessionService _sessions;
-    private readonly ICategoryRepository _categories;
+    private readonly CategoryService _categories;
     private readonly IDialogService _dialogs;
     private readonly IShellService _shell;
     private readonly IUiDispatcher _dispatcher;
     private readonly Dictionary<Guid, SessionItemViewModel> _items = [];
     private int _refreshQueued;
 
-    public MainWindowViewModel(SessionService sessions, ICategoryRepository categories, IDialogService dialogs,
+    public MainWindowViewModel(SessionService sessions, CategoryService categories, IDialogService dialogs,
         IShellService shell, IUiDispatcher dispatcher, IMessenger messenger)
     {
         ArgumentNullException.ThrowIfNull(messenger);
@@ -117,6 +117,15 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private Task NewSession() => NewSessionAsync();
+
+    [RelayCommand]
+    private async Task ManageCategoriesAsync()
+    {
+        var manager = new CategoryManagerViewModel(_categories, _dialogs);
+        await manager.LoadAsync().ConfigureAwait(true);
+        _dialogs.ShowCategoryManager(manager);
+        await RefreshAsync().ConfigureAwait(true);
+    }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private async Task EditAsync()
