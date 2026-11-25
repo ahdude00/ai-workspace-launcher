@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="AWL.Desktop.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AWL.Core\AWL.Core.csproj" />
     <ProjectReference Include="..\AWL.Infrastructure\AWL.Infrastructure.csproj" />
   </ItemGroup>

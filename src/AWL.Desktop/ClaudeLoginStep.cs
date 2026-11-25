@@ -28,7 +28,7 @@ internal sealed class ClaudeLoginStep(IAwlSettingsStore settings, IClaudeInstall
             }
             var choice = await window.Dispatcher.InvokeAsync(() =>
             {
-                window.Welcome.Visibility = System.Windows.Visibility.Collapsed;
+                window.Workspace.Visibility = System.Windows.Visibility.Collapsed;
                 window.Wizard.Visibility = System.Windows.Visibility.Visible;
                 return window.Wizard.WaitForLoginAsync(token);
             });

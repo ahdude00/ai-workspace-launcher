@@ -92,4 +92,32 @@
   <data name="HistoryMissing" xml:space="preserve"><value>Bu oturumun Claude geçmişi bulunamadı. Aynı klasörde yeni bir oturum başlatabilir ya da kaydı silebilirsiniz.</value></data>
   <data name="HistoryStillPresent" xml:space="preserve"><value>Bu oturumun Claude geçmişi hâlâ duruyor; yeni oturum başlatmak yerine oturuma devam edin.</value></data>
   <data name="SessionAlreadyOpen" xml:space="preserve"><value>Bu oturum zaten açık. Terminal penceresi öne getirilmeye çalışıldı.</value></data>
+  <data name="NavSessions" xml:space="preserve"><value>_Sohbet</value></data>
+  <data name="NavTools" xml:space="preserve"><value>A_raçlar</value></data>
+  <data name="SessionsHeader" xml:space="preserve"><value>Oturumlar</value></data>
+  <data name="NewSessionButton" xml:space="preserve"><value>_Yeni oturum</value></data>
+  <data name="SettingsButton" xml:space="preserve"><value>A_yarlar</value></data>
+  <data name="OpenButton" xml:space="preserve"><value>_Aç / Devam et</value></data>
+  <data name="OpenFolderButton" xml:space="preserve"><value>_Klasörü aç</value></data>
+  <data name="OutputsButton" xml:space="preserve"><value>Çı_ktılar</value></data>
+  <data name="DeleteButton" xml:space="preserve"><value>Si_l</value></data>
+  <data name="FolderLabel" xml:space="preserve"><value>Klasör</value></data>
+  <data name="StateLabel" xml:space="preserve"><value>Durum</value></data>
+  <data name="LastActivityLabel" xml:space="preserve"><value>Son etkinlik</value></data>
+  <data name="NeverOpened" xml:space="preserve"><value>Henüz açılmadı</value></data>
+  <data name="EmptySessions" xml:space="preserve"><value>Henüz oturum yok. Başlamak için “Yeni oturum”a tıklayın.</value></data>
+  <data name="NoSelection" xml:space="preserve"><value>Soldaki listeden bir oturum seçin.</value></data>
+  <data name="ToolsPlaceholder" xml:space="preserve"><value>Araçlar burada listelenecek.</value></data>
+  <data name="UncategorizedGroup" xml:space="preserve"><value>Kategorisiz</value></data>
+  <data name="ArchiveGroup" xml:space="preserve"><value>Arşiv</value></data>
+  <data name="State_Closed" xml:space="preserve"><value>Kapalı</value></data>
+  <data name="State_Open" xml:space="preserve"><value>Açık</value></data>
+  <data name="State_Archived" xml:space="preserve"><value>Arşivde</value></data>
+  <data name="State_HistoryMissing" xml:space="preserve"><value>Geçmiş bulunamadı</value></data>
+  <data name="State_Error" xml:space="preserve"><value>Hata</value></data>
+  <data name="HistoryMissingStartOver" xml:space="preserve"><value>Bu oturumun Claude geçmişi bulunamadı. Aynı klasörde yeni bir oturum başlatılsın mı?</value></data>
+  <data name="WorkspaceMissingPickFolder" xml:space="preserve"><value>Bu oturumun çalışma klasörü artık yok. Yeni bir klasör seçmek ister misiniz?</value></data>
+  <data name="FolderNotAccessible" xml:space="preserve"><value>Klasör açılamadı. Klasörün var olduğunu ve erişim izniniz olduğunu kontrol edin.</value></data>
+  <data name="PickFolderTitle" xml:space="preserve"><value>Çalışma klasörünü seçin</value></data>
+  <data name="SessionListName" xml:space="preserve"><value>Oturum listesi</value></data>
 </root>

@@ -5,7 +5,9 @@ using System.Windows;
 using AWL.Core.Setup;
 using AWL.Core.Configuration;
 using AWL.Infrastructure.Diagnostics;
+using AWL.Desktop.Messages;
 using AWL.Desktop.Resources;
+using AWL.Desktop.ViewModels;
 using AWL.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -41,10 +43,12 @@ public partial class App : Application
 
             _host.Start();
             stopping = _host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
+            StringResources.AddTo(Resources);
             var window = _host.Services.GetRequiredService<MainWindow>();
             MainWindow = window;
             MainWindow.Show();
 
+            _host.Services.GetRequiredService<SessionChangeRelay>();
             var pipeline = _host.Services.GetRequiredService<SetupPipeline>();
             var wizard = window.Wizard;
             var settings = _host.Services.GetRequiredService<IAwlSettingsStore>();
@@ -55,7 +59,7 @@ public partial class App : Application
                 if (firstRun)
                 {
                     wizard.Visibility = Visibility.Visible;
-                    window.Welcome.Visibility = Visibility.Collapsed;
+                    window.Workspace.Visibility = Visibility.Collapsed;
                 }
                 var summary = new List<string>();
                 var result = await pipeline.RunAsync(line =>
@@ -66,13 +70,14 @@ public partial class App : Application
                 if (result.IsSuccess || stopping.IsCancellationRequested)
                 {
                     wizard.Visibility = Visibility.Collapsed;
-                    window.Welcome.Visibility = Visibility.Visible;
+                    window.Workspace.Visibility = Visibility.Visible;
+                    await _host.Services.GetRequiredService<MainWindowViewModel>().InitializeAsync(stopping);
                     break;
                 }
 
                 firstRun = true;
                 wizard.Visibility = Visibility.Visible;
-                window.Welcome.Visibility = Visibility.Collapsed;
+                window.Workspace.Visibility = Visibility.Collapsed;
                 string message = Strings.ResourceManager.GetString(result.Error.UserMessageKey, CultureInfo.CurrentUICulture)
                     ?? Strings.StartupErrorMessage;
                 try
