@@ -146,4 +146,8 @@
   <data name="CategoryNotFound" xml:space="preserve"><value>Kategori bulunamadı. Liste yenilenmiş olabilir; yeniden deneyin.</value></data>
   <data name="CategoryNameInvalid" xml:space="preserve"><value>Kategori için 1-60 karakter arasında bir ad girin.</value></data>
   <data name="CategoryNameTaken" xml:space="preserve"><value>Bu adda bir kategori zaten var. Başka bir ad girin.</value></data>
+  <data name="SessionDeleteConfirm" xml:space="preserve"><value>“{0}” oturumu kalıcı olarak silinsin mi?&#xD;&#xA;&#xD;&#xA;Silinecekler: AWL'deki oturum kaydı ile Claude'daki konuşma geçmişi ve bu oturumun Claude dosyaları.&#xD;&#xA;Silinmeyecekler: çalışma klasöründeki belgeleriniz, düzenlenmiş kopyalar ve AWL_Ciktilar klasörü.&#xD;&#xA;&#xD;&#xA;Bu işlem geri alınamaz.</value></data>
+  <data name="SessionOpenStopConfirm" xml:space="preserve"><value>Bu oturum şu anda açık. Silmeden önce Claude terminalinin kapatılması gerekiyor. Terminal kapatılıp oturum silinsin mi? Kaydedilmemiş bir işlem varsa yarıda kalır.</value></data>
+  <data name="SessionOpen" xml:space="preserve"><value>Bu oturum şu anda açık. Önce Claude terminalini kapatın, sonra yeniden deneyin.</value></data>
+  <data name="DeleteIncomplete" xml:space="preserve"><value>Oturumun bazı Claude dosyaları silinemedi. Oturum “Hata” olarak işaretlendi. Dosyaları kullanan bir program açıksa kapatın ve “Sil” ile yeniden deneyin.</value></data>
 </root>

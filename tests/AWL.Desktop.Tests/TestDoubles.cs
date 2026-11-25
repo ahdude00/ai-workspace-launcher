@@ -2,6 +2,7 @@ using AWL.Core.Categories;
 using AWL.Core.Claude;
 using AWL.Core.Common;
 using AWL.Core.Configuration;
+using AWL.Core.Retention;
 using AWL.Core.Sessions;
 using AWL.Core.Terminal;
 using AWL.Desktop.Services;
@@ -29,6 +30,14 @@ internal sealed class SessionFixture : IDisposable
             });
         Service = new SessionService(Repository, new ClaudeCommandBuilder(paths, Installation), Terminal, Monitor,
             History, Installation, Clock);
+        Settings.Load().Returns(_ => new AwlSettings { RetentionDays = RetentionDays });
+        History.DeleteAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(new DeleteReport([]));
+        Monitor.StopSessionAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            Running.Remove(call.Arg<Guid>());
+            return Result.Ok();
+        });
+        Deletion = new SessionDeletionService(Repository, History, Monitor, Settings, Clock) { SettleDelay = TimeSpan.Zero };
     }
 
     public string Root => _root.FullName;
@@ -43,6 +52,9 @@ internal sealed class SessionFixture : IDisposable
     public HashSet<Guid> Running { get; } = [];
     public List<ClaudeLaunchSpec> Launches { get; } = [];
     public SessionService Service { get; }
+    public SessionDeletionService Deletion { get; }
+    public IAwlSettingsStore Settings { get; } = Substitute.For<IAwlSettingsStore>();
+    public int RetentionDays { get; set; } = 3650;
 
     public async Task<Session> AddAsync(string title, Guid? category = null, bool archived = false,
         DateTimeOffset? lastActivity = null, bool opened = false, string? folder = null)

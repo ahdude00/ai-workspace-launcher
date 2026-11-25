@@ -22,7 +22,7 @@ public sealed class MainWindowViewModelTests : IDisposable
     public MainWindowViewModelTests()
     {
         _shell.OpenFolder(Arg.Any<string>()).Returns(true);
-        _viewModel = new MainWindowViewModel(_fixture.Service, new CategoryService(_fixture.Categories), _dialogs, _shell, _dispatcher, _messenger);
+        _viewModel = new MainWindowViewModel(_fixture.Service, _fixture.Deletion, new CategoryService(_fixture.Categories), _dialogs, _shell, _dispatcher, _messenger);
     }
 
     [Fact]
@@ -318,6 +318,69 @@ public sealed class MainWindowViewModelTests : IDisposable
 
         _viewModel.SelectedSession!.GroupName.ShouldBe(Strings.UncategorizedGroup);
         _fixture.Repository.Items.ShouldHaveSingleItem();
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Delete_requires_confirmation_listing_what_is_removed(bool confirm)
+    {
+        var session = await _fixture.AddAsync("Dava");
+        await SelectAsync(session);
+        _dialogs.Confirm(Arg.Any<string>()).Returns(confirm);
+
+        await _viewModel.DeleteCommand.ExecuteAsync(null);
+
+        _dialogs.Received(1).Confirm(Arg.Is<string>(text => text.Contains("Dava", StringComparison.Ordinal)
+            && text.Contains("AWL_Ciktilar", StringComparison.Ordinal)));
+        _fixture.Repository.Items.Count.ShouldBe(confirm ? 0 : 1);
+        _viewModel.Sessions.Count.ShouldBe(confirm ? 0 : 1);
+        await _fixture.History.Received(confirm ? 1 : 0).DeleteAsync(session.ClaudeSessionId, Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Deleting_an_open_session_asks_to_close_it_first(bool stop)
+    {
+        var session = await _fixture.AddAsync("Dava", opened: true);
+        _fixture.Running.Add(session.ClaudeSessionId);
+        await SelectAsync(session);
+        _dialogs.Confirm(Arg.Is<string>(text => text != Strings.SessionOpenStopConfirm)).Returns(true);
+        _dialogs.Confirm(Strings.SessionOpenStopConfirm).Returns(stop);
+
+        await _viewModel.DeleteCommand.ExecuteAsync(null);
+
+        await _fixture.Monitor.Received(stop ? 1 : 0).StopSessionAsync(session.ClaudeSessionId, Arg.Any<CancellationToken>());
+        _fixture.Repository.Items.Count.ShouldBe(stop ? 0 : 1);
+    }
+
+    [Fact]
+    public async Task Partial_deletion_shows_the_error_state()
+    {
+        var session = await _fixture.AddAsync("Dava");
+        await SelectAsync(session);
+        _dialogs.Confirm(Arg.Any<string>()).Returns(true);
+        _fixture.History.DeleteAsync(session.ClaudeSessionId, Arg.Any<CancellationToken>())
+            .Returns(new DeleteReport([new DeleteFailure("x", "in use")]));
+
+        await _viewModel.DeleteCommand.ExecuteAsync(null);
+
+        _dialogs.Received(1).ShowError(Strings.DeleteIncomplete);
+        _viewModel.SelectedSession!.State.ShouldBe(SessionState.Error);
+        _viewModel.SelectedSession.StateText.ShouldBe(Strings.State_Error);
+    }
+
+    [Fact]
+    public async Task Initialize_removes_sessions_past_the_retention_period()
+    {
+        _fixture.RetentionDays = 30;
+        await _fixture.AddAsync("Eski", lastActivity: _fixture.Now.AddDays(-45));
+        await _fixture.AddAsync("Yeni", lastActivity: _fixture.Now.AddDays(-2));
+
+        await _viewModel.InitializeAsync();
+
+        _viewModel.Sessions.ShouldHaveSingleItem().Title.ShouldBe("Yeni");
     }
 
     [Fact]

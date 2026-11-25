@@ -122,6 +122,7 @@
                    VirtualizingPanel.ScrollUnit="Pixel">
             <ListBox.InputBindings>
               <KeyBinding Key="Enter" Command="{Binding OpenCommand}" />
+              <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
               <MouseBinding Gesture="LeftDoubleClick" Command="{Binding OpenCommand}" />
             </ListBox.InputBindings>
             <ListBox.GroupStyle>
@@ -204,7 +205,7 @@
               <Button Style="{StaticResource Action}" Content="{Binding SelectedSession.ArchiveActionText}"
                       Command="{Binding ToggleArchiveCommand}" />
               <Button Style="{StaticResource Action}" Content="{StaticResource T.DeleteButton}"
-                      IsEnabled="False" />
+                      Command="{Binding DeleteCommand}" />
             </WrapPanel>
           </StackPanel>
         </ScrollViewer>
