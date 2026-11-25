@@ -48,6 +48,10 @@ public sealed partial class SessionItemViewModel : ObservableObject
         ? time.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)
         : Strings.NeverOpened;
 
+    public bool IsArchived => Session.IsArchived;
+
+    public string ArchiveActionText => IsArchived ? Strings.UnarchiveButton : Strings.ArchiveButton;
+
     public string AccessibleName => $"{Title}, {StateText}";
 
     [MemberNotNull(nameof(Session), nameof(GroupName))]
@@ -66,5 +70,7 @@ public sealed partial class SessionItemViewModel : ObservableObject
         OnPropertyChanged(nameof(WorkspacePath));
         OnPropertyChanged(nameof(LastActivityText));
         OnPropertyChanged(nameof(AccessibleName));
+        OnPropertyChanged(nameof(IsArchived));
+        OnPropertyChanged(nameof(ArchiveActionText));
     }
 }

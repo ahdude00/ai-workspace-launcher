@@ -96,10 +96,10 @@
   <data name="NavTools" xml:space="preserve"><value>A_raçlar</value></data>
   <data name="SessionsHeader" xml:space="preserve"><value>Oturumlar</value></data>
   <data name="NewSessionButton" xml:space="preserve"><value>_Yeni oturum</value></data>
-  <data name="SettingsButton" xml:space="preserve"><value>A_yarlar</value></data>
+  <data name="SettingsButton" xml:space="preserve"><value>Ayarlar</value></data>
   <data name="OpenButton" xml:space="preserve"><value>_Aç / Devam et</value></data>
   <data name="OpenFolderButton" xml:space="preserve"><value>_Klasörü aç</value></data>
-  <data name="OutputsButton" xml:space="preserve"><value>Çı_ktılar</value></data>
+  <data name="OutputsButton" xml:space="preserve"><value>Çık_tılar</value></data>
   <data name="DeleteButton" xml:space="preserve"><value>Si_l</value></data>
   <data name="FolderLabel" xml:space="preserve"><value>Klasör</value></data>
   <data name="StateLabel" xml:space="preserve"><value>Durum</value></data>
@@ -120,4 +120,16 @@
   <data name="FolderNotAccessible" xml:space="preserve"><value>Klasör açılamadı. Klasörün var olduğunu ve erişim izniniz olduğunu kontrol edin.</value></data>
   <data name="PickFolderTitle" xml:space="preserve"><value>Çalışma klasörünü seçin</value></data>
   <data name="SessionListName" xml:space="preserve"><value>Oturum listesi</value></data>
+  <data name="NewSessionTitle" xml:space="preserve"><value>Yeni oturum</value></data>
+  <data name="EditSessionTitle" xml:space="preserve"><value>Oturumu düzenle</value></data>
+  <data name="TitleLabel" xml:space="preserve"><value>_Başlık</value></data>
+  <data name="FolderPickerLabel" xml:space="preserve"><value>Çalışma _klasörü</value></data>
+  <data name="BrowseButton" xml:space="preserve"><value>_Gözat…</value></data>
+  <data name="CategoryLabel" xml:space="preserve"><value>Ka_tegori</value></data>
+  <data name="CreateAndOpenButton" xml:space="preserve"><value>Oluştur ve _aç</value></data>
+  <data name="SaveButton" xml:space="preserve"><value>Kaydet</value></data>
+  <data name="CancelButton" xml:space="preserve"><value>Vazgeç</value></data>
+  <data name="EditButton" xml:space="preserve"><value>_Düzenle</value></data>
+  <data name="ArchiveButton" xml:space="preserve"><value>Ar_şivle</value></data>
+  <data name="UnarchiveButton" xml:space="preserve"><value>Arşi_vden çıkar</value></data>
 </root>

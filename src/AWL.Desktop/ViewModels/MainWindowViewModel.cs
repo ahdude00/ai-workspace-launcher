@@ -61,7 +61,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
-    [NotifyCanExecuteChangedFor(nameof(OpenCommand), nameof(OpenFolderCommand), nameof(OpenOutputsCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenCommand), nameof(OpenFolderCommand), nameof(OpenOutputsCommand),
+        nameof(EditCommand), nameof(ToggleArchiveCommand))]
     public partial SessionItemViewModel? SelectedSession { get; set; }
 
     public bool HasSelection => SelectedSession is not null;
@@ -95,6 +96,57 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private void ShowTools() => CurrentPage = MainPage.Tools;
+
+    /// <summary>Shows the new-session window, optionally with a folder already chosen, then opens the session.</summary>
+    public async Task NewSessionAsync(string? folder = null)
+    {
+        var categories = await _categories.ListAsync().ConfigureAwait(true);
+        var editor = new SessionEditorViewModel(_sessions, _dialogs, categories, initialFolder: folder);
+        if (!_dialogs.ShowSessionEditor(editor) || editor.SavedSession is not { } created)
+        {
+            return;
+        }
+        await RefreshAsync().ConfigureAwait(true);
+        if (_items.TryGetValue(created.Id, out var item))
+        {
+            CurrentPage = MainPage.Sessions;
+            SelectedSession = item;
+            await OpenSessionAsync(item).ConfigureAwait(true);
+        }
+    }
+
+    [RelayCommand]
+    private Task NewSession() => NewSessionAsync();
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private async Task EditAsync()
+    {
+        if (SelectedSession is not { } item)
+        {
+            return;
+        }
+        var categories = await _categories.ListAsync().ConfigureAwait(true);
+        var editor = new SessionEditorViewModel(_sessions, _dialogs, categories, item.Session);
+        if (_dialogs.ShowSessionEditor(editor))
+        {
+            await RefreshAsync().ConfigureAwait(true);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private async Task ToggleArchiveAsync()
+    {
+        if (SelectedSession is not { } item)
+        {
+            return;
+        }
+        var result = await _sessions.SetArchivedAsync(item.Id, !item.IsArchived).ConfigureAwait(true);
+        if (!result.IsSuccess)
+        {
+            _dialogs.ShowError(Message(result.Error));
+        }
+        await RefreshAsync().ConfigureAwait(true);
+    }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private async Task OpenAsync()

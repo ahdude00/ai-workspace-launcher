@@ -12,4 +12,7 @@ public interface IDialogService
 
     /// <summary>Lets the user choose a folder; returns null when cancelled.</summary>
     string? PickFolder(string? initialFolder);
+
+    /// <summary>Shows the session editor and returns whether the session was saved.</summary>
+    bool ShowSessionEditor(ViewModels.SessionEditorViewModel editor);
 }

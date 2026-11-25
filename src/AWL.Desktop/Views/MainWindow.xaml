@@ -76,6 +76,8 @@
 
   <Window.InputBindings>
     <KeyBinding Key="F5" Command="{Binding RefreshCommand}" />
+    <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewSessionCommand}" />
+    <KeyBinding Key="F2" Command="{Binding EditCommand}" />
   </Window.InputBindings>
 
   <Grid x:Name="Layout">
@@ -101,7 +103,7 @@
         <DockPanel DockPanel.Dock="Top" Margin="20,8,12,4" LastChildFill="False">
           <TextBlock DockPanel.Dock="Left" Text="{StaticResource T.SessionsHeader}"
                      FontWeight="SemiBold" VerticalAlignment="Center" />
-          <Button DockPanel.Dock="Right" Padding="10,4" IsEnabled="False"
+          <Button DockPanel.Dock="Right" Padding="10,4" Command="{Binding NewSessionCommand}"
                   Content="{StaticResource T.NewSessionButton}" />
         </DockPanel>
 
@@ -195,6 +197,10 @@
                       Command="{Binding OpenFolderCommand}" />
               <Button Style="{StaticResource Action}" Content="{StaticResource T.OutputsButton}"
                       Command="{Binding OpenOutputsCommand}" />
+              <Button Style="{StaticResource Action}" Content="{StaticResource T.EditButton}"
+                      Command="{Binding EditCommand}" />
+              <Button Style="{StaticResource Action}" Content="{Binding SelectedSession.ArchiveActionText}"
+                      Command="{Binding ToggleArchiveCommand}" />
               <Button Style="{StaticResource Action}" Content="{StaticResource T.DeleteButton}"
                       IsEnabled="False" />
             </WrapPanel>

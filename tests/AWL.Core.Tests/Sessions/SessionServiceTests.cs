@@ -258,6 +258,39 @@ public sealed class SessionServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task Update_details_renames_and_recategorizes_without_touching_Claude()
+    {
+        var session = await OpenedSessionAsync(withHistory: true);
+        var category = Guid.NewGuid();
+
+        var updated = (await _service.UpdateDetailsAsync(session.Id, "  Yeni Ad ", category)).Value;
+
+        updated.ShouldBe(session with { Title = "Yeni Ad", CategoryId = category });
+        _repository.Items.Single().ShouldBe(updated);
+        (await _service.UpdateDetailsAsync(session.Id, " ", null)).Error!.Code.ShouldBe("SessionTitleInvalid");
+        (await _service.UpdateDetailsAsync(Guid.NewGuid(), "Ad", null)).Error!.Code.ShouldBe("SessionNotFound");
+        _repository.Items.Single().Title.ShouldBe("Yeni Ad");
+        _launches.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Archiving_keeps_the_session_and_its_history()
+    {
+        var session = await OpenedSessionAsync(withHistory: true);
+        int changes = 0;
+        _service.Changed += (_, _) => changes++;
+
+        (await _service.SetArchivedAsync(session.Id, true)).Value.IsArchived.ShouldBeTrue();
+        _service.GetState(_repository.Items.Single()).ShouldBe(SessionState.Archived);
+        (await _service.SetArchivedAsync(session.Id, false)).Value.IsArchived.ShouldBeFalse();
+        _service.GetState(_repository.Items.Single()).ShouldBe(SessionState.Closed);
+
+        changes.ShouldBe(2);
+        await _history.DidNotReceive().DeleteAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        (await _service.SetArchivedAsync(Guid.NewGuid(), true)).Error!.Code.ShouldBe("SessionNotFound");
+    }
+
+    [Fact]
     public async Task Reconcile_takes_last_activity_from_the_transcript_time()
     {
         var withHistory = await OpenedSessionAsync(withHistory: false);
