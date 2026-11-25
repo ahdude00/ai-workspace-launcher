@@ -85,4 +85,11 @@
   <data name="CopyFailed" xml:space="preserve"><value>Pano meşgul. Yeniden deneyin.</value></data>
   <data name="LoginTitle" xml:space="preserve"><value>Claude hesabına giriş</value></data>
   <data name="ReopenTerminal" xml:space="preserve"><value>Terminali yeniden aç</value></data>
+  <data name="SessionNotFound" xml:space="preserve"><value>Oturum bulunamadı. Liste yenilenmiş olabilir; yeniden deneyin.</value></data>
+  <data name="SessionTitleInvalid" xml:space="preserve"><value>Oturum için 1-200 karakter arasında bir başlık girin.</value></data>
+  <data name="WorkspaceInvalid" xml:space="preserve"><value>Çalışma klasörü olarak tam bir klasör yolu seçin.</value></data>
+  <data name="WorkspaceMissing" xml:space="preserve"><value>Çalışma klasörü artık yok. Yeni bir klasör seçin ya da oturum kaydını silin.</value></data>
+  <data name="HistoryMissing" xml:space="preserve"><value>Bu oturumun Claude geçmişi bulunamadı. Aynı klasörde yeni bir oturum başlatabilir ya da kaydı silebilirsiniz.</value></data>
+  <data name="HistoryStillPresent" xml:space="preserve"><value>Bu oturumun Claude geçmişi hâlâ duruyor; yeni oturum başlatmak yerine oturuma devam edin.</value></data>
+  <data name="SessionAlreadyOpen" xml:space="preserve"><value>Bu oturum zaten açık. Terminal penceresi öne getirilmeye çalışıldı.</value></data>
 </root>
