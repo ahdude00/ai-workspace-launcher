@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- View model tests; they need the Windows Desktop runtime and therefore run on Windows (CI). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AWL.Core\AWL.Core.csproj" />
+    <ProjectReference Include="..\..\src\AWL.Desktop\AWL.Desktop.csproj" />
+  </ItemGroup>
+
+</Project>

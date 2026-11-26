@@ -1,0 +1,15 @@
+namespace AWL.Desktop.Services;
+
+/// <summary>Shows modal messages and pickers owned by the main window.</summary>
+public interface IDialogService
+{
+    void ShowError(string message);
+
+    void ShowInfo(string message);
+
+    /// <summary>Asks a yes/no question and returns whether the user chose yes.</summary>
+    bool Confirm(string message);
+
+    /// <summary>Lets the user choose a folder; returns null when cancelled.</summary>
+    string? PickFolder(string? initialFolder);
+}

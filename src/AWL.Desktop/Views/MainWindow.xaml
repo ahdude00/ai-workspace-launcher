@@ -1,16 +1,223 @@
 <Window x:Class="AWL.Desktop.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+        xmlns:core="clr-namespace:AWL.Core.Sessions;assembly=AWL.Core"
         Title="{Binding Title}"
         Width="1100" Height="720"
         MinWidth="800" MinHeight="520"
+        FontSize="14"
+        UseLayoutRounding="True"
         WindowStartupLocation="CenterScreen">
-  <Grid x:Name="Layout" Margin="24">
-    <TextBlock x:Name="Welcome" Text="{Binding WelcomeText}"
-               FontSize="18"
-               TextWrapping="Wrap"
-               TextAlignment="Center"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center" />
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="Visible" />
+
+    <CollectionViewSource x:Key="GroupedSessions" Source="{Binding Sessions}"
+                          IsLiveGroupingRequested="True" IsLiveSortingRequested="True">
+      <CollectionViewSource.GroupDescriptions>
+        <PropertyGroupDescription PropertyName="GroupName" />
+      </CollectionViewSource.GroupDescriptions>
+      <CollectionViewSource.SortDescriptions>
+        <scm:SortDescription PropertyName="GroupOrder" Direction="Ascending" />
+        <scm:SortDescription PropertyName="GroupName" Direction="Ascending" />
+        <scm:SortDescription PropertyName="SortKey" Direction="Descending" />
+      </CollectionViewSource.SortDescriptions>
+      <CollectionViewSource.LiveGroupingProperties>
+        <sys:String>GroupName</sys:String>
+      </CollectionViewSource.LiveGroupingProperties>
+      <CollectionViewSource.LiveSortingProperties>
+        <sys:String>GroupOrder</sys:String>
+        <sys:String>GroupName</sys:String>
+        <sys:String>SortKey</sys:String>
+      </CollectionViewSource.LiveSortingProperties>
+    </CollectionViewSource>
+
+    <!-- State colours keep at least 3:1 contrast against white (KUL-03). -->
+    <Style x:Key="StateDot" TargetType="Ellipse">
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Height" Value="10" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Fill" Value="#6B6B6B" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding State}" Value="{x:Static core:SessionState.Open}">
+          <Setter Property="Fill" Value="#2E7D32" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding State}" Value="{x:Static core:SessionState.Archived}">
+          <Setter Property="Fill" Value="#4F5BB5" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding State}" Value="{x:Static core:SessionState.HistoryMissing}">
+          <Setter Property="Fill" Value="#A35F00" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding State}" Value="{x:Static core:SessionState.Error}">
+          <Setter Property="Fill" Value="#C62828" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="Action" TargetType="Button">
+      <Setter Property="Padding" Value="14,7" />
+      <Setter Property="Margin" Value="0,0,8,8" />
+      <Setter Property="MinWidth" Value="96" />
+    </Style>
+
+    <Style x:Key="Nav" TargetType="Button">
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style x:Key="Secondary" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="#595959" />
+    </Style>
+  </Window.Resources>
+
+  <Window.InputBindings>
+    <KeyBinding Key="F5" Command="{Binding RefreshCommand}" />
+  </Window.InputBindings>
+
+  <Grid x:Name="Layout">
+    <Grid x:Name="Workspace">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="300" MinWidth="220" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <!-- Left: navigation and the grouped session list (OTR-05, D06) -->
+      <DockPanel Grid.Column="0" Background="#F4F5F7">
+        <StackPanel DockPanel.Dock="Top" Margin="12,16,12,8">
+          <Button Style="{StaticResource Nav}" Content="{StaticResource T.NavSessions}"
+                  Command="{Binding ShowSessionsCommand}" />
+          <Button Style="{StaticResource Nav}" Content="{StaticResource T.NavTools}"
+                  Command="{Binding ShowToolsCommand}" />
+        </StackPanel>
+
+        <Button DockPanel.Dock="Bottom" Style="{StaticResource Nav}" Margin="12,8,12,12"
+                Content="{StaticResource T.SettingsButton}" IsEnabled="False" />
+
+        <DockPanel DockPanel.Dock="Top" Margin="20,8,12,4" LastChildFill="False">
+          <TextBlock DockPanel.Dock="Left" Text="{StaticResource T.SessionsHeader}"
+                     FontWeight="SemiBold" VerticalAlignment="Center" />
+          <Button DockPanel.Dock="Right" Padding="10,4" IsEnabled="False"
+                  Content="{StaticResource T.NewSessionButton}" />
+        </DockPanel>
+
+        <Grid>
+          <ListBox x:Name="SessionList"
+                   ItemsSource="{Binding Source={StaticResource GroupedSessions}}"
+                   SelectedItem="{Binding SelectedSession}"
+                   AutomationProperties.Name="{StaticResource T.SessionListName}"
+                   Background="Transparent" BorderThickness="0" Padding="4,0"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   VirtualizingPanel.IsVirtualizing="True"
+                   VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                   VirtualizingPanel.VirtualizationMode="Recycling"
+                   VirtualizingPanel.ScrollUnit="Pixel">
+            <ListBox.InputBindings>
+              <KeyBinding Key="Enter" Command="{Binding OpenCommand}" />
+              <MouseBinding Gesture="LeftDoubleClick" Command="{Binding OpenCommand}" />
+            </ListBox.InputBindings>
+            <ListBox.GroupStyle>
+              <GroupStyle>
+                <GroupStyle.HeaderTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding Name}" Margin="12,12,8,4" FontSize="12"
+                               FontWeight="SemiBold" Style="{StaticResource Secondary}" />
+                  </DataTemplate>
+                </GroupStyle.HeaderTemplate>
+              </GroupStyle>
+            </ListBox.GroupStyle>
+            <ListBox.ItemContainerStyle>
+              <Style TargetType="ListBoxItem">
+                <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}" />
+                <Setter Property="Padding" Value="8,6" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+              </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <DockPanel>
+                  <Ellipse DockPanel.Dock="Left" Margin="0,0,10,0" Style="{StaticResource StateDot}" />
+                  <StackPanel>
+                    <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding StateText}" FontSize="12" Style="{StaticResource Secondary}" />
+                  </StackPanel>
+                </DockPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock Text="{StaticResource T.EmptySessions}" Margin="20,12" TextWrapping="Wrap"
+                     Style="{StaticResource Secondary}"
+                     Visibility="{Binding IsEmpty, Converter={StaticResource Visible}}" />
+        </Grid>
+      </DockPanel>
+
+      <Border Grid.Column="1" Width="1" Background="#DADCE0" />
+
+      <!-- Right: the selected session (OTR-06, OTR-19) -->
+      <Grid Grid.Column="2" Visibility="{Binding IsSessionsPage, Converter={StaticResource Visible}}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      Visibility="{Binding HasSelection, Converter={StaticResource Visible}}">
+          <StackPanel Margin="32,28" DataContext="{Binding SelectedSession}">
+            <TextBlock Text="{Binding Title}" FontSize="26" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <Grid Margin="0,16,0,20">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <TextBlock Grid.Row="0" Text="{StaticResource T.FolderLabel}" Margin="0,0,16,8"
+                         Style="{StaticResource Secondary}" />
+              <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WorkspacePath, Mode=OneWay}" IsReadOnly="True"
+                       BorderThickness="0" Background="Transparent" Padding="0" TextWrapping="Wrap" Margin="0,0,0,8"
+                       AutomationProperties.Name="{StaticResource T.FolderLabel}" />
+              <TextBlock Grid.Row="1" Text="{StaticResource T.StateLabel}" Margin="0,0,16,8"
+                         Style="{StaticResource Secondary}" />
+              <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                <Ellipse Style="{StaticResource StateDot}" Margin="0,0,8,0" />
+                <TextBlock Text="{Binding StateText}" />
+              </StackPanel>
+              <TextBlock Grid.Row="2" Text="{StaticResource T.LastActivityLabel}" Margin="0,0,16,0"
+                         Style="{StaticResource Secondary}" />
+              <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastActivityText}" />
+            </Grid>
+            <WrapPanel DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
+              <Button Style="{StaticResource Action}" Content="{StaticResource T.OpenButton}"
+                      Command="{Binding OpenCommand}" IsDefault="True" />
+              <Button Style="{StaticResource Action}" Content="{StaticResource T.OpenFolderButton}"
+                      Command="{Binding OpenFolderCommand}" />
+              <Button Style="{StaticResource Action}" Content="{StaticResource T.OutputsButton}"
+                      Command="{Binding OpenOutputsCommand}" />
+              <Button Style="{StaticResource Action}" Content="{StaticResource T.DeleteButton}"
+                      IsEnabled="False" />
+            </WrapPanel>
+          </StackPanel>
+        </ScrollViewer>
+
+        <TextBlock Text="{StaticResource T.NoSelection}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   TextWrapping="Wrap" Margin="24">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource Secondary}">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding HasSelection}" Value="True">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Grid>
+
+      <TextBlock Grid.Column="2" Text="{StaticResource T.ToolsPlaceholder}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Secondary}"
+                 Visibility="{Binding IsToolsPage, Converter={StaticResource Visible}}" />
+    </Grid>
   </Grid>
 </Window>
