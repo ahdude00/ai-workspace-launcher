@@ -1,7 +1,9 @@
 ﻿#ifndef Payload
   #error Build with installer/build.ps1
 #endif
+#ifndef AppVersion
 #define AppVersion GetVersionNumbersString(AddBackslash(Payload) + "AWL.exe")
+#endif
 
 [Setup]
 AppId=AWL.AiWorkspaceLauncher
