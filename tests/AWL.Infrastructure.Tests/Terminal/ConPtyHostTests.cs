@@ -19,7 +19,7 @@ public sealed class ConPtyHostTests(ITestOutputHelper output)
             ["--pty-test", "two words"], Path.GetTempPath());
         using var host = ConPtyHost.Start(spec, 100, 30,
             new Dictionary<string, string> { ["AWL_PTY_TEST"] = marker });
-        host.Resize(110, 32);
+
         using var text = new StreamReader(host.Output, Encoding.UTF8, leaveOpen: true);
         string expected = $"two words:ping:{marker}";
         var ready = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -43,7 +43,17 @@ public sealed class ConPtyHostTests(ITestOutputHelper output)
             }
             return transcript.ToString();
         });
-        await Task.WhenAny(ready.Task, response).WaitAsync(TimeSpan.FromSeconds(15));
+        try
+        {
+            await Task.WhenAny(ready.Task, response).WaitAsync(TimeSpan.FromSeconds(15));
+        }
+        catch (TimeoutException)
+        {
+            using var child = System.Diagnostics.Process.GetProcessById((int)host.ProcessId);
+            output.WriteLine($"Child {child.Id}, exited: {child.HasExited}");
+            throw;
+        }
+        host.Resize(110, 32);
         await host.Input.WriteAsync(Encoding.UTF8.GetBytes("ping\r"));
         await host.Input.FlushAsync();
         (await response.WaitAsync(TimeSpan.FromSeconds(15))).ShouldContain(expected);
