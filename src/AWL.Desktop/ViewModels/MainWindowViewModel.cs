@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using AWL.Core.Categories;
 using AWL.Core.Common;
+using AWL.Core.Retention;
 using AWL.Core.Sessions;
 using AWL.Desktop.Messages;
 using AWL.Desktop.Resources;
@@ -32,7 +34,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private const int UncategorizedOrder = int.MaxValue - 1;
     private const int ArchiveOrder = int.MaxValue;
 
+    private static readonly CompositeFormat DeleteConfirm = CompositeFormat.Parse(Strings.SessionDeleteConfirm);
+
     private readonly SessionService _sessions;
+    private readonly SessionDeletionService _deletion;
     private readonly CategoryService _categories;
     private readonly IDialogService _dialogs;
     private readonly IShellService _shell;
@@ -40,11 +45,12 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private readonly Dictionary<Guid, SessionItemViewModel> _items = [];
     private int _refreshQueued;
 
-    public MainWindowViewModel(SessionService sessions, CategoryService categories, IDialogService dialogs,
-        IShellService shell, IUiDispatcher dispatcher, IMessenger messenger)
+    public MainWindowViewModel(SessionService sessions, SessionDeletionService deletion, CategoryService categories,
+        IDialogService dialogs, IShellService shell, IUiDispatcher dispatcher, IMessenger messenger)
     {
         ArgumentNullException.ThrowIfNull(messenger);
         _sessions = sessions;
+        _deletion = deletion;
         _categories = categories;
         _dialogs = dialogs;
         _shell = shell;
@@ -62,7 +68,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
     [NotifyCanExecuteChangedFor(nameof(OpenCommand), nameof(OpenFolderCommand), nameof(OpenOutputsCommand),
-        nameof(EditCommand), nameof(ToggleArchiveCommand))]
+        nameof(EditCommand), nameof(ToggleArchiveCommand), nameof(DeleteCommand))]
     public partial SessionItemViewModel? SelectedSession { get; set; }
 
     public bool HasSelection => SelectedSession is not null;
@@ -75,10 +81,17 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public bool IsToolsPage => CurrentPage == MainPage.Tools;
 
-    /// <summary>Reconciles stored sessions with Claude's files (OTR-15) and loads the list.</summary>
+    /// <summary>
+    /// Reconciles stored sessions with Claude's files (OTR-15), removes sessions past the retention period (OTR-16)
+    /// and loads the list.
+    /// </summary>
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        await Task.Run(() => _sessions.ReconcileAsync(cancellationToken), cancellationToken).ConfigureAwait(true);
+        await Task.Run(async () =>
+        {
+            await _sessions.ReconcileAsync(cancellationToken).ConfigureAwait(false);
+            await _deletion.PurgeExpiredAsync(cancellationToken).ConfigureAwait(false);
+        }, cancellationToken).ConfigureAwait(true);
         await RefreshAsync(cancellationToken).ConfigureAwait(true);
     }
 
@@ -150,6 +163,33 @@ public sealed partial class MainWindowViewModel : ObservableObject
             return;
         }
         var result = await _sessions.SetArchivedAsync(item.Id, !item.IsArchived).ConfigureAwait(true);
+        if (!result.IsSuccess)
+        {
+            _dialogs.ShowError(Message(result.Error));
+        }
+        await RefreshAsync().ConfigureAwait(true);
+    }
+
+    /// <summary>Deletes the selected session after an explicit confirmation (OTR-11–14, KUL-05).</summary>
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private async Task DeleteAsync()
+    {
+        if (SelectedSession is not { } item
+            || !_dialogs.Confirm(string.Format(CultureInfo.CurrentCulture, DeleteConfirm, item.Title)))
+        {
+            return;
+        }
+        bool stop = false;
+        if (_deletion.IsRunning(item.Session))
+        {
+            if (!_dialogs.Confirm(Strings.SessionOpenStopConfirm))
+            {
+                return;
+            }
+            stop = true;
+        }
+
+        var result = await Task.Run(() => _deletion.DeleteAsync(item.Id, stop)).ConfigureAwait(true);
         if (!result.IsSuccess)
         {
             _dialogs.ShowError(Message(result.Error));
