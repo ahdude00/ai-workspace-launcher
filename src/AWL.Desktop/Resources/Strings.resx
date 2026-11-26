@@ -150,4 +150,8 @@
   <data name="SessionOpenStopConfirm" xml:space="preserve"><value>Bu oturum şu anda açık. Silmeden önce Claude terminalinin kapatılması gerekiyor. Terminal kapatılıp oturum silinsin mi? Kaydedilmemiş bir işlem varsa yarıda kalır.</value></data>
   <data name="SessionOpen" xml:space="preserve"><value>Bu oturum şu anda açık. Önce Claude terminalini kapatın, sonra yeniden deneyin.</value></data>
   <data name="DeleteIncomplete" xml:space="preserve"><value>Oturumun bazı Claude dosyaları silinemedi. Oturum “Hata” olarak işaretlendi. Dosyaları kullanan bir program açıksa kapatın ve “Sil” ile yeniden deneyin.</value></data>
+  <data name="LaunchArgumentsInvalid" xml:space="preserve"><value>AWL'ye verilen komut anlaşılamadı. Sağ tık menüsünden yeniden deneyin; sorun sürerse AWL'yi yeniden kurun.</value></data>
+  <data name="LaunchPathMissing" xml:space="preserve"><value>Açılmak istenen klasör ya da dosya bulunamadı. Taşınmış veya silinmiş olabilir; Gezgin'de yeniden seçip deneyin.</value></data>
+  <data name="AlreadyRunningNoAnswer" xml:space="preserve"><value>AWL zaten açık ama yanıt vermiyor. Açık AWL penceresini kapatıp yeniden deneyin.</value></data>
+  <data name="FilePathCopied" xml:space="preserve"><value>Dosyanın yolu panoya kopyalandı. Claude penceresinde Ctrl+V ile yapıştırabilirsiniz.</value></data>
 </root>
