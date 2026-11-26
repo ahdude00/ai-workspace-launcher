@@ -96,6 +96,8 @@ public sealed class ConPtyHost : IDisposable
                 }
                 STARTUPINFOEXW startup = default;
                 startup.StartupInfo.cb = (uint)sizeof(STARTUPINFOEXW);
+                // Prevent Windows from duplicating redirected parent streams into the console child.
+                startup.StartupInfo.dwFlags = STARTUPINFOW_FLAGS.STARTF_USESTDHANDLES;
                 startup.lpAttributeList = list;
                 PROCESS_INFORMATION process;
                 fixed (char* executable = spec.Executable, arguments = command, cwd = spec.WorkingDirectory, env = environment)

@@ -1,11 +1,10 @@
 using System.Text;
-using Xunit.Abstractions;
 using AWL.Core.Terminal;
 using AWL.Infrastructure.Terminal;
 
 namespace AWL.Infrastructure.Tests.Terminal;
 
-public sealed class ConPtyHostTests(ITestOutputHelper output)
+public sealed class ConPtyHostTests
 {
     [Fact]
     public async Task Console_child_reads_input_and_returns_its_environment()
@@ -34,7 +33,6 @@ public sealed class ConPtyHostTests(ITestOutputHelper output)
                 {
                     break;
                 }
-                output.WriteLine(Convert.ToHexString(Encoding.UTF8.GetBytes(buffer, 0, count)));
                 transcript.Append(buffer, 0, count);
                 if (transcript.ToString().Contains("ready", StringComparison.Ordinal))
                 {
@@ -43,16 +41,8 @@ public sealed class ConPtyHostTests(ITestOutputHelper output)
             }
             return transcript.ToString();
         });
-        try
-        {
-            await Task.WhenAny(ready.Task, response).WaitAsync(TimeSpan.FromSeconds(15));
-        }
-        catch (TimeoutException)
-        {
-            using var child = System.Diagnostics.Process.GetProcessById((int)host.ProcessId);
-            output.WriteLine($"Child {child.Id}, exited: {child.HasExited}");
-            throw;
-        }
+        await Task.WhenAny(ready.Task, response).WaitAsync(TimeSpan.FromSeconds(15));
+        ready.Task.IsCompletedSuccessfully.ShouldBeTrue();
         host.Resize(110, 32);
         await host.Input.WriteAsync(Encoding.UTF8.GetBytes("ping\r"));
         await host.Input.FlushAsync();
