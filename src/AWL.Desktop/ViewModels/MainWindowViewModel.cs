@@ -67,7 +67,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
-    [NotifyCanExecuteChangedFor(nameof(OpenCommand), nameof(OpenFolderCommand), nameof(OpenOutputsCommand),
+    [NotifyCanExecuteChangedFor(nameof(OpenCommand), nameof(OpenExternalCommand), nameof(OpenFolderCommand), nameof(OpenOutputsCommand),
         nameof(EditCommand), nameof(ToggleArchiveCommand), nameof(DeleteCommand))]
     public partial SessionItemViewModel? SelectedSession { get; set; }
 
@@ -212,9 +212,14 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private async Task OpenSessionAsync(SessionItemViewModel item)
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private Task OpenExternalAsync() => SelectedSession is { } item
+        ? OpenSessionAsync(item, openExternally: true)
+        : Task.CompletedTask;
+
+    private async Task OpenSessionAsync(SessionItemViewModel item, bool openExternally = false)
     {
-        var result = await _sessions.OpenAsync(item.Id).ConfigureAwait(true);
+        var result = await _sessions.OpenAsync(item.Id, openExternally).ConfigureAwait(true);
         if (result.IsSuccess)
         {
             if (result.Value == OpenOutcome.AlreadyOpen)
@@ -227,10 +232,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
         switch (result.Error.Code)
         {
             case "HistoryMissing" when _dialogs.Confirm(Strings.HistoryMissingStartOver):
-                ReportFailure(await _sessions.StartOverAsync(item.Id).ConfigureAwait(true));
+                ReportFailure(await _sessions.StartOverAsync(item.Id, openExternally).ConfigureAwait(true));
                 break;
             case "WorkspaceMissing" when _dialogs.Confirm(Strings.WorkspaceMissingPickFolder):
-                await RelocateAndOpenAsync(item).ConfigureAwait(true);
+                await RelocateAndOpenAsync(item, openExternally).ConfigureAwait(true);
                 break;
             case "HistoryMissing" or "WorkspaceMissing":
                 break;
@@ -258,7 +263,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private async Task RelocateAndOpenAsync(SessionItemViewModel item)
+    private async Task RelocateAndOpenAsync(SessionItemViewModel item, bool openExternally)
     {
         string? folder = _dialogs.PickFolder(Path.GetDirectoryName(item.WorkspacePath));
         if (folder is null)
@@ -271,7 +276,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             _dialogs.ShowError(Message(moved.Error));
             return;
         }
-        await OpenSessionAsync(item).ConfigureAwait(true);
+        await OpenSessionAsync(item, openExternally).ConfigureAwait(true);
     }
 
     private void OpenInExplorer(string folder, bool create)

@@ -191,5 +191,6 @@
   <data name="Step_document_skills" xml:space="preserve"><value>Claude belge eklentisi</value></data>
   <data name="DocumentSkillsUnavailable" xml:space="preserve"><value>Claude belge eklentisi kurulamadı. Belge işlemlerine Python araçlarıyla devam edebilirsiniz.</value></data>
   <data name="EmbeddedTerminal" xml:space="preserve"><value>AWL içinde aç</value></data>
+  <data name="OpenExternalButton" xml:space="preserve"><value>Ayrı pencerede aç</value></data>
   <data name="CloseTerminal" xml:space="preserve"><value>Terminali kapat</value></data>
 </root>

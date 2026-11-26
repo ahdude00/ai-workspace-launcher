@@ -23,6 +23,6 @@ public sealed class ClaudeCommandBuilder(AwlPaths paths, IClaudeInstallation? in
             [sessionFlag, session.ClaudeSessionId.ToString("D"),
              ClaudeCli.Settings, paths.ClaudeSettingsFile,
              ClaudeCli.AppendSystemPromptFile, paths.ContextFile],
-            session.WorkspacePath);
+            session.WorkspacePath) { WorkspaceSessionId = session.Id };
     }
 }
