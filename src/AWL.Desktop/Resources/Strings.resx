@@ -109,6 +109,9 @@
   <data name="NoSelection" xml:space="preserve"><value>Soldaki listeden bir oturum seçin.</value></data>
   <data name="ToolsPlaceholder" xml:space="preserve"><value>Araçlar burada listelenecek.</value></data>
   <data name="UncategorizedGroup" xml:space="preserve"><value>Kategorisiz</value></data>
+  <data name="SessionSearch" xml:space="preserve"><value>Başlık veya klasör ara</value></data>
+  <data name="IncludeArchived" xml:space="preserve"><value>Arşivdekileri dahil et</value></data>
+  <data name="NoSearchResults" xml:space="preserve"><value>Eşleşen oturum yok.</value></data>
   <data name="ArchiveGroup" xml:space="preserve"><value>Arşiv</value></data>
   <data name="State_Closed" xml:space="preserve"><value>Kapalı</value></data>
   <data name="State_Open" xml:space="preserve"><value>Açık</value></data>

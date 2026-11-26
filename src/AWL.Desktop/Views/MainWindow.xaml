@@ -17,7 +17,7 @@
     <BooleanToVisibilityConverter x:Key="Visible" />
 
     <CollectionViewSource x:Key="GroupedSessions" Source="{Binding Sessions}"
-                          IsLiveGroupingRequested="True" IsLiveSortingRequested="True">
+                          IsLiveFilteringRequested="True" IsLiveGroupingRequested="True" IsLiveSortingRequested="True">
       <CollectionViewSource.GroupDescriptions>
         <PropertyGroupDescription PropertyName="GroupName" />
       </CollectionViewSource.GroupDescriptions>
@@ -26,6 +26,11 @@
         <scm:SortDescription PropertyName="GroupName" Direction="Ascending" />
         <scm:SortDescription PropertyName="SortKey" Direction="Descending" />
       </CollectionViewSource.SortDescriptions>
+      <CollectionViewSource.LiveFilteringProperties>
+        <sys:String>Title</sys:String>
+        <sys:String>WorkspacePath</sys:String>
+        <sys:String>IsArchived</sys:String>
+      </CollectionViewSource.LiveFilteringProperties>
       <CollectionViewSource.LiveGroupingProperties>
         <sys:String>GroupName</sys:String>
       </CollectionViewSource.LiveGroupingProperties>
@@ -117,6 +122,11 @@
                   Content="{StaticResource T.NewSessionButton}" />
         </DockPanel>
 
+        <StackPanel DockPanel.Dock="Top" Margin="20,4,12,4">
+          <Label Content="{StaticResource T.SessionSearch}" Target="{Binding ElementName=SearchBox}" Padding="0,2" />
+          <TextBox x:Name="SearchBox" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+          <CheckBox Content="{StaticResource T.IncludeArchived}" IsChecked="{Binding IncludeArchived}" Margin="0,4" />
+        </StackPanel>
         <Grid>
           <ListBox x:Name="SessionList"
                    ItemsSource="{Binding Source={StaticResource GroupedSessions}}"
@@ -162,9 +172,23 @@
               </DataTemplate>
             </ListBox.ItemTemplate>
           </ListBox>
-          <TextBlock Text="{StaticResource T.EmptySessions}" Margin="20,12" TextWrapping="Wrap"
-                     Style="{StaticResource Secondary}"
-                     Visibility="{Binding IsEmpty, Converter={StaticResource Visible}}" />
+          <TextBlock Margin="20,12" TextWrapping="Wrap">
+            <TextBlock.Style>
+              <Style TargetType="TextBlock" BasedOn="{StaticResource Secondary}">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Setter Property="Text" Value="{StaticResource T.NoSearchResults}" />
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding HasItems, ElementName=SessionList}" Value="False">
+                    <Setter Property="Visibility" Value="Visible" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding IsEmpty}" Value="True">
+                    <Setter Property="Text" Value="{StaticResource T.EmptySessions}" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </TextBlock.Style>
+          </TextBlock>
+
         </Grid>
       </DockPanel>
 
