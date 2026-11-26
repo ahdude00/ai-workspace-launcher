@@ -166,4 +166,10 @@
   <data name="DiagnosticsSaveFailed" xml:space="preserve"><value>Tanılama paketi kaydedilemedi. Başka bir klasör seçip yeniden deneyin.</value></data>
   <data name="VersionUnknown" xml:space="preserve"><value>Bilinmiyor</value></data>
   <data name="VersionNotInstalled" xml:space="preserve"><value>Henüz kurulmadı</value></data>
+  <data name="DropHint" xml:space="preserve"><value>Dosyaları buraya bırakın: tırnak içindeki tam yolları panoya kopyalanır, Claude penceresine Ctrl+V ile yapıştırabilirsiniz.</value></data>
+  <data name="DropCopied" xml:space="preserve"><value>{0} yol panoya kopyalandı. Claude penceresine Ctrl+V ile yapıştırın.</value></data>
+  <data name="DropSkipped" xml:space="preserve"><value> Bulunamayan {0} öğe atlandı.</value></data>
+  <data name="DropNothingUsable" xml:space="preserve"><value>Bırakılanlar kullanılamadı. Bilgisayarınızdaki var olan dosya veya klasörleri bırakın.</value></data>
+  <data name="DropTooMany" xml:space="preserve"><value>Bir seferde en fazla 100 dosya bırakabilirsiniz.</value></data>
+  <data name="DropZoneName" xml:space="preserve"><value>Dosya bırakma alanı</value></data>
 </root>

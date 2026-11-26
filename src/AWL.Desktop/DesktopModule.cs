@@ -28,6 +28,7 @@ internal static class DesktopModule
             .AddSingleton<MainWindowViewModel>()
             .AddTransient<AboutViewModel>()
             .AddSingleton(_ => new AppVersion(ReadVersion()))
+            .AddSingleton<DropZoneViewModel>()
             .AddSingleton<MainWindow>()
             // Order follows KUR-03: … configuration, Windows integration, sign-in.
             .AddSingleton<ISetupStep>(provider => new ShellIntegrationStep(
