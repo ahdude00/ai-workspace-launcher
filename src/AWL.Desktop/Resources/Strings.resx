@@ -188,4 +188,6 @@
   <data name="SettingsRepairHint" xml:space="preserve"><value>“Onar”, kurulum adımlarını yeniden denetler ve eksik ya da bozulmuş bileşenleri yeniden kurar. Oturumlarınıza ve belgelerinize dokunmaz.</value></data>
   <data name="RepairButton" xml:space="preserve"><value>_Onar</value></data>
   <data name="RepairConfirm" xml:space="preserve"><value>AWL kurulum adımlarını yeniden denetleyecek ve eksikleri tamamlayacak. Bu birkaç dakika sürebilir. Başlatılsın mı?</value></data>
+  <data name="Step_document_skills" xml:space="preserve"><value>Claude belge eklentisi</value></data>
+  <data name="DocumentSkillsUnavailable" xml:space="preserve"><value>Claude belge eklentisi kurulamadı. Belge işlemlerine Python araçlarıyla devam edebilirsiniz.</value></data>
 </root>

@@ -35,6 +35,8 @@ public sealed class DiagnosticsPackageTests : IDisposable
         File.WriteAllText(Path.Combine(_paths.LogsDirectory, "awl_001.log"), "older\n");
         File.WriteAllText(Path.Combine(_paths.LogsDirectory, "setup-diagnostics.zip"), "zip");
         // Data that must never leave the computer through the package.
+        File.WriteAllText(Path.Combine(_paths.LogsDirectory, "other.log"), DocumentText);
+        File.WriteAllText(Path.Combine(_paths.LogsDirectory, "awl_notes.log"), SessionTitle);
         File.WriteAllText(_paths.DatabaseFile, SessionTitle);
         File.WriteAllText(_paths.SettingsFile, SessionTitle);
         File.WriteAllText(Path.Combine(_root.FullName, "Dilekçe.docx"), DocumentText);

@@ -41,12 +41,21 @@ internal sealed partial class SetupRunner(MainWindow window, SetupPipeline pipel
                 {
                     ShowWizard(true);
                 }
+                window.DocumentSkillsWarning.Visibility = Visibility.Collapsed;
                 var summary = new List<string>();
                 var result = await pipeline.RunAsync(line =>
                 {
                     summary.Add(line);
                     LogSetup(logger, line);
-                }, (id, status) => window.Dispatcher.Invoke(() => wizard.Update(id, status)), stopping);
+                }, (id, status) => window.Dispatcher.Invoke(() =>
+                {
+                    wizard.Update(id, status);
+                    // The document skills are optional (KUR-12): setup continues and the main window explains.
+                    if (id == "document-skills" && status == SetupProgress.Failed)
+                    {
+                        window.DocumentSkillsWarning.Visibility = Visibility.Visible;
+                    }
+                }), stopping);
                 if (result.IsSuccess || stopping.IsCancellationRequested)
                 {
                     ShowWizard(false);
