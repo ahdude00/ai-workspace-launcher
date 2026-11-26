@@ -29,6 +29,11 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        if (e.Args is ["--uninstall-cleanup", ..])
+        {
+            Shutdown(await UninstallCleanup.RunAsync(e.Args));
+            return;
+        }
         CancellationToken stopping = default;
 
         // SAG-04: only known flags with absolute, existing, non-device paths. Anything else just activates AWL.

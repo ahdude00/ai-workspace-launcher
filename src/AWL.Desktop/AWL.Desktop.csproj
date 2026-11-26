@@ -40,7 +40,13 @@
           CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <Import Project="Uv.targets" />
-  <Import Project="WindowsTerminal.targets" />
+  <Import Project="Uv.targets" Condition="'$(AwlVerifiedAssets)' == ''" />
+  <Import Project="WindowsTerminal.targets" Condition="'$(AwlVerifiedAssets)' == ''" />
+
+  <ItemGroup Condition="'$(AwlVerifiedAssets)' != ''">
+    <Content Include="$(AwlVerifiedAssets)/uv.exe;$(AwlVerifiedAssets)/windows-terminal.zip"
+             Link="third_party/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
 
 </Project>
