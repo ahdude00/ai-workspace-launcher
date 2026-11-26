@@ -1,0 +1,71 @@
+name: Draft release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Build and verify tagged installer
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME.Substring(1)
+          if (!$version) { throw 'Missing release version' }
+          ./installer/build.ps1 -ReleaseVersion $version
+          ./installer/smoke-test.ps1
+          $name = "AWL-Setup-$version.exe"
+          $file = Get-Item -LiteralPath "installer/Output/$name" -ErrorAction Stop
+          $digest = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -LiteralPath "$($file.FullName).sha256" -Value "$digest  $name" -Encoding ascii
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-assets
+          path: installer/Output/AWL-Setup-*
+          if-no-files-found: error
+
+  draft:
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-assets
+          path: assets
+      - name: Create or refresh draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$GITHUB_REF_NAME"
+          name="AWL-Setup-${tag#v}.exe"
+          (cd assets && sha256sum --check "$name.sha256")
+          if gh release view "$tag" --json isDraft > "$RUNNER_TEMP/release.json"; then
+            jq -e '.isDraft == true' "$RUNNER_TEMP/release.json" >/dev/null
+            gh release upload "$tag" "assets/$name" "assets/$name.sha256" --clobber
+          else
+            gh release create "$tag" "assets/$name" "assets/$name.sha256" \
+              --verify-tag --draft --title "AWL $tag" --notes-file .github/release-notes.md
+          fi
