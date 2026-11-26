@@ -182,7 +182,7 @@
   <data name="SettingsTerminalGroup" xml:space="preserve"><value>Terminal</value></data>
   <data name="SettingsWindowsTerminal" xml:space="preserve"><value>_Windows Terminal (önerilen)</value></data>
   <data name="SettingsWindowsConsole" xml:space="preserve"><value>Windows _konsolu</value></data>
-  <data name="SettingsTerminalHint" xml:space="preserve"><value>Windows Terminal bu bilgisayarda kullanılamıyorsa Claude her zaman Windows konsolunda açılır.</value></data>
+  <data name="SettingsTerminalHint" xml:space="preserve"><value>Gömülü terminal kullanılamazsa oturum ayrı pencerede açılır.</value></data>
   <data name="SettingsSaveFailed" xml:space="preserve"><value>Ayarlar kaydedilemedi. AWL klasörüne yazma izniniz olduğunu kontrol edip yeniden deneyin.</value></data>
   <data name="SettingsSupportGroup" xml:space="preserve"><value>Bakım ve destek</value></data>
   <data name="SettingsRepairHint" xml:space="preserve"><value>“Onar”, kurulum adımlarını yeniden denetler ve eksik ya da bozulmuş bileşenleri yeniden kurar. Oturumlarınıza ve belgelerinize dokunmaz.</value></data>
@@ -190,4 +190,6 @@
   <data name="RepairConfirm" xml:space="preserve"><value>AWL kurulum adımlarını yeniden denetleyecek ve eksikleri tamamlayacak. Bu birkaç dakika sürebilir. Başlatılsın mı?</value></data>
   <data name="Step_document_skills" xml:space="preserve"><value>Claude belge eklentisi</value></data>
   <data name="DocumentSkillsUnavailable" xml:space="preserve"><value>Claude belge eklentisi kurulamadı. Belge işlemlerine Python araçlarıyla devam edebilirsiniz.</value></data>
+  <data name="EmbeddedTerminal" xml:space="preserve"><value>AWL içinde aç</value></data>
+  <data name="CloseTerminal" xml:space="preserve"><value>Terminali kapat</value></data>
 </root>

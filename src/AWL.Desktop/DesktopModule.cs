@@ -23,6 +23,7 @@ internal static class DesktopModule
             .AddSingleton<IShellService, ExplorerShellService>()
             .AddSingleton<IWindowActivator, WpfWindowActivator>()
             .AddSingleton<IClipboardService, WpfClipboardService>()
+            .AddSingleton<AWL.Core.Terminal.ITerminalLauncher, Terminal.EmbeddedLauncher>()
             .AddSingleton<LaunchRequestCoordinator>()
             .AddSingleton<SessionChangeRelay>()
             .AddSingleton<MainWindowViewModel>()

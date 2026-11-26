@@ -56,7 +56,8 @@ public static class InfrastructureModule
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, PortableTerminalStep>());
         services.TryAddSingleton<WindowsTerminalLauncher>();
         services.TryAddSingleton<ConsoleLauncher>();
-        services.TryAddSingleton<ITerminalLauncher>(provider => new TerminalLauncherSelector(
+        services.TryAddSingleton<ITerminalLauncher>(provider => provider.GetRequiredService<IExternalTerminalLauncher>());
+        services.TryAddSingleton<IExternalTerminalLauncher>(provider => new TerminalLauncherSelector(
             provider.GetRequiredService<IAwlSettingsStore>(), provider.GetRequiredService<WindowsTerminalLauncher>(),
             provider.GetRequiredService<ConsoleLauncher>()));
         services.TryAddSingleton<SetupPipeline>();

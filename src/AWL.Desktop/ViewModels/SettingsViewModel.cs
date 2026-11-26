@@ -44,7 +44,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         var settings = store.Load();
         _savedRetention = settings.RetentionDays;
         RetentionText = settings.RetentionDays.ToString(CultureInfo.CurrentCulture);
-        UseWindowsTerminal = settings.TerminalPreference == TerminalPreference.WindowsTerminal;
+        SelectedTerminal = settings.TerminalPreference;
     }
 
     /// <summary>Raised when the window should close (after saving or before a repair).</summary>
@@ -55,12 +55,44 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(UseConsole))]
-    public partial bool UseWindowsTerminal { get; set; }
+    [NotifyPropertyChangedFor(nameof(UseWindowsTerminal))]
+    [NotifyPropertyChangedFor(nameof(UseEmbedded))]
+    public partial TerminalPreference SelectedTerminal { get; set; }
 
     public bool UseConsole
     {
-        get => !UseWindowsTerminal;
-        set => UseWindowsTerminal = !value;
+        get => SelectedTerminal == TerminalPreference.WindowsConsole;
+        set
+        {
+            if (value)
+            {
+                SelectedTerminal = TerminalPreference.WindowsConsole;
+            }
+        }
+    }
+
+    public bool UseWindowsTerminal
+    {
+        get => SelectedTerminal == TerminalPreference.WindowsTerminal;
+        set
+        {
+            if (value)
+            {
+                SelectedTerminal = TerminalPreference.WindowsTerminal;
+            }
+        }
+    }
+
+    public bool UseEmbedded
+    {
+        get => SelectedTerminal == TerminalPreference.Embedded;
+        set
+        {
+            if (value)
+            {
+                SelectedTerminal = TerminalPreference.Embedded;
+            }
+        }
     }
 
     [ObservableProperty]
@@ -92,7 +124,7 @@ public sealed partial class SettingsViewModel : ObservableObject
             _store.Save(_store.Load() with
             {
                 RetentionDays = days,
-                TerminalPreference = UseWindowsTerminal ? TerminalPreference.WindowsTerminal : TerminalPreference.WindowsConsole,
+                TerminalPreference = SelectedTerminal,
             });
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)

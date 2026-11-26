@@ -73,13 +73,13 @@ internal sealed class ConsoleLauncher : ProcessTerminalLauncher
 }
 
 internal sealed class TerminalLauncherSelector(IAwlSettingsStore settings, ITerminalLauncher terminal, ITerminalLauncher console)
-    : ITerminalLauncher
+    : IExternalTerminalLauncher
 {
     public bool IsAvailable => terminal.IsAvailable || console.IsAvailable;
 
     public Task<Result> LaunchAsync(ClaudeLaunchSpec spec, string windowTitle, CancellationToken cancellationToken)
     {
-        ITerminalLauncher launcher = settings.Load().TerminalPreference == TerminalPreference.WindowsTerminal && terminal.IsAvailable
+        ITerminalLauncher launcher = settings.Load().TerminalPreference != TerminalPreference.WindowsConsole && terminal.IsAvailable
             ? terminal : console;
         return launcher.LaunchAsync(spec, windowTitle, cancellationToken);
     }
