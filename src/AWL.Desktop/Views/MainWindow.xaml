@@ -9,6 +9,9 @@
         MinWidth="800" MinHeight="520"
         FontSize="14"
         UseLayoutRounding="True"
+        AllowDrop="True"
+        PreviewDragOver="OnPreviewDragOver"
+        PreviewDrop="OnPreviewDrop"
         WindowStartupLocation="CenterScreen">
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="Visible" />
@@ -207,6 +210,26 @@
               <Button Style="{StaticResource Action}" Content="{StaticResource T.DeleteButton}"
                       Command="{Binding DeleteCommand}" />
             </WrapPanel>
+
+            <!-- Drop area (BLG-07): the window accepts drops anywhere; this shows where and the result. -->
+            <Grid x:Name="DropZone" Margin="0,20,0,0" MinHeight="110"
+                  AutomationProperties.Name="{StaticResource T.DropZoneName}">
+              <Rectangle Stroke="#8A8F98" StrokeThickness="1.5" StrokeDashArray="4 3" RadiusX="6" RadiusY="6"
+                         Fill="#FAFBFC" />
+              <TextBlock Text="{Binding Message}" Margin="20,16" TextWrapping="Wrap" TextAlignment="Center"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         AutomationProperties.LiveSetting="Polite">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock" BasedOn="{StaticResource Secondary}">
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsError}" Value="True">
+                        <Setter Property="Foreground" Value="#B00020" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+            </Grid>
           </StackPanel>
         </ScrollViewer>
 
