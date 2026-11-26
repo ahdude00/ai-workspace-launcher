@@ -106,8 +106,20 @@ public sealed class SingleInstanceTests : IAsyncDisposable
         var huge = new byte[NamedPipeLaunchRequestSource.MaxMessageBytes + 10];
         Array.Fill(huge, (byte)'a');
 
-        (await SendRawAsync(huge)).ShouldBe(0);
-        _received.ShouldBeEmpty();
+        int response;
+        try
+        {
+            response = await SendRawAsync(huge);
+        }
+        catch (IOException)
+        {
+            // Windows may report the disconnect during the write instead of EOF during the read.
+            response = -1;
+        }
+        response.ShouldBe(-1);
+        (await NamedPipeLaunchRequestSource.TrySendAsync(LaunchRequest.Activate, Timeout, _pipe)).ShouldBeTrue();
+        (await _signal.WaitAsync(Timeout)).ShouldBeTrue();
+        _received.ShouldHaveSingleItem().Kind.ShouldBe(LaunchKind.Activate);
     }
 
     [Fact]
