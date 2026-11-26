@@ -58,6 +58,30 @@ public sealed class MainWindowViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task Search_matches_title_or_folder_and_can_exclude_archived_rows()
+    {
+        var sample = await _fixture.AddAsync("Örnek");
+        var snapshots = Enumerable.Range(0, 1000).Select(index =>
+            new SessionSnapshot(sample with
+            {
+                Id = Guid.NewGuid(),
+                Title = $"Dava {index:D4}",
+                WorkspacePath = Path.Combine(_fixture.Root, $"Klasör {index:D4}"),
+                IsArchived = index == 999,
+            }, SessionState.Closed)).ToList();
+        _viewModel.Apply(snapshots, []);
+
+        _viewModel.SearchText = "dava 099";
+        _viewModel.Sessions.Count(_viewModel.MatchesFilter).ShouldBe(10);
+        _viewModel.IncludeArchived = false;
+        _viewModel.Sessions.Count(_viewModel.MatchesFilter).ShouldBe(9);
+        _viewModel.SearchText = "KLASÖR 0001";
+        _viewModel.Sessions.Where(_viewModel.MatchesFilter).ShouldHaveSingleItem().Title.ShouldBe("Dava 0001");
+        _viewModel.SearchText = string.Empty;
+        _viewModel.Sessions.Count(_viewModel.MatchesFilter).ShouldBe(999);
+    }
+
+    [Fact]
     public async Task Refresh_updates_rows_in_place_and_keeps_the_selection()
     {
         var older = await _fixture.AddAsync("Eski", lastActivity: _fixture.Now.AddDays(-5));

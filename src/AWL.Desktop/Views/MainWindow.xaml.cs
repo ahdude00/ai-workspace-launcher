@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using AWL.Desktop.ViewModels;
 
 namespace AWL.Desktop.Views;
@@ -7,6 +8,7 @@ namespace AWL.Desktop.Views;
 public partial class MainWindow : Window
 {
     private readonly DropZoneViewModel _drop;
+    private readonly CollectionViewSource _groupedSessions;
 
     internal SetupWizard Wizard { get; } = new() { Visibility = Visibility.Collapsed };
 
@@ -14,6 +16,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Layout.Children.Add(Wizard);
+        _groupedSessions = (CollectionViewSource)Resources["GroupedSessions"];
+        _groupedSessions.Filter += (_, e) => e.Accepted =
+            e.Item is SessionItemViewModel item && viewModel.MatchesFilter(item);
         DataContext = viewModel;
         viewModel.PropertyChanged += OnViewModelChanged;
         Closed += (_, _) => viewModel.PropertyChanged -= OnViewModelChanged;
@@ -23,6 +28,10 @@ public partial class MainWindow : Window
 
     private void OnViewModelChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is nameof(MainWindowViewModel.SearchText) or nameof(MainWindowViewModel.IncludeArchived))
+        {
+            _groupedSessions.View?.Refresh();
+        }
         if (e.PropertyName == nameof(MainWindowViewModel.SelectedSession))
         {
             UpdateTerminalSelection();

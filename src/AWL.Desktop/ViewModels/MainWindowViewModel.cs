@@ -63,6 +63,17 @@ public sealed partial class MainWindowViewModel : ObservableObject
     /// <summary>Every session; the view groups and sorts them.</summary>
     public ObservableCollection<SessionItemViewModel> Sessions { get; } = [];
 
+    [ObservableProperty]
+    public partial string SearchText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IncludeArchived { get; set; } = true;
+
+    internal bool MatchesFilter(SessionItemViewModel item) =>
+        (IncludeArchived || !item.IsArchived) &&
+        (item.Title.Contains(SearchText, StringComparison.CurrentCultureIgnoreCase) ||
+         item.WorkspacePath.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
     public bool IsEmpty => Sessions.Count == 0;
 
     [ObservableProperty]
@@ -129,6 +140,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         if (_items.TryGetValue(created.Id, out var item))
         {
             CurrentPage = MainPage.Sessions;
+            SearchText = string.Empty;
             SelectedSession = item;
             await OpenSessionAsync(item).ConfigureAwait(true);
         }
@@ -364,7 +376,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 SelectedSession = null;
             }
         }
-        SelectedSession ??= Sessions.MaxBy(item => item.SortKey);
+        SelectedSession ??= Sessions.Where(MatchesFilter).MaxBy(item => item.SortKey);
         OnPropertyChanged(nameof(IsEmpty));
     }
 
