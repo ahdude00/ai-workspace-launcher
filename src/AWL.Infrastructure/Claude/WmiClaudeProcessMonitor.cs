@@ -74,6 +74,82 @@ internal sealed partial class WmiClaudeProcessMonitor(ILogger<WmiClaudeProcessMo
         }
     }, token);
 
+    public Task<bool> TryBringToFrontAsync(Guid sessionId, CancellationToken token) => Task.Run(() =>
+    {
+        try
+        {
+            foreach (var row in Query(token).Where(row => row.Id == sessionId))
+            {
+                // A console launch owns its own window; Windows Terminal owns the window of its child processes.
+                // The walk stops at AWL so that AWL's own window is never mistaken for the session's terminal.
+                int? pid = row.Pid;
+                for (int depth = 0; pid is int current && current != Environment.ProcessId && depth < 3; depth++)
+                {
+                    token.ThrowIfCancellationRequested();
+                    if (MainWindow(current) is { } window)
+                    {
+                        if (IsIconic(window))
+                        {
+                            ShowWindow(window, RestoreWindow);
+                        }
+                        return SetForegroundWindow(window);
+                    }
+                    pid = ParentProcessId(current, token);
+                }
+            }
+            return false;
+        }
+        catch (Exception ex) when (IsQueryFailure(ex))
+        {
+            LogFailure(logger, ex.HResult);
+            return false;
+        }
+    }, token);
+
+    private static nint? MainWindow(int pid)
+    {
+        try
+        {
+            using var process = Process.GetProcessById(pid);
+            nint window = process.MainWindowHandle;
+            return window == 0 ? null : window;
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
+    private static int? ParentProcessId(int pid, CancellationToken token)
+    {
+        using var search = new ManagementObjectSearcher(FormattableString.Invariant(
+            $"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {pid}"));
+        using var rows = search.Get();
+        foreach (ManagementObject row in rows)
+        {
+            using (row)
+            {
+                token.ThrowIfCancellationRequested();
+                return row["ParentProcessId"] is uint parent && parent != 0 ? checked((int)parent) : null;
+            }
+        }
+        return null;
+    }
+
+    private const int RestoreWindow = 9;
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetForegroundWindow(nint window);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool IsIconic(nint window);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool ShowWindow(nint window, int command);
+
     private static List<(Guid Id, int Pid)> Query(CancellationToken token, int? pid = null)
     {
         using var identity = WindowsIdentity.GetCurrent();

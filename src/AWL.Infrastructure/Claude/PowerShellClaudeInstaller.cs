@@ -25,6 +25,8 @@ internal sealed partial class PowerShellClaudeInstaller(
 
     public string? ExecutablePath { get; private set; }
 
+    public string? Version { get; private set; }
+
     public async Task<bool> CheckAsync(CancellationToken cancellationToken)
     {
         return FindExecutable() is not null && (await VerifyAsync(install: false, cancellationToken).ConfigureAwait(false)).IsSuccess;
@@ -41,6 +43,7 @@ internal sealed partial class PowerShellClaudeInstaller(
         {
             cancellationToken.ThrowIfCancellationRequested();
             ExecutablePath = null;
+            Version = null;
             string? executable = FindExecutable();
             if (executable is null)
             {
@@ -76,6 +79,7 @@ internal sealed partial class PowerShellClaudeInstaller(
 
             ExecutablePath = executable;
             string value = version.Groups[1].Value;
+            Version = value;
             LogVersion(logger, value);
             return Result.Ok(value);
         }

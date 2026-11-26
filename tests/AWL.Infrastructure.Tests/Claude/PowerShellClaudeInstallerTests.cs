@@ -38,6 +38,7 @@ public sealed class PowerShellClaudeInstallerTests : IDisposable
         call.FileName.ShouldBe(hasUserInstall ? _paths.DefaultClaudeExecutable : pathExecutable);
         call.ArgumentList.ShouldHaveSingleItem().ShouldBe("--version");
         installer.ExecutablePath.ShouldBe(call.FileName);
+        installer.Version.ShouldBe("2.1.4");
     }
 
     [Fact]
@@ -73,6 +74,7 @@ public sealed class PowerShellClaudeInstallerTests : IDisposable
         (await installer.EnsureInstalledAsync(CancellationToken.None)).Error!.Code.ShouldBe(expected);
         _calls.Count.ShouldBe(1);
         installer.ExecutablePath.ShouldBeNull();
+        installer.Version.ShouldBeNull();
     }
 
     [Theory]
