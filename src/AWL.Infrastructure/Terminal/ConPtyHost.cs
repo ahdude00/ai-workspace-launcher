@@ -100,7 +100,7 @@ public sealed class ConPtyHost : IDisposable
                 PROCESS_INFORMATION process;
                 fixed (char* executable = spec.Executable, arguments = command, cwd = spec.WorkingDirectory, env = environment)
                 {
-                    if (!PInvoke.CreateProcessW(executable, arguments, null, null, false,
+                    if (!PInvoke.CreateProcess(executable, arguments, null, null, false,
                         PROCESS_CREATION_FLAGS.EXTENDED_STARTUPINFO_PRESENT | PROCESS_CREATION_FLAGS.CREATE_UNICODE_ENVIRONMENT,
                         env, cwd, &startup.StartupInfo, &process))
                     {
