@@ -15,18 +15,20 @@ internal sealed class EmbeddedLauncher(IAwlSettingsStore settings, IExternalTerm
     {
         ArgumentNullException.ThrowIfNull(spec);
         if (settings.Load().TerminalPreference == TerminalPreference.Embedded &&
-            OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763) &&
             (spec.Arguments.Contains(ClaudeCli.SessionId) || spec.Arguments.Contains(ClaudeCli.Resume)))
         {
             var opened = await Application.Current.Dispatcher.InvokeAsync(async () =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                return Application.Current.MainWindow is MainWindow window &&
-                    await TerminalBridge.TryOpenAsync(window, spec, windowTitle, cancellationToken);
+                if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763) && Application.Current.MainWindow is MainWindow window)
+                {
+                    return await TerminalBridge.TryOpenAsync(window, spec, windowTitle, cancellationToken);
+                }
+                return null;
             });
-            if (await opened.ConfigureAwait(false))
+            if (await opened.ConfigureAwait(false) is Result result)
             {
-                return Result.Ok();
+                return result;
             }
         }
         return await external.LaunchAsync(spec, windowTitle, cancellationToken).ConfigureAwait(false);

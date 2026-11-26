@@ -8,6 +8,7 @@ using System.Threading.Channels;
 using System.Windows;
 using System.Windows.Controls;
 using AWL.Core.Configuration;
+using AWL.Core.Common;
 using AWL.Core.Terminal;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Views;
@@ -46,11 +47,11 @@ internal sealed class TerminalBridge : IDisposable
         window.TerminalPane.Visibility = Visibility.Visible;
     }
 
-    internal static async Task<bool> TryOpenAsync(MainWindow window, ClaudeLaunchSpec spec, string title, CancellationToken token)
+    internal static async Task<Result?> TryOpenAsync(MainWindow window, ClaudeLaunchSpec spec, string title, CancellationToken token)
     {
         if (window.TerminalPane.Content is not null)
         {
-            return false;
+            return null;
         }
         var bridge = new TerminalBridge(window, title);
         try
@@ -59,10 +60,10 @@ internal sealed class TerminalBridge : IDisposable
             startup.CancelAfter(TimeSpan.FromSeconds(15));
             await bridge.InitializeAsync(startup.Token);
             startup.Token.ThrowIfCancellationRequested();
+            bridge._view.Focus();
             bridge._host = ConPtyHost.Start(spec, bridge._columns, bridge._rows);
             _ = bridge.RunAsync(bridge._host, bridge._stop.Token);
-            bridge._view.Focus();
-            return true;
+            return Result.Ok();
         }
         catch (Exception ex) when (ex is WebView2RuntimeNotFoundException or COMException or IOException or
             InvalidOperationException or Win32Exception or UnauthorizedAccessException or OperationCanceledException)
@@ -72,9 +73,9 @@ internal sealed class TerminalBridge : IDisposable
             token.ThrowIfCancellationRequested();
             if (closed)
             {
-                throw new OperationCanceledException("Terminal closed during startup.");
+                return Result.Fail(new AppError("TerminalLaunchFailed", "TerminalLaunchFailed"));
             }
-            return false;
+            return null;
         }
     }
 
