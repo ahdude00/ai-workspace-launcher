@@ -67,6 +67,8 @@ jobs:
         with:
           python-version: '3.13'
       - name: Build per-user installer
-        run: ./installer/build.ps1
+        run: |
+          ./installer/build.ps1 -ReleaseVersion '0.0.0-ci.1'
+          if (!(Test-Path 'installer/Output/AWL-Setup-0.0.0-ci.1.exe')) { throw 'Versioned installer missing' }
       - name: Install, upgrade and uninstall
         run: ./installer/smoke-test.ps1
