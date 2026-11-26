@@ -9,6 +9,7 @@ try {
     Copy-Item "$PSScriptRoot/harness.js" $work
     $edge = "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"
     $dom = & $edge --headless --disable-gpu "--user-data-dir=$work/profile" --virtual-time-budget=5000 --dump-dom ([uri]::new($page).AbsoluteUri) 2>$null | Out-String
+    if ($dom -notmatch 'data-drop-verified="yes"') { throw 'Terminal file drop transport check failed.' }
     if ($dom -notmatch 'data-verified="yes"') { throw 'Offline terminal rendering check failed.' }
 } finally {
     Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue
