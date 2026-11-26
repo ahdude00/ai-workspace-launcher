@@ -90,15 +90,19 @@ public sealed class SessionServiceTests : IDisposable
         _service.GetState(session).ShouldBe(SessionState.Closed);
     }
 
-    [Fact]
-    public async Task Open_starts_a_new_session_with_its_identifier_and_records_version_and_time()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Open_starts_a_new_session_with_its_identifier_and_records_version_and_time(bool openExternally)
     {
         var session = await CreateAsync();
 
-        (await _service.OpenAsync(session.Id)).Value.ShouldBe(OpenOutcome.Launched);
+        (await _service.OpenAsync(session.Id, openExternally)).Value.ShouldBe(OpenOutcome.Launched);
 
         var (spec, title) = _launches.ShouldHaveSingleItem();
         title.ShouldBe(session.Title);
+        spec.WorkspaceSessionId.ShouldBe(session.Id);
+        spec.OpenExternally.ShouldBe(openExternally);
         spec.WorkingDirectory.ShouldBe(Workspace);
         spec.Arguments.Take(2).ShouldBe(["--session-id", session.ClaudeSessionId.ToString("D")]);
         spec.Arguments.ShouldContain("--settings");

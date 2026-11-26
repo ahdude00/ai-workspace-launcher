@@ -204,6 +204,8 @@
             <WrapPanel DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
               <Button Style="{StaticResource Action}" Content="{StaticResource T.OpenButton}"
                       Command="{Binding OpenCommand}" IsDefault="True" />
+              <Button Style="{StaticResource Action}" Content="{StaticResource T.OpenExternalButton}"
+                      Command="{Binding OpenExternalCommand}" />
               <Button Style="{StaticResource Action}" Content="{StaticResource T.OpenFolderButton}"
                       Command="{Binding OpenFolderCommand}" />
               <Button Style="{StaticResource Action}" Content="{StaticResource T.OutputsButton}"
@@ -250,12 +252,12 @@
             </Style>
           </TextBlock.Style>
         </TextBlock>
+        <Grid x:Name="TerminalPane" />
       </Grid>
 
       <TextBlock Grid.Column="2" Text="{StaticResource T.ToolsPlaceholder}"
                  HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Secondary}"
                  Visibility="{Binding IsToolsPage, Converter={StaticResource Visible}}" />
-      <ContentControl x:Name="TerminalPane" Grid.Column="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
     </Grid>
   </Grid>
 </Window>

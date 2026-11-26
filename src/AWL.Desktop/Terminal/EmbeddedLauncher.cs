@@ -1,5 +1,4 @@
 using System.Windows;
-using AWL.Core.Claude;
 using AWL.Core.Common;
 using AWL.Core.Configuration;
 using AWL.Core.Terminal;
@@ -14,15 +13,15 @@ internal sealed class EmbeddedLauncher(IAwlSettingsStore settings, IExternalTerm
     public async Task<Result> LaunchAsync(ClaudeLaunchSpec spec, string windowTitle, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(spec);
-        if (settings.Load().TerminalPreference == TerminalPreference.Embedded &&
-            (spec.Arguments.Contains(ClaudeCli.SessionId) || spec.Arguments.Contains(ClaudeCli.Resume)))
+        if (!spec.OpenExternally && spec.WorkspaceSessionId is Guid sessionId &&
+            settings.Load().TerminalPreference == TerminalPreference.Embedded)
         {
             var opened = await Application.Current.Dispatcher.InvokeAsync(async () =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763) && Application.Current.MainWindow is MainWindow window)
                 {
-                    return await TerminalBridge.TryOpenAsync(window, spec, windowTitle, cancellationToken);
+                    return await TerminalBridge.TryOpenAsync(window, sessionId, spec, windowTitle, cancellationToken);
                 }
                 return null;
             });

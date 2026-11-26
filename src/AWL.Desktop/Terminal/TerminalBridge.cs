@@ -31,37 +31,48 @@ internal sealed class TerminalBridge : IDisposable
     private TaskCompletionSource? _drained;
     private short _columns = 80, _rows = 24;
     private ConPtyHost? _host;
+    private readonly Button _separate = new() { Content = Strings.OpenExternalButton, IsEnabled = false };
+    private Window? _separateWindow;
     private bool _disposed;
 
-    private TerminalBridge(MainWindow window, string title)
+    private TerminalBridge(MainWindow window, Guid sessionId, string title)
     {
         _window = window;
         var close = new Button { Content = Strings.CloseTerminal, HorizontalAlignment = HorizontalAlignment.Right };
         close.Click += (_, _) => Dispose();
-        DockPanel.SetDock(close, Dock.Top);
-        _panel.Children.Add(close);
+        _separate.Click += (_, _) => ShowSeparateWindow(title);
+        var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+        actions.Children.Add(_separate);
+        actions.Children.Add(close);
+        DockPanel.SetDock(actions, Dock.Top);
+        _panel.Children.Add(actions);
         _panel.Children.Add(_view);
         System.Windows.Automation.AutomationProperties.SetName(_view, title);
         window.Closed += WindowClosed;
-        window.TerminalPane.Content = _panel;
-        window.TerminalPane.Visibility = Visibility.Visible;
+        _panel.Tag = sessionId;
+        window.TerminalPane.Children.Add(_panel);
+        window.UpdateTerminalSelection();
     }
 
-    internal static async Task<Result?> TryOpenAsync(MainWindow window, ClaudeLaunchSpec spec, string title, CancellationToken token)
+    internal static async Task<Result?> TryOpenAsync(MainWindow window, Guid sessionId, ClaudeLaunchSpec spec, string title, CancellationToken token)
     {
-        if (window.TerminalPane.Content is not null)
+        if (window.TerminalPane.Children.OfType<DockPanel>().Any(panel => Equals(panel.Tag, sessionId)))
         {
-            return null;
+            return Result.Ok();
         }
-        var bridge = new TerminalBridge(window, title);
+        var bridge = new TerminalBridge(window, sessionId, title);
         try
         {
             using var startup = CancellationTokenSource.CreateLinkedTokenSource(token, bridge._stop.Token);
             startup.CancelAfter(TimeSpan.FromSeconds(15));
             await bridge.InitializeAsync(startup.Token);
             startup.Token.ThrowIfCancellationRequested();
-            bridge._view.Focus();
+            if (bridge._panel.IsVisible)
+            {
+                bridge._view.Focus();
+            }
             bridge._host = ConPtyHost.Start(spec, bridge._columns, bridge._rows);
+            bridge._separate.IsEnabled = true;
             _ = bridge.RunAsync(bridge._host, bridge._stop.Token);
             return Result.Ok();
         }
@@ -77,6 +88,31 @@ internal sealed class TerminalBridge : IDisposable
             }
             return null;
         }
+    }
+
+    private void ShowSeparateWindow(string title)
+    {
+        if (_separateWindow is { } existing)
+        {
+            existing.Activate();
+            return;
+        }
+
+        var window = new Window { Owner = _window, Title = title, Width = 900, Height = 600 };
+        _panel.Children.Remove(_view);
+        window.Content = _view;
+        _separateWindow = window;
+        window.Closed += (_, _) =>
+        {
+            window.Content = null;
+            _separateWindow = null;
+            if (!_disposed)
+            {
+                _panel.Children.Add(_view);
+            }
+        };
+        window.Show();
+        _view.Focus();
     }
 
     private async Task InitializeAsync(CancellationToken token)
@@ -195,9 +231,9 @@ internal sealed class TerminalBridge : IDisposable
         _window.Closed -= WindowClosed;
         _stop.Cancel();
         _input.Writer.TryComplete();
+        _separateWindow?.Close();
         _view.Dispose();
-        _window.TerminalPane.Content = null;
-        _window.TerminalPane.Visibility = Visibility.Collapsed;
+        _window.TerminalPane.Children.Remove(_panel);
         _host?.Dispose();
         _stop.Dispose();
     }
