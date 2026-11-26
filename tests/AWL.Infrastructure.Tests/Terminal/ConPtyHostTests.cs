@@ -14,17 +14,19 @@ public sealed class ConPtyHostTests
             return;
         }
         string marker = Guid.NewGuid().ToString("N");
-        var spec = new ClaudeLaunchSpec(Path.Combine(Environment.SystemDirectory, "cmd.exe"),
-            ["/d", "/q"], Path.GetTempPath());
+        var spec = new ClaudeLaunchSpec(Path.Combine(AppContext.BaseDirectory, "ClaudeFixture", "claude.exe"),
+            ["--pty-test", "two words"], Path.GetTempPath());
         using var host = ConPtyHost.Start(spec, 100, 30,
             new Dictionary<string, string> { ["AWL_PTY_TEST"] = marker });
         host.Resize(110, 32);
         using var text = new StreamReader(host.Output, Encoding.UTF8, leaveOpen: true);
+        string expected = $"two words:ping:{marker}";
+        var ready = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var response = Task.Run(async () =>
         {
             var buffer = new char[512];
             var transcript = new StringBuilder();
-            while (!transcript.ToString().Contains(marker, StringComparison.Ordinal))
+            while (!transcript.ToString().Contains(expected, StringComparison.Ordinal))
             {
                 int count = await text.ReadAsync(buffer);
                 if (count == 0)
@@ -32,11 +34,16 @@ public sealed class ConPtyHostTests
                     break;
                 }
                 transcript.Append(buffer, 0, count);
+                if (transcript.ToString().Contains("ready", StringComparison.Ordinal))
+                {
+                    ready.TrySetResult();
+                }
             }
             return transcript.ToString();
         });
-        await host.Input.WriteAsync(Encoding.UTF8.GetBytes("echo %AWL_PTY_TEST%\r"));
+        await ready.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        await host.Input.WriteAsync(Encoding.UTF8.GetBytes("ping\r"));
         await host.Input.FlushAsync();
-        (await response.WaitAsync(TimeSpan.FromSeconds(15))).ShouldContain(marker);
+        (await response.WaitAsync(TimeSpan.FromSeconds(15))).ShouldContain(expected);
     }
 }
