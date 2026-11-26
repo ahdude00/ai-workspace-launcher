@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using AWL.Core.Configuration;
 using AWL.Core.Common;
 using AWL.Core.Terminal;
+using AWL.Core.Shell;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Views;
 using AWL.Infrastructure.Terminal;
@@ -166,6 +167,15 @@ internal sealed class TerminalBridge : IDisposable
                 {
                     _ready.TrySetResult();
                 }
+            }
+        }
+        else if (type == "drop")
+        {
+            var paths = e.AdditionalObjects.OfType<CoreWebView2File>().Select(file => file.Path);
+            var formatted = DroppedPaths.Format(paths);
+            if (formatted.IsSuccess)
+            {
+                _input.Writer.TryWrite(Encoding.UTF8.GetBytes(formatted.Value.Text));
             }
         }
         else if (type == "drained")
