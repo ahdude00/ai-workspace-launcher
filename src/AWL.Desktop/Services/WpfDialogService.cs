@@ -3,11 +3,12 @@ using System.Windows;
 using AWL.Desktop.Resources;
 using AWL.Desktop.ViewModels;
 using AWL.Desktop.Views;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 
 namespace AWL.Desktop.Services;
 
-internal sealed class WpfDialogService : IDialogService
+internal sealed class WpfDialogService(IServiceProvider services) : IDialogService
 {
     public void ShowError(string message) => Show(message, MessageBoxButton.OK, MessageBoxImage.Warning);
 
@@ -39,6 +40,29 @@ internal sealed class WpfDialogService : IDialogService
     public void ShowCategoryManager(CategoryManagerViewModel manager)
     {
         var window = new CategoryManagerWindow(manager);
+        if (Owner is { } owner)
+        {
+            window.Owner = owner;
+        }
+        window.ShowDialog();
+    }
+
+    public string? PickSaveFile(string suggestedName, string filter)
+    {
+        var dialog = new SaveFileDialog
+        {
+            FileName = suggestedName,
+            Filter = filter,
+            AddExtension = true,
+            OverwritePrompt = true,
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+        };
+        return dialog.ShowDialog(Owner) == true ? dialog.FileName : null;
+    }
+
+    public void ShowAbout()
+    {
+        var window = new AboutWindow(services.GetRequiredService<AboutViewModel>());
         if (Owner is { } owner)
         {
             window.Owner = owner;

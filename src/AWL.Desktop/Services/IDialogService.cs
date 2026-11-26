@@ -18,4 +18,10 @@ public interface IDialogService
 
     /// <summary>Shows the category manager until the user closes it.</summary>
     void ShowCategoryManager(ViewModels.CategoryManagerViewModel manager);
+
+    /// <summary>Asks where to save a file; returns null when cancelled.</summary>
+    string? PickSaveFile(string suggestedName, string filter);
+
+    /// <summary>Shows the About screen.</summary>
+    void ShowAbout();
 }

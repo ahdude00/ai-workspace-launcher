@@ -1,0 +1,38 @@
+AWL — Üçüncü taraf bileşenler ve lisansları
+
+AWL ile birlikte dağıtılanlar
+-----------------------------
+.NET çalışma zamanı ve Microsoft.Extensions.* ............ MIT        https://github.com/dotnet/runtime
+WPF (Windows Desktop) ..................................... MIT        https://github.com/dotnet/wpf
+CommunityToolkit.Mvvm ..................................... MIT        https://github.com/CommunityToolkit/dotnet
+Microsoft.Data.Sqlite ..................................... MIT        https://github.com/dotnet/efcore
+SQLitePCLRaw .............................................. Apache-2.0 https://github.com/ericsink/SQLitePCL.raw
+SQLite .................................................... Kamu malı  https://sqlite.org/copyright.html
+Dapper .................................................... Apache-2.0 https://github.com/DapperLib/Dapper
+Serilog, Serilog.Extensions.Logging, Serilog.Sinks.File ... Apache-2.0 https://github.com/serilog/serilog
+System.Management ......................................... MIT        https://github.com/dotnet/runtime
+uv ........................................................ MIT veya Apache-2.0  https://github.com/astral-sh/uv
+Windows Terminal .......................................... MIT        https://github.com/microsoft/terminal
+
+İlk açılışta indirilenler (AWL paketinde yer almaz)
+--------------------------------------------------
+Claude Code ............................................... Anthropic kullanım koşulları  https://claude.ai
+Python (uv'nin yönettiği dağıtım) ......................... PSF-2.0    https://docs.python.org/3/license.html
+python-docx ............................................... MIT
+pypdf ..................................................... BSD-3-Clause
+pdfplumber, pdfminer.six .................................. MIT
+openpyxl, et-xmlfile ...................................... MIT
+pandas, numpy ............................................. BSD-3-Clause
+python-dateutil ........................................... Apache-2.0 veya BSD-3-Clause
+tzdata .................................................... Apache-2.0
+reportlab ................................................. BSD
+lxml ...................................................... BSD-3-Clause
+pillow .................................................... MIT-CMU (HPND)
+pypdfium2 ve PDFium ....................................... Apache-2.0 veya BSD-3-Clause
+charset-normalizer, cffi .................................. MIT
+cryptography .............................................. Apache-2.0 veya BSD-3-Clause
+pycparser ................................................. BSD-3-Clause
+typing-extensions ......................................... PSF-2.0
+
+Anthropic belge skill'leri AWL paketine gömülmez (LIS-01).
+Her bileşenin tam lisans metni yukarıdaki adreslerde ve kendi paketinin içindedir.

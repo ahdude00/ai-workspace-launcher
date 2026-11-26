@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Windows;
 using AWL.Core.Setup;
 using AWL.Desktop.Messages;
@@ -25,9 +26,19 @@ internal static class DesktopModule
             .AddSingleton<LaunchRequestCoordinator>()
             .AddSingleton<SessionChangeRelay>()
             .AddSingleton<MainWindowViewModel>()
+            .AddTransient<AboutViewModel>()
+            .AddSingleton(_ => new AppVersion(ReadVersion()))
             .AddSingleton<MainWindow>()
             // Order follows KUR-03: … configuration, Windows integration, sign-in.
             .AddSingleton<ISetupStep>(provider => new ShellIntegrationStep(
                 provider.GetRequiredService<AWL.Core.Shell.IShellIntegration>()))
             .AddSingleton<ISetupStep, ClaudeLoginStep>();
+
+    internal static string ReadVersion()
+    {
+        Assembly assembly = typeof(App).Assembly;
+        return assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? assembly.GetName().Version?.ToString()
+            ?? "unknown";
+    }
 }

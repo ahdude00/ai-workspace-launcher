@@ -16,6 +16,8 @@ internal sealed partial class UvPythonEnvironment(
     private static readonly string LockFile = Path.Combine(AssetDirectory, "requirements.lock");
     private static readonly string Uv = Path.Combine(AppContext.BaseDirectory, "third_party", "uv.exe");
 
+    public string? InstalledVersion => PythonVersion.Read(paths);
+
     public async Task<bool> CheckAsync(CancellationToken cancellationToken) =>
         await ProbeAsync(cancellationToken).ConfigureAwait(false) == 0;
 
