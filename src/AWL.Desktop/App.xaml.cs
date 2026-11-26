@@ -4,9 +4,12 @@ using System.IO;
 using System.Windows;
 using AWL.Core.Setup;
 using AWL.Core.Configuration;
+using AWL.Core.Shell;
+using AWL.Infrastructure.Ipc;
 using AWL.Infrastructure.Diagnostics;
 using AWL.Desktop.Messages;
 using AWL.Desktop.Resources;
+using AWL.Desktop.Services;
 using AWL.Desktop.ViewModels;
 using AWL.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,17 +23,41 @@ namespace AWL.Desktop;
 /// </summary>
 public partial class App : Application
 {
+    private static readonly TimeSpan ForwardTimeout = TimeSpan.FromSeconds(5);
+
     private IHost? _host;
     private GlobalExceptionHandler? _exceptionHandler;
+    private SingleInstanceLock? _instanceLock;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
         CancellationToken stopping = default;
 
+        // SAG-04: only known flags with absolute, existing, non-device paths. Anything else just activates AWL.
+        var parsed = LaunchArgumentParser.Parse(e.Args);
+        LaunchRequest request = parsed.IsSuccess ? parsed.Value : LaunchRequest.Activate;
+
+        // SAG-05: a second AWL hands its request to the running one and exits without opening a window.
+        _instanceLock = SingleInstanceLock.TryAcquire();
+        if (_instanceLock is null)
+        {
+            if (!parsed.IsSuccess)
+            {
+                ShowError(Message(parsed.Error.UserMessageKey));
+            }
+            ForegroundHandoff.AllowAny();
+            if (!await NamedPipeLaunchRequestSource.TrySendAsync(request, ForwardTimeout))
+            {
+                ShowError(Strings.AlreadyRunningNoAnswer);
+            }
+            Shutdown(0);
+            return;
+        }
+
         try
         {
-            _host = AppHost.Build(e.Args);
+            _host = AppHost.Build([]);
             ILogger<App> logger = _host.Services.GetRequiredService<ILogger<App>>();
             _exceptionHandler = new GlobalExceptionHandler(
                 Dispatcher, logger, () => ShowError(Strings.UnexpectedErrorMessage));
@@ -41,12 +68,19 @@ public partial class App : Application
                 ?? "unknown";
             LogStartup(logger, version);
 
+            // Subscribe before the pipe listener starts so that no forwarded request is lost.
+            var launches = _host.Services.GetRequiredService<LaunchRequestCoordinator>();
             _host.Start();
             stopping = _host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
             StringResources.AddTo(Resources);
             var window = _host.Services.GetRequiredService<MainWindow>();
             MainWindow = window;
             MainWindow.Show();
+            if (!parsed.IsSuccess)
+            {
+                ShowError(Message(parsed.Error.UserMessageKey));
+            }
+            await launches.SubmitAsync(request);
 
             _host.Services.GetRequiredService<SessionChangeRelay>();
             var pipeline = _host.Services.GetRequiredService<SetupPipeline>();
@@ -72,6 +106,7 @@ public partial class App : Application
                     wizard.Visibility = Visibility.Collapsed;
                     window.Workspace.Visibility = Visibility.Visible;
                     await _host.Services.GetRequiredService<MainWindowViewModel>().InitializeAsync(stopping);
+                    await launches.MarkReadyAsync();
                     break;
                 }
 
@@ -111,8 +146,12 @@ public partial class App : Application
         _host?.Services.GetService<IHostApplicationLifetime>()?.StopApplication();
         _exceptionHandler?.Detach();
         _host?.Dispose();
+        _instanceLock?.Dispose();
         base.OnExit(e);
     }
+
+    private static string Message(string key) =>
+        Strings.ResourceManager.GetString(key, CultureInfo.CurrentUICulture) ?? Strings.StartupErrorMessage;
 
     private void ShowError(string message)
     {

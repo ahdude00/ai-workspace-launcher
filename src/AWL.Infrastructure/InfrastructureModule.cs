@@ -4,11 +4,13 @@ using AWL.Core.Configuration;
 using AWL.Core.Python;
 using AWL.Core.Sessions;
 using AWL.Core.Setup;
+using AWL.Core.Shell;
 using AWL.Core.Terminal;
 using AWL.Infrastructure.Terminal;
 using AWL.Infrastructure.Setup;
 using AWL.Infrastructure.Claude;
 using AWL.Infrastructure.Configuration;
+using AWL.Infrastructure.Ipc;
 using AWL.Infrastructure.Persistence;
 using AWL.Infrastructure.Processes;
 using AWL.Infrastructure.Python;
@@ -54,6 +56,9 @@ public static class InfrastructureModule
             provider.GetRequiredService<IAwlSettingsStore>(), provider.GetRequiredService<WindowsTerminalLauncher>(),
             provider.GetRequiredService<ConsoleLauncher>()));
         services.TryAddSingleton<SetupPipeline>();
+        services.TryAddSingleton<NamedPipeLaunchRequestSource>();
+        services.TryAddSingleton<ILaunchRequestSource>(p => p.GetRequiredService<NamedPipeLaunchRequestSource>());
+        services.AddHostedService(p => p.GetRequiredService<NamedPipeLaunchRequestSource>());
         return services;
     }
 }
