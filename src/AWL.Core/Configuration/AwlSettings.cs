@@ -4,6 +4,7 @@ public enum TerminalPreference
 {
     WindowsTerminal,
     WindowsConsole,
+    Embedded,
 }
 
 public enum SetupStepStatus

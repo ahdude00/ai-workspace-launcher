@@ -1,0 +1,29 @@
+<Project>
+  <PropertyGroup>
+    <AwlXtermRoot>$(BaseIntermediateOutputPath)xterm</AwlXtermRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Terminal/Assets/*" Link="terminal/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <Content Include="$(AwlXtermRoot)/xterm-5.5.0/package/lib/xterm.js" Link="terminal/xterm.js" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <Content Include="$(AwlXtermRoot)/xterm-5.5.0/package/css/xterm.css" Link="terminal/xterm.css" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <Content Include="$(AwlXtermRoot)/xterm-5.5.0/package/LICENSE" Link="terminal/xterm-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <Content Include="$(AwlXtermRoot)/addon-fit-0.10.0/package/lib/addon-fit.js" Link="terminal/addon-fit.js" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <Content Include="$(AwlXtermRoot)/addon-fit-0.10.0/package/LICENSE" Link="terminal/addon-fit-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+  <Target Name="PrepareXtermAssets" BeforeTargets="PrepareForBuild" Condition="'$(DesignTimeBuild)' != 'true'"
+          Inputs="$(MSBuildThisFileFullPath)" Outputs="$(AwlXtermRoot)/xterm-5.5.0/package/lib/xterm.js;$(AwlXtermRoot)/xterm-5.5.0/package/css/xterm.css;$(AwlXtermRoot)/xterm-5.5.0/package/LICENSE">
+    <MakeDir Directories="$(AwlXtermRoot)/xterm-5.5.0" />
+    <DownloadFile SourceUrl="https://registry.npmjs.org/@xterm/xterm/-/xterm-5.5.0.tgz" DestinationFolder="$(AwlXtermRoot)/xterm-5.5.0" DestinationFileName="source.tgz" Retries="2" />
+    <VerifyFileHash File="$(AwlXtermRoot)/xterm-5.5.0/source.tgz" Algorithm="SHA256" Hash="BD954FA721872170188CC5D7E83E88DB3C83C9A18A4E8D24C2783D26491F59D2" />
+    <Exec Command="tar -xf &quot;$(AwlXtermRoot)/xterm-5.5.0/source.tgz&quot; -C &quot;$(AwlXtermRoot)/xterm-5.5.0&quot; package/lib/xterm.js package/css/xterm.css package/LICENSE" />
+    <Touch Files="$(AwlXtermRoot)/xterm-5.5.0/package/lib/xterm.js;$(AwlXtermRoot)/xterm-5.5.0/package/css/xterm.css;$(AwlXtermRoot)/xterm-5.5.0/package/LICENSE" />
+  </Target>
+  <Target Name="PrepareFitAssets" BeforeTargets="PrepareForBuild" Condition="'$(DesignTimeBuild)' != 'true'"
+          Inputs="$(MSBuildThisFileFullPath)" Outputs="$(AwlXtermRoot)/addon-fit-0.10.0/package/lib/addon-fit.js;$(AwlXtermRoot)/addon-fit-0.10.0/package/LICENSE">
+    <MakeDir Directories="$(AwlXtermRoot)/addon-fit-0.10.0" />
+    <DownloadFile SourceUrl="https://registry.npmjs.org/@xterm/addon-fit/-/addon-fit-0.10.0.tgz" DestinationFolder="$(AwlXtermRoot)/addon-fit-0.10.0" DestinationFileName="source.tgz" Retries="2" />
+    <VerifyFileHash File="$(AwlXtermRoot)/addon-fit-0.10.0/source.tgz" Algorithm="SHA256" Hash="917AC44972453D5EED52EDC1E50260C76398CE48CF2290C2E60671102BBA0B33" />
+    <Exec Command="tar -xf &quot;$(AwlXtermRoot)/addon-fit-0.10.0/source.tgz&quot; -C &quot;$(AwlXtermRoot)/addon-fit-0.10.0&quot; package/lib/addon-fit.js package/LICENSE" />
+    <Touch Files="$(AwlXtermRoot)/addon-fit-0.10.0/package/lib/addon-fit.js;$(AwlXtermRoot)/addon-fit-0.10.0/package/LICENSE" />
+  </Target>
+</Project>

@@ -34,6 +34,7 @@
     <RadioButton Content="{StaticResource T.SettingsWindowsTerminal}" IsChecked="{Binding UseWindowsTerminal}"
                  GroupName="Terminal" Margin="0,0,0,6" />
     <RadioButton Content="{StaticResource T.SettingsWindowsConsole}" IsChecked="{Binding UseConsole}" GroupName="Terminal" />
+    <RadioButton Content="{StaticResource T.EmbeddedTerminal}" IsChecked="{Binding UseEmbedded}" GroupName="Terminal" />
     <TextBlock Text="{StaticResource T.SettingsTerminalHint}" Style="{StaticResource Hint}" Margin="0,6,0,0" />
 
     <TextBlock Text="{Binding ErrorMessage}" Foreground="#B00020" TextWrapping="Wrap" Margin="0,16,0,0"

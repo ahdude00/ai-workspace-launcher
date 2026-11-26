@@ -255,6 +255,7 @@
       <TextBlock Grid.Column="2" Text="{StaticResource T.ToolsPlaceholder}"
                  HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Secondary}"
                  Visibility="{Binding IsToolsPage, Converter={StaticResource Visible}}" />
+      <ContentControl x:Name="TerminalPane" Grid.Column="2" Visibility="Collapsed" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
     </Grid>
   </Grid>
 </Window>
