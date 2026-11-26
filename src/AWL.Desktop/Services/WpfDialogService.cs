@@ -70,6 +70,16 @@ internal sealed class WpfDialogService(IServiceProvider services) : IDialogServi
         window.ShowDialog();
     }
 
+    public void ShowSettings()
+    {
+        var window = new SettingsWindow(services.GetRequiredService<SettingsViewModel>());
+        if (Owner is { } owner)
+        {
+            window.Owner = owner;
+        }
+        window.ShowDialog();
+    }
+
     // The active window (for example an open editor) owns new dialogs; otherwise the main window does.
     private static Window? Owner =>
         Application.Current?.Windows.OfType<Window>().FirstOrDefault(window => window.IsActive)

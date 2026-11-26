@@ -27,9 +27,12 @@ internal static class DesktopModule
             .AddSingleton<SessionChangeRelay>()
             .AddSingleton<MainWindowViewModel>()
             .AddTransient<AboutViewModel>()
+            .AddTransient<SettingsViewModel>()
             .AddSingleton(_ => new AppVersion(ReadVersion()))
             .AddSingleton<DropZoneViewModel>()
             .AddSingleton<MainWindow>()
+            .AddSingleton<SetupRunner>()
+            .AddSingleton<IRepairService>(provider => provider.GetRequiredService<SetupRunner>())
             // Order follows KUR-03: … configuration, Windows integration, sign-in.
             .AddSingleton<ISetupStep>(provider => new ShellIntegrationStep(
                 provider.GetRequiredService<AWL.Core.Shell.IShellIntegration>()))

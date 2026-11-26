@@ -186,6 +186,23 @@ public sealed class SessionDeletionServiceTests
         await _monitor.DidNotReceive().StopSessionAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
+    [Fact]
+    public async Task A_shorter_period_can_be_counted_and_applied_at_once()
+    {
+        Add(Now.AddDays(-20));
+        Add(Now.AddDays(-5));
+        var open = Add(Now.AddDays(-40));
+        _running.Add(open.ClaudeSessionId);
+
+        (await _service.CountExpiredAsync(30)).ShouldBe(0);
+        (await _service.CountExpiredAsync(10)).ShouldBe(1);
+        _stored.Count.ShouldBe(3);
+
+        (await _service.PurgeExpiredAsync(10)).ShouldBe(1);
+        _stored.Count.ShouldBe(2);
+        _stored.ShouldContainKey(open.Id);
+    }
+
     private Session Add(DateTimeOffset activity, bool archived = false)
     {
         var session = RetentionPolicyTests.Create(activity.AddDays(-1), activity) with { IsArchived = archived };

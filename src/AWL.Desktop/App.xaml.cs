@@ -1,11 +1,9 @@
 using System.Globalization;
-using System.IO;
 using System.Windows;
 using AWL.Core.Setup;
 using AWL.Core.Configuration;
 using AWL.Core.Shell;
 using AWL.Infrastructure.Ipc;
-using AWL.Infrastructure.Diagnostics;
 using AWL.Desktop.Messages;
 using AWL.Desktop.Resources;
 using AWL.Desktop.Services;
@@ -79,58 +77,13 @@ public partial class App : Application
             await launches.SubmitAsync(request);
 
             _host.Services.GetRequiredService<SessionChangeRelay>();
-            var pipeline = _host.Services.GetRequiredService<SetupPipeline>();
-            var wizard = window.Wizard;
             var settings = _host.Services.GetRequiredService<IAwlSettingsStore>();
             bool firstRun = settings.Load().SetupSteps.GetValueOrDefault("login") != SetupStepStatus.Completed;
-            while (!stopping.IsCancellationRequested)
+            await _host.Services.GetRequiredService<SetupRunner>().RunAsync(firstRun, stopping);
+            if (!stopping.IsCancellationRequested)
             {
-                wizard.Reset(pipeline.StepIds);
-                if (firstRun)
-                {
-                    wizard.Visibility = Visibility.Visible;
-                    window.Workspace.Visibility = Visibility.Collapsed;
-                }
-                window.DocumentSkillsWarning.Visibility = Visibility.Collapsed;
-                var summary = new List<string>();
-                var result = await pipeline.RunAsync(line =>
-                {
-                    summary.Add(line);
-                    LogSetup(logger, line);
-                }, (id, status) => Dispatcher.Invoke(() =>
-                {
-                    wizard.Update(id, status);
-                    if (id == "document-skills" && status == SetupProgress.Failed)
-                    {
-                        window.DocumentSkillsWarning.Visibility = Visibility.Visible;
-                    }
-                }), stopping);
-                if (result.IsSuccess || stopping.IsCancellationRequested)
-                {
-                    wizard.Visibility = Visibility.Collapsed;
-                    window.Workspace.Visibility = Visibility.Visible;
-                    await _host.Services.GetRequiredService<MainWindowViewModel>().InitializeAsync(stopping);
-                    await launches.MarkReadyAsync();
-                    break;
-                }
-
-                firstRun = true;
-                wizard.Visibility = Visibility.Visible;
-                window.Workspace.Visibility = Visibility.Collapsed;
-                string message = Strings.ResourceManager.GetString(result.Error.UserMessageKey, CultureInfo.CurrentUICulture)
-                    ?? Strings.StartupErrorMessage;
-                try
-                {
-                    string package = SetupDiagnostics.Save(_host.Services.GetRequiredService<AwlPaths>(), version, summary);
-                    summary.Add(Strings.SetupPackageSaved + Environment.NewLine + package);
-                }
-                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-                {
-                    // Keep the on-screen summary available even on a read-only disk.
-                    LogDiagnosticsWriteFailure(logger, ex.HResult);
-                }
-                string details = string.Join(Environment.NewLine, summary);
-                await wizard.WaitForRetryAsync(message, details, stopping);
+                await _host.Services.GetRequiredService<MainWindowViewModel>().InitializeAsync(stopping);
+                await launches.MarkReadyAsync();
             }
         }
         catch (OperationCanceledException) when (stopping.IsCancellationRequested)
@@ -167,12 +120,6 @@ public partial class App : Application
 
         MessageBox.Show(message, Strings.UnexpectedErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error);
     }
-
-    [LoggerMessage(EventId = 1020, Level = LogLevel.Warning, Message = "Setup diagnostics could not be saved (HRESULT {HResult:X8}).")]
-    private static partial void LogDiagnosticsWriteFailure(ILogger logger, int hResult);
-
-    [LoggerMessage(EventId = 1019, Level = LogLevel.Information, Message = "Setup: {Summary}")]
-    private static partial void LogSetup(ILogger logger, string summary);
 
     [LoggerMessage(EventId = 1000, Level = LogLevel.Information, Message = "AWL starting. Version: {Version}")]
     private static partial void LogStartup(ILogger logger, string version);
