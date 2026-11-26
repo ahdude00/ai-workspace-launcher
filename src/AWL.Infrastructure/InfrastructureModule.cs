@@ -35,6 +35,8 @@ public static class InfrastructureModule
         services.TryAddSingleton<WmiClaudeProcessMonitor>();
         services.TryAddSingleton<IClaudeProcessMonitor>(p => p.GetRequiredService<WmiClaudeProcessMonitor>());
         services.AddHostedService(p => p.GetRequiredService<WmiClaudeProcessMonitor>());
+        services.TryAddSingleton<ClaudeHistoryOptions>();
+        services.TryAddSingleton<IClaudeHistoryStore, FileSystemClaudeHistoryStore>();
         services.TryAddSingleton<IAwlSettingsStore, JsonAwlSettingsStore>();
         services.TryAddSingleton<SqliteDatabase>();
         services.TryAddSingleton<ISessionRepository, SqliteSessionRepository>();
