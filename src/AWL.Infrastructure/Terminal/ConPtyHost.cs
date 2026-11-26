@@ -55,9 +55,9 @@ public sealed class ConPtyHost : IDisposable
             output = new AnonymousPipeServerStream(PipeDirection.In);
             PInvoke.CreatePseudoConsole(size, (HANDLE)input.ClientSafePipeHandle.DangerousGetHandle(),
                 (HANDLE)output.ClientSafePipeHandle.DangerousGetHandle(), 0, &console).ThrowOnFailure();
+            uint processId = Spawn(spec, command.Append('\0').ToString().ToCharArray(), block, console);
             input.DisposeLocalCopyOfClientHandle();
             output.DisposeLocalCopyOfClientHandle();
-            uint processId = Spawn(spec, command.Append('\0').ToString().ToCharArray(), block, console);
             return new ConPtyHost(console, input, output, processId);
         }
         catch

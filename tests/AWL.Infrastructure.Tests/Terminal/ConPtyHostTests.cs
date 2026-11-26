@@ -1,10 +1,11 @@
 using System.Text;
+using Xunit.Abstractions;
 using AWL.Core.Terminal;
 using AWL.Infrastructure.Terminal;
 
 namespace AWL.Infrastructure.Tests.Terminal;
 
-public sealed class ConPtyHostTests
+public sealed class ConPtyHostTests(ITestOutputHelper output)
 {
     [Fact]
     public async Task Console_child_reads_input_and_returns_its_environment()
@@ -33,6 +34,7 @@ public sealed class ConPtyHostTests
                 {
                     break;
                 }
+                output.WriteLine(Convert.ToHexString(Encoding.UTF8.GetBytes(buffer, 0, count)));
                 transcript.Append(buffer, 0, count);
                 if (transcript.ToString().Contains("ready", StringComparison.Ordinal))
                 {
@@ -41,7 +43,7 @@ public sealed class ConPtyHostTests
             }
             return transcript.ToString();
         });
-        await ready.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        await (await Task.WhenAny(ready.Task, response)).WaitAsync(TimeSpan.FromSeconds(15));
         await host.Input.WriteAsync(Encoding.UTF8.GetBytes("ping\r"));
         await host.Input.FlushAsync();
         (await response.WaitAsync(TimeSpan.FromSeconds(15))).ShouldContain(expected);
