@@ -11,6 +11,7 @@ using AWL.Infrastructure.Setup;
 using AWL.Infrastructure.Claude;
 using AWL.Infrastructure.Configuration;
 using AWL.Infrastructure.Ipc;
+using AWL.Infrastructure.Shell;
 using AWL.Infrastructure.Persistence;
 using AWL.Infrastructure.Processes;
 using AWL.Infrastructure.Python;
@@ -56,6 +57,7 @@ public static class InfrastructureModule
             provider.GetRequiredService<IAwlSettingsStore>(), provider.GetRequiredService<WindowsTerminalLauncher>(),
             provider.GetRequiredService<ConsoleLauncher>()));
         services.TryAddSingleton<SetupPipeline>();
+        services.TryAddSingleton<IShellIntegration, HkcuShellIntegration>();
         services.TryAddSingleton<NamedPipeLaunchRequestSource>();
         services.TryAddSingleton<ILaunchRequestSource>(p => p.GetRequiredService<NamedPipeLaunchRequestSource>());
         services.AddHostedService(p => p.GetRequiredService<NamedPipeLaunchRequestSource>());
