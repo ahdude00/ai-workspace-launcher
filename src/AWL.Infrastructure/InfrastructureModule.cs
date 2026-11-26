@@ -1,6 +1,7 @@
 using AWL.Core.Categories;
 using AWL.Core.Claude;
 using AWL.Core.Configuration;
+using AWL.Core.Diagnostics;
 using AWL.Core.Python;
 using AWL.Core.Sessions;
 using AWL.Core.Setup;
@@ -10,6 +11,7 @@ using AWL.Infrastructure.Terminal;
 using AWL.Infrastructure.Setup;
 using AWL.Infrastructure.Claude;
 using AWL.Infrastructure.Configuration;
+using AWL.Infrastructure.Diagnostics;
 using AWL.Infrastructure.Ipc;
 using AWL.Infrastructure.Shell;
 using AWL.Infrastructure.Persistence;
@@ -59,6 +61,8 @@ public static class InfrastructureModule
             provider.GetRequiredService<ConsoleLauncher>()));
         services.TryAddSingleton<SetupPipeline>();
         services.TryAddSingleton<IShellIntegration, HkcuShellIntegration>();
+        services.TryAddSingleton<IDiagnosticsPackage>(p => new DiagnosticsPackage(
+            p.GetRequiredService<AwlPaths>(), p.GetRequiredService<IAwlSettingsStore>()));
         services.TryAddSingleton<NamedPipeLaunchRequestSource>();
         services.TryAddSingleton<ILaunchRequestSource>(p => p.GetRequiredService<NamedPipeLaunchRequestSource>());
         services.AddHostedService(p => p.GetRequiredService<NamedPipeLaunchRequestSource>());

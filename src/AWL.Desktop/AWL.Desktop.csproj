@@ -33,6 +33,13 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <!-- Shown on the About screen and shipped next to AWL.exe for the installer (AYR-04, LIS-01). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\THIRD-PARTY-NOTICES.txt" LogicalName="AWL.ThirdPartyNotices" />
+    <None Include="Resources\THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <Import Project="Uv.targets" />
   <Import Project="WindowsTerminal.targets" />
 

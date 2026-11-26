@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Reflection;
 using System.IO;
 using System.Windows;
 using AWL.Core.Setup;
@@ -62,10 +61,7 @@ public partial class App : Application
             _exceptionHandler = new GlobalExceptionHandler(
                 Dispatcher, logger, () => ShowError(Strings.UnexpectedErrorMessage));
 
-            Assembly assembly = typeof(App).Assembly;
-            string version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-                ?? assembly.GetName().Version?.ToString()
-                ?? "unknown";
+            string version = DesktopModule.ReadVersion();
             LogStartup(logger, version);
 
             // Subscribe before the pipe listener starts so that no forwarded request is lost.

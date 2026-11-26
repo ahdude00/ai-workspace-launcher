@@ -110,6 +110,9 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void ShowTools() => CurrentPage = MainPage.Tools;
 
+    [RelayCommand]
+    private void ShowAbout() => _dialogs.ShowAbout();
+
     /// <summary>Shows the new-session window, optionally with a folder already chosen, then opens the session.</summary>
     public async Task NewSessionAsync(string? folder = null)
     {
