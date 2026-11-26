@@ -80,8 +80,18 @@ public sealed class DiagnosticsPackage(AwlPaths paths, IAwlSettingsStore setting
             return [];
         }
         // Only AWL's own text logs; archives such as setup-diagnostics.zip and any other file stay out.
-        return Directory.EnumerateFiles(paths.LogsDirectory, "*.log", SearchOption.TopDirectoryOnly)
+        return Directory.EnumerateFiles(paths.LogsDirectory, "*.log",
+                new EnumerationOptions { AttributesToSkip = FileAttributes.ReparsePoint })
+            .Where(IsAwlLog)
             .Order(StringComparer.Ordinal);
+    }
+
+    private static bool IsAwlLog(string path)
+    {
+        string name = Path.GetFileNameWithoutExtension(path);
+        return name.Equals("awl", StringComparison.OrdinalIgnoreCase) ||
+            (name.StartsWith("awl_", StringComparison.OrdinalIgnoreCase) && name.Length >= 7 &&
+             !name.AsSpan(4).ContainsAnyExceptInRange('0', '9'));
     }
 
     private static void CopyLog(ZipArchive archive, string log)

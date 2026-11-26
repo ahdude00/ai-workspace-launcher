@@ -6,6 +6,7 @@ namespace AWL.Core.Setup;
 public interface ISetupStep
 {
     string Id { get; }
+    bool IsOptional => false;
     Task<bool> CheckAsync(CancellationToken token);
     Task<Result> RunAsync(CancellationToken token);
 }
@@ -55,6 +56,10 @@ public sealed class SetupPipeline(IEnumerable<ISetupStep> steps, IAwlSettingsSto
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 report($"settings: 0x{ex.HResult:X8}");
+            }
+            if (step.IsOptional)
+            {
+                continue;
             }
             return result;
         }

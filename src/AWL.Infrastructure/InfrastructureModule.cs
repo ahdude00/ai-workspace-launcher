@@ -51,6 +51,7 @@ public static class InfrastructureModule
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, PythonStep>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, ConfigurationStep>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, UdfStep>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, DocumentSkillsStep>());
         services.TryAddSingleton<PortableTerminalStep>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISetupStep, PortableTerminalStep>());
         services.TryAddSingleton<WindowsTerminalLauncher>();

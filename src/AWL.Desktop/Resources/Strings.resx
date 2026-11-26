@@ -172,4 +172,6 @@
   <data name="DropNothingUsable" xml:space="preserve"><value>Bırakılanlar kullanılamadı. Bilgisayarınızdaki var olan dosya veya klasörleri bırakın.</value></data>
   <data name="DropTooMany" xml:space="preserve"><value>Bir seferde en fazla 100 dosya bırakabilirsiniz.</value></data>
   <data name="DropZoneName" xml:space="preserve"><value>Dosya bırakma alanı</value></data>
+  <data name="Step_document_skills" xml:space="preserve"><value>Claude belge eklentisi</value></data>
+  <data name="DocumentSkillsUnavailable" xml:space="preserve"><value>Claude belge eklentisi kurulamadı. Belge işlemlerine Python araçlarıyla devam edebilirsiniz.</value></data>
 </root>
