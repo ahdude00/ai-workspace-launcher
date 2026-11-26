@@ -100,7 +100,7 @@ public sealed partial class NamedPipeLaunchRequestSource(ILogger<NamedPipeLaunch
             {
                 return;
             }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or OperationCanceledException)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or OperationCanceledException or InvalidDataException)
             {
                 // A client that disconnects or stalls must not stop the listener.
                 LogConnectionFailed(logger, ex.HResult);
@@ -145,7 +145,12 @@ public sealed partial class NamedPipeLaunchRequestSource(ILogger<NamedPipeLaunch
                 break;
             }
         }
-        return length > MaxMessageBytes ? null : Decode(buffer.AsSpan(0, length));
+        if (length > MaxMessageBytes)
+        {
+            // The peer may still be writing. Close the pipe without waiting for it to read a reply.
+            throw new InvalidDataException("Launch message exceeds the size limit.");
+        }
+        return Decode(buffer.AsSpan(0, length));
     }
 
     internal static byte[] Encode(LaunchRequest request) =>
