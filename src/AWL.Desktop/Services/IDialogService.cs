@@ -24,4 +24,7 @@ public interface IDialogService
 
     /// <summary>Shows the About screen.</summary>
     void ShowAbout();
+
+    /// <summary>Shows the Settings screen.</summary>
+    void ShowSettings();
 }

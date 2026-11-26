@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Runtime.InteropServices;
 using AWL.Core.Claude;
 using AWL.Core.Diagnostics;
 using AWL.Core.Python;
@@ -26,8 +24,7 @@ public sealed partial class AboutViewModel : ObservableObject
         _package = package;
         _dialogs = dialogs;
         _time = time ?? TimeProvider.System;
-        Versions = new VersionReport(version.Value, claude.Version, python.InstalledVersion,
-            Environment.OSVersion.VersionString, RuntimeInformation.OSArchitecture.ToString());
+        Versions = DiagnosticsExport.Versions(version, claude, python);
         Notices = ThirdPartyNotices.Text;
     }
 
@@ -52,23 +49,10 @@ public sealed partial class AboutViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task SaveDiagnosticsAsync()
     {
-        string name = string.Create(CultureInfo.InvariantCulture, $"AWL-tanilama-{_time.GetLocalNow():yyyyMMdd-HHmm}.zip");
-        if (_dialogs.PickSaveFile(name, Strings.DiagnosticsFileFilter) is not { } destination)
-        {
-            return;
-        }
         IsSaving = true;
         try
         {
-            var result = await _package.SaveAsync(destination, Versions, CancellationToken.None).ConfigureAwait(true);
-            if (result.IsSuccess)
-            {
-                _dialogs.ShowInfo(Strings.DiagnosticsSaved + Environment.NewLine + destination);
-            }
-            else
-            {
-                _dialogs.ShowError(Strings.DiagnosticsSaveFailed);
-            }
+            await DiagnosticsExport.RunAsync(_dialogs, _package, Versions, _time).ConfigureAwait(true);
         }
         finally
         {

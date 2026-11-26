@@ -90,7 +90,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         await Task.Run(async () =>
         {
             await _sessions.ReconcileAsync(cancellationToken).ConfigureAwait(false);
-            await _deletion.PurgeExpiredAsync(cancellationToken).ConfigureAwait(false);
+            await _deletion.PurgeExpiredAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         }, cancellationToken).ConfigureAwait(true);
         await RefreshAsync(cancellationToken).ConfigureAwait(true);
     }
@@ -112,6 +112,9 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private void ShowAbout() => _dialogs.ShowAbout();
+
+    [RelayCommand]
+    private void ShowSettings() => _dialogs.ShowSettings();
 
     /// <summary>Shows the new-session window, optionally with a folder already chosen, then opens the session.</summary>
     public async Task NewSessionAsync(string? folder = null)

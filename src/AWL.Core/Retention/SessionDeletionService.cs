@@ -79,18 +79,12 @@ public sealed class SessionDeletionService(ISessionRepository repository, IClaud
     /// <summary>
     /// Startup clean-up (OTR-16): deletes every session that has outlived the retention period and is not open.
     /// </summary>
+    /// <param name="retentionDays">The period to apply; the saved setting when null.</param>
     /// <returns>The number of sessions deleted.</returns>
-    public async Task<int> PurgeExpiredAsync(CancellationToken cancellationToken = default)
+    public async Task<int> PurgeExpiredAsync(int? retentionDays = null, CancellationToken cancellationToken = default)
     {
-        int days = settings.Load().RetentionDays;
-        if (days < RetentionPolicy.MinDays)
-        {
-            return 0;
-        }
-        DateTimeOffset now = clock.UtcNow;
-        var sessions = await repository.ListAsync(cancellationToken).ConfigureAwait(false);
         int deleted = 0;
-        foreach (var session in sessions.Where(session => !IsRunning(session) && RetentionPolicy.IsExpired(session, days, now)))
+        foreach (var session in await ExpiredAsync(retentionDays, cancellationToken).ConfigureAwait(false))
         {
             if ((await DeleteAsync(session.Id, stopIfRunning: false, cancellationToken).ConfigureAwait(false)).IsSuccess)
             {
@@ -98,6 +92,22 @@ public sealed class SessionDeletionService(ISessionRepository repository, IClaud
             }
         }
         return deleted;
+    }
+
+    /// <summary>How many closed sessions a period would remove, so that shortening it can be confirmed first.</summary>
+    public async Task<int> CountExpiredAsync(int retentionDays, CancellationToken cancellationToken = default) =>
+        (await ExpiredAsync(retentionDays, cancellationToken).ConfigureAwait(false)).Count;
+
+    private async Task<IReadOnlyList<Session>> ExpiredAsync(int? retentionDays, CancellationToken cancellationToken)
+    {
+        int days = retentionDays ?? settings.Load().RetentionDays;
+        if (days < RetentionPolicy.MinDays)
+        {
+            return [];
+        }
+        DateTimeOffset now = clock.UtcNow;
+        var sessions = await repository.ListAsync(cancellationToken).ConfigureAwait(false);
+        return [.. sessions.Where(session => !IsRunning(session) && RetentionPolicy.IsExpired(session, days, now))];
     }
 
     private void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
