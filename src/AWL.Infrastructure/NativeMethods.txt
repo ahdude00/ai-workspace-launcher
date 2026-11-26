@@ -1,0 +1,10 @@
+CreatePseudoConsole
+ResizePseudoConsole
+ClosePseudoConsole
+InitializeProcThreadAttributeList
+UpdateProcThreadAttribute
+DeleteProcThreadAttributeList
+CreateProcessW
+CloseHandle
+PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE
+STARTUPINFOEXW
