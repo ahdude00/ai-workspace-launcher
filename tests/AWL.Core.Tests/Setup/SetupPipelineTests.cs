@@ -49,6 +49,24 @@ public sealed class SetupPipelineTests
         settings.DidNotReceiveWithAnyArgs().SetStepStatus(default!, default);
     }
 
+    [Fact]
+    public async Task Optional_failure_is_reported_and_remaining_steps_complete()
+    {
+        var settings = Substitute.For<IAwlSettingsStore>();
+        var optional = Step("document-skills");
+        optional.IsOptional.Returns(true);
+        optional.RunAsync(default).Returns(Result.Fail(new AppError("offline", "offline")));
+        var last = Step("last");
+        var pipeline = new SetupPipeline([optional, last], settings);
+        var updates = new List<(string, SetupProgress)>();
+
+        (await pipeline.RunAsync(_ => { }, (id, state) => updates.Add((id, state)), default)).IsSuccess.ShouldBeTrue();
+
+        updates.ShouldContain(("document-skills", SetupProgress.Failed));
+        settings.Received().SetStepStatus("document-skills", SetupStepStatus.Failed);
+        await last.Received(1).RunAsync(default);
+    }
+
     private static ISetupStep Step(string id)
     {
         var step = Substitute.For<ISetupStep>();

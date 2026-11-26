@@ -95,12 +95,20 @@ public partial class App : Application
                     wizard.Visibility = Visibility.Visible;
                     window.Workspace.Visibility = Visibility.Collapsed;
                 }
+                window.DocumentSkillsWarning.Visibility = Visibility.Collapsed;
                 var summary = new List<string>();
                 var result = await pipeline.RunAsync(line =>
                 {
                     summary.Add(line);
                     LogSetup(logger, line);
-                }, (id, status) => Dispatcher.Invoke(() => wizard.Update(id, status)), stopping);
+                }, (id, status) => Dispatcher.Invoke(() =>
+                {
+                    wizard.Update(id, status);
+                    if (id == "document-skills" && status == SetupProgress.Failed)
+                    {
+                        window.DocumentSkillsWarning.Visibility = Visibility.Visible;
+                    }
+                }), stopping);
                 if (result.IsSuccess || stopping.IsCancellationRequested)
                 {
                     wizard.Visibility = Visibility.Collapsed;
