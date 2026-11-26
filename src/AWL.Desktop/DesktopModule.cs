@@ -26,5 +26,8 @@ internal static class DesktopModule
             .AddSingleton<SessionChangeRelay>()
             .AddSingleton<MainWindowViewModel>()
             .AddSingleton<MainWindow>()
+            // Order follows KUR-03: … configuration, Windows integration, sign-in.
+            .AddSingleton<ISetupStep>(provider => new ShellIntegrationStep(
+                provider.GetRequiredService<AWL.Core.Shell.IShellIntegration>()))
             .AddSingleton<ISetupStep, ClaudeLoginStep>();
 }
