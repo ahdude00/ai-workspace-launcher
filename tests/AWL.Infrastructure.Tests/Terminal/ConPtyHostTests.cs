@@ -43,7 +43,7 @@ public sealed class ConPtyHostTests(ITestOutputHelper output)
             }
             return transcript.ToString();
         });
-        await (await Task.WhenAny(ready.Task, response)).WaitAsync(TimeSpan.FromSeconds(15));
+        await Task.WhenAny(ready.Task, response).WaitAsync(TimeSpan.FromSeconds(15));
         await host.Input.WriteAsync(Encoding.UTF8.GetBytes("ping\r"));
         await host.Input.FlushAsync();
         (await response.WaitAsync(TimeSpan.FromSeconds(15))).ShouldContain(expected);
