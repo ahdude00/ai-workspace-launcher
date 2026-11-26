@@ -22,7 +22,7 @@ public sealed class MainWindowViewModelTests : IDisposable
     public MainWindowViewModelTests()
     {
         _shell.OpenFolder(Arg.Any<string>()).Returns(true);
-        _viewModel = new MainWindowViewModel(_fixture.Service, _fixture.Categories, _dialogs, _shell, _dispatcher, _messenger);
+        _viewModel = new MainWindowViewModel(_fixture.Service, new CategoryService(_fixture.Categories), _dialogs, _shell, _dispatcher, _messenger);
     }
 
     [Fact]
@@ -298,6 +298,26 @@ public sealed class MainWindowViewModelTests : IDisposable
 
         await _viewModel.ToggleArchiveCommand.ExecuteAsync(null);
         _viewModel.SelectedSession.GroupName.ShouldBe(Strings.UncategorizedGroup);
+    }
+
+    [Fact]
+    public async Task Category_changes_regroup_sessions_after_the_manager_closes()
+    {
+        var category = new Category(Guid.NewGuid(), "Raporlar", 0);
+        await _fixture.Categories.AddAsync(category);
+        await SelectAsync(await _fixture.AddAsync("Dava", category.Id));
+        _dialogs.When(d => d.ShowCategoryManager(Arg.Any<CategoryManagerViewModel>())).Do(call =>
+        {
+            var manager = call.Arg<CategoryManagerViewModel>();
+            manager.SelectedCategory = manager.Categories.Single();
+            _dialogs.Confirm(Arg.Any<string>()).Returns(true);
+            manager.DeleteCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+        });
+
+        await _viewModel.ManageCategoriesCommand.ExecuteAsync(null);
+
+        _viewModel.SelectedSession!.GroupName.ShouldBe(Strings.UncategorizedGroup);
+        _fixture.Repository.Items.ShouldHaveSingleItem();
     }
 
     [Fact]

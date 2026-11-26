@@ -15,4 +15,7 @@ public interface IDialogService
 
     /// <summary>Shows the session editor and returns whether the session was saved.</summary>
     bool ShowSessionEditor(ViewModels.SessionEditorViewModel editor);
+
+    /// <summary>Shows the category manager until the user closes it.</summary>
+    void ShowCategoryManager(ViewModels.CategoryManagerViewModel manager);
 }

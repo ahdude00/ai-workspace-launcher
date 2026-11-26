@@ -1,3 +1,4 @@
+using AWL.Core.Categories;
 using AWL.Core.Claude;
 using AWL.Core.Common;
 using AWL.Core.Configuration;
@@ -19,6 +20,7 @@ public static class CoreModule
         ArgumentNullException.ThrowIfNull(services);
         services.TryAddSingleton<ClaudeCommandBuilder>();
         services.TryAddSingleton<SessionService>();
+        services.TryAddSingleton<CategoryService>();
         services.TryAddSingleton<IClock, SystemClock>();
         services.TryAddSingleton<AwlPaths>(_ => AwlPaths.FromEnvironment());
         return services;
