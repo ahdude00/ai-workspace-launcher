@@ -157,4 +157,10 @@
   <data name="ShellMenuText" xml:space="preserve"><value>AWL ile aç</value></data>
   <data name="Step_shell" xml:space="preserve"><value>Sağ tık menüsü</value></data>
   <data name="ShellIntegrationFailed" xml:space="preserve"><value>“AWL ile aç” sağ tık menüsü eklenemedi. Bilgisayarınızdaki bir kısıtlama buna izin vermiyor olabilir; teknik özeti BT ekibinizle paylaşın.</value></data>
+  <data name="DropHint" xml:space="preserve"><value>Dosyaları buraya bırakın: tırnak içindeki tam yolları panoya kopyalanır, Claude penceresine Ctrl+V ile yapıştırabilirsiniz.</value></data>
+  <data name="DropCopied" xml:space="preserve"><value>{0} yol panoya kopyalandı. Claude penceresine Ctrl+V ile yapıştırın.</value></data>
+  <data name="DropSkipped" xml:space="preserve"><value> Bulunamayan {0} öğe atlandı.</value></data>
+  <data name="DropNothingUsable" xml:space="preserve"><value>Bırakılanlar kullanılamadı. Bilgisayarınızdaki var olan dosya veya klasörleri bırakın.</value></data>
+  <data name="DropTooMany" xml:space="preserve"><value>Bir seferde en fazla 100 dosya bırakabilirsiniz.</value></data>
+  <data name="DropZoneName" xml:space="preserve"><value>Dosya bırakma alanı</value></data>
 </root>

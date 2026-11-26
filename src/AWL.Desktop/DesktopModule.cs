@@ -25,6 +25,7 @@ internal static class DesktopModule
             .AddSingleton<LaunchRequestCoordinator>()
             .AddSingleton<SessionChangeRelay>()
             .AddSingleton<MainWindowViewModel>()
+            .AddSingleton<DropZoneViewModel>()
             .AddSingleton<MainWindow>()
             // Order follows KUR-03: … configuration, Windows integration, sign-in.
             .AddSingleton<ISetupStep>(provider => new ShellIntegrationStep(
