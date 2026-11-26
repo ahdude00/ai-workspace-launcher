@@ -20,6 +20,7 @@ public sealed partial class NamedPipeLaunchRequestSource(ILogger<NamedPipeLaunch
     internal const int MaxMessageBytes = 64 * 1024;
 
     private static readonly TimeSpan ReadTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(50);
 
     public event EventHandler<LaunchRequest>? RequestReceived;
 
@@ -34,20 +35,46 @@ public sealed partial class NamedPipeLaunchRequestSource(ILogger<NamedPipeLaunch
     {
         ArgumentNullException.ThrowIfNull(request);
         using var cancel = new CancellationTokenSource(timeout);
-        try
+        byte[] message = Encode(request);
+        // The listener serves one client at a time and briefly has no pipe between two clients;
+        // a connection that fails in that gap is tried again until the timeout.
+        while (true)
         {
-            // CurrentUserOnly also verifies that the server belongs to this user.
-            await using var client = new NamedPipeClientStream(".", pipeName ?? InstanceNames.Pipe, PipeDirection.InOut,
-                PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
-            await client.ConnectAsync(cancel.Token).ConfigureAwait(false);
-            await client.WriteAsync(Encode(request), cancel.Token).ConfigureAwait(false);
-            await client.FlushAsync(cancel.Token).ConfigureAwait(false);
-            var answer = new byte[1];
-            return await client.ReadAsync(answer, cancel.Token).ConfigureAwait(false) == 1;
-        }
-        catch (Exception ex) when (ex is OperationCanceledException or IOException or UnauthorizedAccessException or TimeoutException)
-        {
-            return false;
+            try
+            {
+                // CurrentUserOnly also verifies that the server belongs to this user.
+                await using var client = new NamedPipeClientStream(".", pipeName ?? InstanceNames.Pipe, PipeDirection.InOut,
+                    PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
+                await client.ConnectAsync(cancel.Token).ConfigureAwait(false);
+                await client.WriteAsync(message, cancel.Token).ConfigureAwait(false);
+                await client.FlushAsync(cancel.Token).ConfigureAwait(false);
+                var answer = new byte[1];
+                if (await client.ReadAsync(answer, cancel.Token).ConfigureAwait(false) == 1)
+                {
+                    return true;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return false;
+            }
+            catch (Exception ex) when (ex is IOException or TimeoutException)
+            {
+                // Retried below.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // A pipe of another user (or a squatter) answers this name: never send to it.
+                return false;
+            }
+            try
+            {
+                await Task.Delay(RetryDelay, cancel.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                return false;
+            }
         }
     }
 
