@@ -1,6 +1,8 @@
 using System.IO;
 using System.Windows;
 using AWL.Desktop.Resources;
+using AWL.Desktop.ViewModels;
+using AWL.Desktop.Views;
 using Microsoft.Win32;
 
 namespace AWL.Desktop.Services;
@@ -24,7 +26,20 @@ internal sealed class WpfDialogService : IDialogService
         return dialog.ShowDialog(Owner) == true ? dialog.FolderName : null;
     }
 
-    private static Window? Owner => Application.Current?.MainWindow is { IsVisible: true } window ? window : null;
+    public bool ShowSessionEditor(SessionEditorViewModel editor)
+    {
+        var window = new SessionEditorWindow(editor);
+        if (Owner is { } owner)
+        {
+            window.Owner = owner;
+        }
+        return window.ShowDialog() == true;
+    }
+
+    // The active window (for example an open editor) owns new dialogs; otherwise the main window does.
+    private static Window? Owner =>
+        Application.Current?.Windows.OfType<Window>().FirstOrDefault(window => window.IsActive)
+        ?? (Application.Current?.MainWindow is { IsVisible: true } main ? main : null);
 
     private static MessageBoxResult Show(string message, MessageBoxButton buttons, MessageBoxImage image) =>
         Owner is { } owner

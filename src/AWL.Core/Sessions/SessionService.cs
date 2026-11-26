@@ -167,20 +167,26 @@ public sealed class SessionService : IDisposable
         {
             return Result.Fail<Session>(error);
         }
-        var session = await _repository.GetAsync(sessionId, cancellationToken).ConfigureAwait(false);
-        if (session is null)
-        {
-            return Result.Fail<Session>(Errors.SessionNotFound);
-        }
-
-        var moved = session with { WorkspacePath = Path.GetFullPath(workspacePath) };
-        if (!await _repository.UpdateAsync(moved, cancellationToken).ConfigureAwait(false))
-        {
-            return Result.Fail<Session>(Errors.SessionNotFound);
-        }
-        RaiseChanged();
-        return Result.Ok(moved);
+        string folder = Path.GetFullPath(workspacePath);
+        return await ModifyAsync(sessionId, session => session with { WorkspacePath = folder }, cancellationToken)
+            .ConfigureAwait(false);
     }
+
+    /// <summary>Renames a session and changes its category (OTR-10).</summary>
+    public async Task<Result<Session>> UpdateDetailsAsync(Guid sessionId, string title, Guid? categoryId,
+        CancellationToken cancellationToken = default)
+    {
+        if (ValidateTitle(title) is { } error)
+        {
+            return Result.Fail<Session>(error);
+        }
+        return await ModifyAsync(sessionId, session => session with { Title = title.Trim(), CategoryId = categoryId },
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>Moves a session to or from the archive (OTR-10). Archiving keeps all of its history.</summary>
+    public Task<Result<Session>> SetArchivedAsync(Guid sessionId, bool archived, CancellationToken cancellationToken = default) =>
+        ModifyAsync(sessionId, session => session with { IsArchived = archived }, cancellationToken);
 
     /// <summary>
     /// Startup reconciliation (OTR-15): the last activity of every session is taken from the modification
@@ -206,6 +212,23 @@ public sealed class SessionService : IDisposable
             RaiseChanged();
         }
         return changed;
+    }
+
+    private async Task<Result<Session>> ModifyAsync(Guid sessionId, Func<Session, Session> change,
+        CancellationToken cancellationToken)
+    {
+        var session = await _repository.GetAsync(sessionId, cancellationToken).ConfigureAwait(false);
+        if (session is null)
+        {
+            return Result.Fail<Session>(Errors.SessionNotFound);
+        }
+        var changed = change(session);
+        if (changed != session && !await _repository.UpdateAsync(changed, cancellationToken).ConfigureAwait(false))
+        {
+            return Result.Fail<Session>(Errors.SessionNotFound);
+        }
+        RaiseChanged();
+        return Result.Ok(changed);
     }
 
     private async Task<Result<OpenOutcome>> LaunchAsync(Session session, LaunchMode mode, CancellationToken cancellationToken)

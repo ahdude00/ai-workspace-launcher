@@ -233,6 +233,74 @@ public sealed class MainWindowViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task New_session_is_created_selected_and_opened()
+    {
+        await _fixture.AddAsync("Mevcut");
+        await _viewModel.RefreshAsync();
+        _viewModel.ShowToolsCommand.Execute(null);
+        _dialogs.ShowSessionEditor(Arg.Any<SessionEditorViewModel>()).Returns(call =>
+        {
+            var editor = call.Arg<SessionEditorViewModel>();
+            editor.WorkspacePath.ShouldBe(_fixture.Root);
+            editor.Title = "Yeni Dava";
+            editor.SaveCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+            return editor.SavedSession is not null;
+        });
+
+        await _viewModel.NewSessionAsync(_fixture.Root);
+
+        _viewModel.SelectedSession!.Title.ShouldBe("Yeni Dava");
+        _viewModel.IsSessionsPage.ShouldBeTrue();
+        _fixture.Launches.ShouldHaveSingleItem().Arguments[0].ShouldBe("--session-id");
+    }
+
+    [Fact]
+    public async Task Cancelled_new_session_changes_nothing()
+    {
+        _dialogs.ShowSessionEditor(Arg.Any<SessionEditorViewModel>()).Returns(false);
+
+        await _viewModel.NewSessionCommand.ExecuteAsync(null);
+
+        _fixture.Repository.Items.ShouldBeEmpty();
+        _fixture.Launches.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Edit_opens_the_editor_for_the_selected_session_and_refreshes()
+    {
+        var session = await _fixture.AddAsync("Eski");
+        await SelectAsync(session);
+        _dialogs.ShowSessionEditor(Arg.Any<SessionEditorViewModel>()).Returns(call =>
+        {
+            var editor = call.Arg<SessionEditorViewModel>();
+            editor.IsNew.ShouldBeFalse();
+            editor.Title = "Yeni";
+            editor.SaveCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+            return true;
+        });
+
+        await _viewModel.EditCommand.ExecuteAsync(null);
+
+        _viewModel.SelectedSession!.Title.ShouldBe("Yeni");
+        _fixture.Launches.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Archive_toggles_and_moves_the_session_between_groups()
+    {
+        await SelectAsync(await _fixture.AddAsync("Dava"));
+        _viewModel.SelectedSession!.ArchiveActionText.ShouldBe(Strings.ArchiveButton);
+
+        await _viewModel.ToggleArchiveCommand.ExecuteAsync(null);
+        _viewModel.SelectedSession.GroupName.ShouldBe(Strings.ArchiveGroup);
+        _viewModel.SelectedSession.State.ShouldBe(SessionState.Archived);
+        _viewModel.SelectedSession.ArchiveActionText.ShouldBe(Strings.UnarchiveButton);
+
+        await _viewModel.ToggleArchiveCommand.ExecuteAsync(null);
+        _viewModel.SelectedSession.GroupName.ShouldBe(Strings.UncategorizedGroup);
+    }
+
+    [Fact]
     public void Navigation_switches_between_sessions_and_tools()
     {
         _viewModel.IsSessionsPage.ShouldBeTrue();
